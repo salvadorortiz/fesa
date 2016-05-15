@@ -5,15 +5,20 @@
 {% block breadcrumbs %}
    <!--  <li><a href="#">Inicio</a></li>
     <li class="active">Ingresar</li> -->
+    <li class="active">
+	    <i class="fa fa-file"></i> Prueba breadcrumbs
+	</li>
 {% endblock %}
-          
+
+{% block pagetitle %} Titulo :3c{% endblock %} 
+{% block subheading %} Por si queremos subtitulo{% endblock %}
 
 {% block content %}
 	{% csrf_token %}
     <div class="row">
         <h1>Este será el index</h1>
     </div>
-	
+	Prueba del content en template
 {% endblock %}
 
 {% block addExtraScript %} 
