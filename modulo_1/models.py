@@ -60,9 +60,9 @@ class Cliente(models.Model):
 	codigo = models.CharField('Código',max_length=20,blank=True,null=True,default='')
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 	DUI = models.CharField('DUI',max_length=10,blank=True,null=True,default='')
-	telefono = models.CharField('Teléfono', max_length=50, validators=[phone_regex], blank=False)
-	telefono_alterno = models.CharField('Teléfono alterno', max_length=50, validators=[phone_regex], blank=True)
-	correo = models.EmailField('Correo electrónico', max_length=60, blank=True, validators=[validate_email])
+	telefono = models.CharField('Teléfono', max_length=15, validators=[phone_regex], blank=False)
+	telefono_alterno = models.CharField('Teléfono alterno', max_length=15, validators=[phone_regex], blank=True,null=True)
+	correo = models.EmailField('Correo electrónico', max_length=60, blank=True, validators=[validate_email],null=True)
 	direccion = models.TextField('Dirección', max_length=250, blank=True)
 
 class Empresa(models.Model):

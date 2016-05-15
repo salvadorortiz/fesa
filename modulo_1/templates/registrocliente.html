@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Registro de cliente natural {% endblock %}
+
+{% block breadcrumbs %}
+   <!--  <li><a href="#">Inicio</a></li>
+    <li class="active">Ingresar</li> -->
+    <li class="active">
+	    <i class="fa fa-file"></i> Registro
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Cliente natural{% endblock %} 
+{% block subheading %}{% endblock %}
+
+{% block content %}
+	{% csrf_token %}
+    {% load widget_tweaks %}
+    <div class="row"> 
+        <form id="cliente_form">
+        <div class="col-sm-12">
+             <div class="col-sm-1">
+                Código:
+            </div>
+            <div class="col-sm-2">
+                 <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+                        {{cliente_form.codigo|add_class:"form-control"}}
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <strong>Nombre:</strong>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-child"></i></span>
+                        {{cliente_form.nombre|add_class:"form-control"}}
+                </div>
+                
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Información personal</h3>
+                </div>
+                 <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-1">
+                                <strong>Dirección:</strong>
+                            </div>
+                            <div class="col-sm-11">
+                                {% render_field cliente_form.direccion class+="form-control" resize="none" rows="2" placeholder="Dirección" %}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12">
+                             <div class="col-sm-1">
+                                DUI:
+                            </div>
+                            <div class="col-sm-3">
+                                {{cliente_form.DUI|add_class:"form-control"}}
+                            </div>
+                            <div class="col-sm-1">
+                                <strong>Teléfono:</strong>
+                            </div>
+                            <div class="col-sm-3">
+                                {{cliente_form.telefono|add_class:"form-control"}}
+                            </div>
+                             <div class="col-sm-1">
+                                Otro teléfono:
+                            </div>
+                            <div class="col-sm-3">
+                                {{cliente_form.telefono_alterno|add_class:"form-control"}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                             <div class="col-sm-2">
+                                Correo electrónico:
+                            </div>
+                            <div class="col-sm-9">
+                                 <div class="form-group input-group">
+                                    <span class="input-group-addon">@</span>
+                                    {{cliente_form.correo|add_class:"form-control"}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="col-sm-12">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <center>
+                <button type="button" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-default">Cancelar</button>
+                </center>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+   $(window).load(function() {
+        $('#id_telefono').mask('(000) 0000-0000', {placeholder: "(___) ____-____"});
+        $('#id_telefono_alterno').mask('(000) 0000-0000', {placeholder: "(___) ____-____"});
+        //$('#id_correo').mask('(000) 000-0000');
+    });
+</script>
+{% endblock %}

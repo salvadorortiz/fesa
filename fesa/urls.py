@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from modulo_1 import registro_urls as registro_urls
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$','fesa.views.login', name='login'),
     url(r'^home','fesa.views.home', name='home'),
+    url(r'^registro/', include(registro_urls)),
 ]
