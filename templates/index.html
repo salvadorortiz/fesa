@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Ingresar {% endblock %}
+
+{% block breadcrumbs %}
+   <!--  <li><a href="#">Inicio</a></li>
+    <li class="active">Ingresar</li> -->
+{% endblock %}
+          
+
+{% block content %}
+	{% csrf_token %}
+    <div class="row">
+        <h1>Este será el index</h1>
+    </div>
+	
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+	
+</script>
+{% endblock %}
