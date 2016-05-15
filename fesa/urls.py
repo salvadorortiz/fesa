@@ -18,5 +18,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^$','fesa.views.home', name='home'),
+    url(r'^$','fesa.views.login', name='login'),
+    url(r'^home','fesa.views.home', name='home'),
 ]
