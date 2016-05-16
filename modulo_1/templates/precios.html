@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Guía de precios {% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">
+	    <i class="fa fa-usd"></i> Precios
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Guía de precios{% endblock %} 
+{% block subheading %}{% endblock %}
+
+{% block content %}
+	{% csrf_token %}
+    <div class="row"> 
+        <div class="col-sm-12">
+            <table id="dt_precios">
+                <thead>
+                    <th>Complejo</th>
+                    <th>Cancha</th>
+                    <th>Precio</th>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Guazapa</td>
+                        <td>Fútbol 11</td>
+                        <td>$15.99</td>
+                    </tr>
+                    <tr>
+                        <td>Santa Tecla</td>
+                        <td>Fútbol 8</td>
+                        <td>$14.99</td>
+                    </tr>
+                    <tr>
+                        <td>Bengoa</td>
+                        <td>Basketball</td>
+                        <td>$17.99</td>
+                    </tr>
+                </tbody>
+            </table>             
+        </div>
+        <hr>
+        <div class="col-sm-12">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <center>
+                <button type="button" class="btn btn-primary">Guardar</button>
+                </center>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+   $(window).load(function() {
+       $('#dt_precios').DataTable({
+            "pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+    });
+</script>
+{% endblock %}
