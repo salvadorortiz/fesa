@@ -19,14 +19,14 @@ class Usuario(models.Model):
 	user = models.CharField('Nombre',max_length=50,blank=False,null=False,default='')
 	password = models.CharField('Contraseña',max_length=50,blank=False,null=False,default='123')
 	
-	def __str__(self):
+	def __unicode__(self):
 		return self.nombre
 
 class Complejo(models.Model):
 	complejo_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.nombre
 
 class HorarioComplejo(models.Model):
@@ -52,7 +52,7 @@ class Cancha(models.Model):
 	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	horas_posibles = models.IntegerField('Horas posibles', blank=True, default=0)
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.nombre
 
 class Cliente(models.Model):
@@ -65,6 +65,9 @@ class Cliente(models.Model):
 	correo = models.EmailField('Correo electrónico', max_length=60, blank=True, validators=[validate_email],null=True)
 	direccion = models.TextField('Dirección', max_length=250, blank=True)
 
+	def __unicode__(self):
+		return self.nombre
+
 class Empresa(models.Model):
 	empresa_id = models.AutoField(primary_key=True)
 	codigo = models.CharField('Código',max_length=20,blank=True,null=True,default='')
@@ -76,17 +79,29 @@ class Empresa(models.Model):
 	telefono_contacto = models.CharField('Teléfono de contacto', max_length=50, validators=[phone_regex], blank=False, null=False)
 	correo_contacto = models.EmailField('Correo electrónico de contacto', max_length=60, blank=True, validators=[validate_email])
 
+	def __unicode__(self):
+		return self.nombre
+
 class FormaPago(models.Model):
 	forma_pago_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
+
+	def __unicode__(self):
+		return self.nombre
 
 class FormaFacturacion(models.Model):
 	forma_facturacion_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 
+	def __unicode__(self):
+		return self.nombre
+
 class TipoAlquiler(models.Model):
 	tipo_alquiler_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
+
+	def __unicode__(self):
+		return self.nombre
 
 class Reserva(models.Model):
 	ESTADO = 	(
@@ -106,6 +121,9 @@ class Reserva(models.Model):
 	remesado = models.DecimalField('Remesado',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	remanente = models.DecimalField('Remanente',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
+
+	def __unicode__(self):
+		return self.nombre_evento
 
 class ReservaCancha(models.Model):
 	reserva_cancha_id = models.AutoField(primary_key=True)

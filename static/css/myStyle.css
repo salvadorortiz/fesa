@@ -112,24 +112,29 @@
     height: 600px;
 }
 /*------------------------------------------------CUSTOMIZE THE CAROUSEL--------------------------------------------- */
-/*------------------------------------------------CORRECCION DE FOOTER -----------------------------------------------*/
-html, body {
-  height: 100%;
+
+/*------------------------------------------------Datatables Style ---------------------------------------*/
+.button-row {
+    display: table;
+    margin-top: 5px;
 }
 
-#wrap {
-  min-height: 96%;
+.button-row-li{
+    display: table-cell;
+    border-left: 0.4rem solid white;
 }
-
-#main {
-  /*overflow:auto;*/
-  padding-bottom:150px; /* this needs to be bigger than footer height*/
+.filareq-selected{
+    background-color: #ECF6CE;
 }
-
-.footer {
-  position: relative;
-  margin-top: -150px; /* negative value of footer height */
-  height: 150px;
-  clear:both;
-  padding-top:20px;
+.filarev-selected{
+    background-color: #ECF6CE;
+}
+.filacam-selected{
+    background-color: #ECF6CE;
+}
+.filacom-selected{
+    background-color: #ECF6CE;
+}
+.fileinput-upload-button{
+    display: none;
 }

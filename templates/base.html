@@ -16,7 +16,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
     <!-- DataTables Style -->
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.11/css/jquery.dataTables.css">
-
     <!-- JS -->
     <!-- jQuery -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -36,22 +35,25 @@
     <!-- DataTables JavaScript -->
     <script type="text/javascript" src="https://cdn.datatables.net/t/bs/dt-1.10.11/datatables.min.js"></script>
 
+    <!-- DataTables JavaScript -->
+    <script src="{% static 'js/validaciones_form.js' %}"></script>
+
     <!--Icono de la aplicación-->
     <link rel="icon" href="{% static 'img/icono.ico' %}">
     
     <title>{% block title %} Base {% endblock %}</title>
 
-    {% block addExtraStyle %}
-        <style type="text/css">
-            #notificaciones{
-                position: fixed;
-                right:0px; 
-                top:15%; 
-                width: 30%;
-                z-index: 3;
-            }
-        </style>
-    {% endblock %}
+    
+    <style type="text/css">
+        #notificaciones{
+            position: fixed;
+            right:0px; 
+            top:15%; 
+            width: 30%;
+            z-index: 3;
+        }
+    </style>
+    {% block addExtraStyle %} {% endblock %}
     {% block addExtraScript %} {% endblock %}
 </head>
 

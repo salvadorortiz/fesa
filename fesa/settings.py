@@ -102,16 +102,24 @@ DATABASES = {
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
+DEFAULT_CONTENT_TYPE = 'text/html'
+
+DEFAULT_CHARSET = 'utf-8'
+
+CLIENT_ENCODING = 'UTF8'
 
 LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'America/El_Salvador'
 
+DECIMAL_SEPARATOR = '.'
+
 USE_I18N = True
 
-USE_L10N = True
+USE_L10N = False
 
-USE_TZ = True
+USE_TZ = False  
+
 
 
 # Static files (CSS, JavaScript, Images)

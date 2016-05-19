@@ -10,45 +10,67 @@
 
 {% block pagetitle %} Guía de precios{% endblock %} 
 {% block subheading %}{% endblock %}
+{% block addExtraStyle %} 
+<style type="text/css">
+    .fila-selected{
+        background-color: #ECF6CE;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 	{% csrf_token %}
     <div class="row"> 
         <div class="col-sm-12">
-            <table id="dt_precios">
-                <thead>
-                    <th>Complejo</th>
-                    <th>Cancha</th>
-                    <th>Precio</th>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Guazapa</td>
-                        <td>Fútbol 11</td>
-                        <td>$15.99</td>
-                    </tr>
-                    <tr>
-                        <td>Santa Tecla</td>
-                        <td>Fútbol 8</td>
-                        <td>$14.99</td>
-                    </tr>
-                    <tr>
-                        <td>Bengoa</td>
-                        <td>Basketball</td>
-                        <td>$17.99</td>
-                    </tr>
-                </tbody>
-            </table>             
-        </div>
-        <hr>
-        <div class="col-sm-12">
-            <div class="col-sm-3"></div>
-            <div class="col-sm-6">
-                <center>
-                <button type="button" class="btn btn-primary">Guardar</button>
-                </center>
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#requi_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-usd"></i> &nbsp;Guía de precios</label>
+                <a href="#" onclick="$('#dt_precios').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
             </div>
-            <div class="col-sm-3"></div>
+            <div id="requi_toggle" class="collapse in col-sm-12">
+                <table id="dt_precios">
+                    <thead>
+                        <th>Cancha_id</th>
+                        <th>Complejo</th>
+                        <th>Cancha</th>
+                        <th>Precio</th>
+                        <th>Acciones</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+            <div class="col-sm-12">
+                <div class="col-sm-5">Complejo:</div>
+                <div class="col-sm-5">Cancha:</div>
+                <div class="col-sm-2"><b>Precio:</b></div>
+            </div>
+            <div class="col-sm-12">
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" id="txt_complejo" disabled/>
+                </div>
+                <div class="col-sm-5">
+                    <input type="text" class="form-control" id="txt_cancha" disabled/>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-usd"></i></span>
+                        <input type="text" class="form-control" id="txt_precio"/>
+                    </div>
+                </div>
+            </div>        
+            <div class="col-sm-12">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <center>
+                    <button type="button" class="btn btn-primary" id="btn_guardar">Guardar</button>
+                    <button type="button" class="btn btn-default" id="btn_cancelar">Cancelar</button>
+                    </center>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -56,12 +78,27 @@
 {% block addExtraScript %} 
 <script type="text/javascript">
    $(window).load(function() {
-       $('#dt_precios').DataTable({
+        var id_cancha=-1;
+        var dt_precios = $('#dt_precios').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_vista_precios' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
             "pageLength": 10,
             "ordering": true,
             "lengthChange": true,
             "searching": true,
             "paging": true,
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"35%"},
+                {"targets":2, "width":"35%"},
+                {"targets":3, "width":"20%"},
+                {"targets": 4 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
                 "zeroRecords": "No se encontraron resultados",
@@ -74,6 +111,47 @@
                 },
             }
         });
+
+        $(document).on('click', "[name=edit_precio]",function(){
+            $('#dt_precios').DataTable().$('tr.fila-selected').removeClass('fila-selected');
+            $(this).parent().parent().parent().addClass('fila-selected');
+            var data = $('#dt_precios').DataTable().rows('.fila-selected').data()
+            console.log(data);
+            $('#txt_complejo').val(data[0][1]);
+            $('#txt_cancha').val(data[0][2]);
+            $('#txt_precio').val(String(data[0][3]).replace('$',''));
+            id_cancha=data[0][0];
+        });
+
+        $('#btn_cancelar').on('click', function(){
+            $('#txt_complejo').val("");
+            $('#txt_cancha').val("");
+            $('#txt_precio').val("");
+            id_cancha=-1;
+        });
+
+        $('#btn_guardar').on('click', function(){
+            if(id_cancha!=-1){
+                jQuery.ajax({
+                    url:"{%url 'guardar_precio' %}",
+                    type:"POST",
+                    processData:false,  
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+id_cancha+"&precio="+$('#txt_precio').val(),
+                    success:function(json){
+                        dt_precios.ajax.reload();
+                        create_alert("<li>Precio actualizado con éxito</li>","EXITO","notificaciones",true,5000);
+                    }
+                }); 
+
+                $('#txt_complejo').val("");
+                $('#txt_cancha').val("");
+                $('#txt_precio').val("");
+                id_cancha=-1;
+            }else{
+                create_alert("<li>Seleccione una cancha para actualizar su precio</li>","ERROR","notificaciones",true,5000);
+            }
+        });
     });
+
 </script>
 {% endblock %}
