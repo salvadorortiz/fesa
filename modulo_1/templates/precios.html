@@ -11,11 +11,6 @@
 {% block pagetitle %} Guía de precios{% endblock %} 
 {% block subheading %}{% endblock %}
 {% block addExtraStyle %} 
-<style type="text/css">
-    .fila-selected{
-        background-color: #ECF6CE;
-    }
-</style>
 {% endblock %}
 
 {% block content %}
@@ -113,9 +108,9 @@
         });
 
         $(document).on('click', "[name=edit_precio]",function(){
-            $('#dt_precios').DataTable().$('tr.fila-selected').removeClass('fila-selected');
-            $(this).parent().parent().parent().addClass('fila-selected');
-            var data = $('#dt_precios').DataTable().rows('.fila-selected').data()
+            $('#dt_precios').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_precios').DataTable().rows('.selected').data()
             console.log(data);
             $('#txt_complejo').val(data[0][1]);
             $('#txt_cancha').val(data[0][2]);

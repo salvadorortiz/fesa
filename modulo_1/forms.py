@@ -4,7 +4,7 @@ from django.forms.fields import CharField
 from django.forms import ModelForm,Textarea
 
 class ClienteForm(ModelForm):
-	your_name = forms.CharField(label='Your name', max_length=100)
+	#your_name = forms.CharField(label='Your name', max_length=100)
 
 	class Meta:
 		model = Cliente

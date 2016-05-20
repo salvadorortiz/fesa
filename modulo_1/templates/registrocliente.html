@@ -13,11 +13,42 @@
 {% block pagetitle %} Cliente natural{% endblock %} 
 {% block subheading %}{% endblock %}
 
+
 {% block content %}
 	{% csrf_token %}
     {% load widget_tweaks %}
     <div class="row"> 
+        <div class="col-sm-12">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#clientes_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-child"></i> &nbsp;Registro de clientes</label>
+                <a href="#" onclick="$('#dt_clientes').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+             <div id="clientes_toggle" class="collapse in col-sm-12">
+                    <table id="dt_clientes">
+                        <thead>
+                            <th>Id cliente</th>
+                            <th>Código</th>
+                            <th>Nombre </th>
+                            <th>Teléfono</th>
+                            <th>Correo electrónico</th>
+                            <th>Acciones</th>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+            </div>
+                
+        </div>
+        <hr>
+        <br>
+        <div class="col-sm-12">
+            <div id="div_errores"></div>
+        </div>
         <form id="cliente_form">
+            <input type="hidden" value="" name="id_cliente" />
         <div class="col-sm-12">
              <div class="col-sm-1">
                 Código:
@@ -99,8 +130,9 @@
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <center>
-                <button type="button" class="btn btn-primary">Guardar</button>
-                <button type="button" class="btn btn-default">Cancelar</button>
+                <button type="button" id="guardar_cliente" class="btn btn-primary">Guardar</button>
+                 <button type="button" id="guardar_cambios_cliente" style="display:none" class="btn btn-primary">Guardar Cambios</button>
+                <button type="button" id="cancelar_cliente" style="display:none" class="btn btn-default">Cancelar</button>
                 </center>
             </div>
             <div class="col-sm-3"></div>
@@ -112,9 +144,152 @@
 {% block addExtraScript %} 
 <script type="text/javascript">
    $(window).load(function() {
+    //------------------------------------------------------------------------------
+        var dt_clientes = $('#dt_clientes').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_clientes' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            "pageLength": 5,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"30%"},
+                {"targets":2, "width":"20%"},
+                {"targets":3, "width":"20%"},
+                {"targets":4, "width":"20%"},
+                {"targets": 5 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_cliente\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+         $("#dt_clientes").on('click', "[name=edit_cliente]",function(){
+           // alert("click");
+            $('#dt_clientes').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_clientes').DataTable().rows('.selected').data();
+            jQuery.ajax({
+                url: "{%url 'cargar_cliente'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cliente="+data[0][0].toString(),
+                success: function(json){
+                    $("[name=id_cliente]").val(json['cliente'][0]);
+                    $("#id_codigo").val(json['cliente'][1]);
+                    $("#id_nombre").val(json['cliente'][2]);
+                    $("#id_direccion").val(json['cliente'][3]);
+                    $("#id_DUI").val(json['cliente'][4]);
+                    $("#id_telefono").val(json['cliente'][5]);
+                    $("#id_telefono_alterno").val(json['cliente'][6]);
+                    $("#id_correo").val(json['cliente'][7]);
+                    $("#guardar_cambios_cliente").show();
+                    $("#cancelar_cliente").show();
+                    $("#guardar_cliente").hide();
+                }
+            });
+           /* console.log(data);
+            $('#txt_complejo').val(data[0][1]);
+            $('#txt_cancha').val(data[0][2]);
+            $('#txt_precio').val(String(data[0][3]).replace('$',''));
+            id_cancha=data[0][0];*/
+        });
+
+         $("#cancelar_cliente").on('click',function(){
+               $("#cliente_form").find("[id^='id_']").val('');
+               $('#dt_clientes').DataTable().$('tr.selected').removeClass('selected');
+               $("#guardar_cambios_cliente").hide();
+               $("#cancelar_cliente").hide();
+               $("#guardar_cliente").show();
+         });
+
+    //------------------------------------------------------------------------------
         $('#id_telefono').mask('(000) 0000-0000', {placeholder: "(___) ____-____"});
         $('#id_telefono_alterno').mask('(000) 0000-0000', {placeholder: "(___) ____-____"});
+        $('#id_DUI').mask('00000000-0', {placeholder: "________-_"});
         //$('#id_correo').mask('(000) 000-0000');
+         $("#id_direccion").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 250, // Characters limit
+            status: true, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+          $("#id_nombre").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 100, // Characters limit
+            status: false, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+          //---------------------------------------------------------------------------
+             $("#guardar_cliente").on('click',function(){
+                //alert("entro");
+                 jQuery.ajax({
+                    url: "{%url 'guardar_cliente'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(cliente_form).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#div_errores").html('');
+                            create_alert("<li>Cliente ingresado con éxito </li>","EXITO","notificaciones",true,5000);
+                            $("#dt_clientes").DataTable().ajax.reload();
+                        }else{
+                            show_errors(json, 'div_errores');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });
+
+            $("#guardar_cambios_cliente").on('click',function(){
+                //alert("entro");
+                 jQuery.ajax({
+                    url: "{%url 'guardar_cambios_cliente'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(cliente_form).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#div_errores").html('');
+                            create_alert("<li>Cliente actualizado con éxito </li>","EXITO","notificaciones",true,5000);
+                            $("#dt_clientes").DataTable().ajax.reload();
+                            $("#cancelar_cliente").click();
+                        }else{
+                            show_errors(json, 'div_errores');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });
     });
 </script>
 {% endblock %}

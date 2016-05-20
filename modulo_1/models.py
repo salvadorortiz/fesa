@@ -2,7 +2,7 @@
 from django.db import models
 from django.core.validators  import validate_email, RegexValidator
 
-phone_regex = RegexValidator(regex=r'^(([(][0-9]+[)])( |[0-9-]+)+([ ](ext|EXT)[ ][0-9]+)(,|-)?)+$' , message= "El teléfono no cumple con un formato válido: (503) 2256 45 54 EXT 123 ó (503) 2256-4554 EXT 123")
+phone_regex = RegexValidator(regex=r'^([(][0-9]+[)]) ([0-9-][0-9][0-9][0-9]-[0-9][0-9][0-9][0-9])$' , message= "El teléfono no cumple con un formato válido")
 
 class Usuario(models.Model):
 	TIPO = 	(
@@ -60,10 +60,10 @@ class Cliente(models.Model):
 	codigo = models.CharField('Código',max_length=20,blank=True,null=True,default='')
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 	DUI = models.CharField('DUI',max_length=10,blank=True,null=True,default='')
-	telefono = models.CharField('Teléfono', max_length=15, validators=[phone_regex], blank=False)
+	telefono = models.CharField('Teléfono', max_length=15, validators=[phone_regex], blank=False, null=False)
 	telefono_alterno = models.CharField('Teléfono alterno', max_length=15, validators=[phone_regex], blank=True,null=True)
 	correo = models.EmailField('Correo electrónico', max_length=60, blank=True, validators=[validate_email],null=True)
-	direccion = models.TextField('Dirección', max_length=250, blank=True)
+	direccion = models.TextField('Dirección', max_length=250, blank=True, null=True)
 
 	def __unicode__(self):
 		return self.nombre

@@ -31,6 +31,7 @@
     <script src="{% static 'js/jquery.flot.pie.js' %}"></script>
     <script src="{% static 'js/flot-data.js' %}"></script>
     <script src="{% static 'js/jquery.mask.js' %}"></script>
+    <script src="{% static 'js/jquery.maxlength.js' %}"></script>
 
     <!-- DataTables JavaScript -->
     <script type="text/javascript" src="https://cdn.datatables.net/t/bs/dt-1.10.11/datatables.min.js"></script>
@@ -51,6 +52,9 @@
             top:15%; 
             width: 30%;
             z-index: 3;
+        }
+        .selected{
+            background-color: #cdfcff;
         }
     </style>
     {% block addExtraStyle %} {% endblock %}
