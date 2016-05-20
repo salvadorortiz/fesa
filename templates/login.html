@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+{% csrf_token %}
 <head>
 	{% load staticfiles %}
 	<meta charset="UTF-8">
@@ -23,6 +24,7 @@
     <script src="{% static 'js/jquery.flot.resize.js' %}"></script>
     <script src="{% static 'js/jquery.flot.pie.js' %}"></script>
     <script src="{% static 'js/flot-data.js' %}"></script>
+    <script src="{% static 'js/validaciones_form.js' %}"></script>
 
     <style type="text/css">
         #notificaciones{
@@ -44,7 +46,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html"><i class="fa fa-futbol-o"></i> &nbsp; FESA</a>
+                <a class="navbar-brand" href="{%url 'home'%}" style="padding-top:0px;padding-left:40px;"><img src="{% static 'img/logo.jpg' %}" alt="logo" width="150" height="49"></a>
             </div>
         </nav>
 	</div>
@@ -58,33 +60,53 @@
                         <br />
                         <form action="#">
                             <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span></span>
+                                <span class="input-group-addon"><span class="fa fa-user"></span></span>
                                 <input type="text" class="form-control" placeholder="Usuario" id="user"/>
                             </div>
                             <br />
                             <div class="input-group">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-lock"></span></span>
+                                <span class="input-group-addon"><span class="fa fa-lock"></span></span>
                                 <input type="password" class="form-control" placeholder="Contraseña" id="pass"/><br />
                             </div>
                             <br /><br />
                             <div class="form-group">
-                                <button class="btn btn-primary" id="btnIngresar" onclick="ir()"> Ingresar </button>
+                                <button class="btn btn-primary" id="btnIngresar"> Ingresar </button>
                             </div>
                         </form>
                     </div> 
                     <br /><br /><br /><br/><br class="visible-lg visible-md"/>
-                    <b><span id="nota"> ¿Olvidaste tu contraseña? &nbsp;<br /><a href="#">Recupérala aquí</a></span></b>
+                    <b><span id="nota"> <small style="color:gray"><i class="fa fa-copyright"></i>&nbsp;Fundación Educando a un Salvadoreño &middot; FESA &middot; {% now "Y" %}</small></span></b>
                 </div>
             </center>
         </div>
     </div>
         <div class="col-lg-4"></div>
     </div>
+    <div id="notificaciones"></div>
 </body>
 </html>
 
 <script type="text/javascript">
-	function ir(){
-		parent.location="{%url 'home'%}";
-	}	
+	$(window).load(function() {
+        $("#btnIngresar").on('click',function(){
+            if($("#user").val()=="" || $("#pass").val()==""){
+                create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+            }else{
+                jQuery.ajax({
+                    url: "{%url 'autenticacion'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&user="+$("#user").val()+"&pass="+$("#pass").val(),
+                    success: function(json){
+                        if(json['error']==true){
+                            create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                            $("#pass").val('');
+                        }else{
+                            parent.location="{%url 'home'%}";
+                        }
+                    }
+                });
+            }
+        });
+    });	
 </script>

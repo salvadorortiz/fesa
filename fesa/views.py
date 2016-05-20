@@ -4,5 +4,4 @@ def login(request):
 	return render(request,'login.html')
 
 def home(request):
-	data={'usuario': 'Kate'}
-	return render(request,'index.html',data)
+	return render(request,'index.html')

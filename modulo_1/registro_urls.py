@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^precios/', 'modulo_1.views.PreciosView',name='precios_guia'),
     url(r'^precios_vista/', 'modulo_1.views.dt_vista_precios',name='dt_vista_precios'),
     url(r'^actualizar_precio/', 'modulo_1.views.GuardarPrecio',name='guardar_precio'),
+    url(r'^autenticacion/', 'modulo_1.views.Autenticacion',name='autenticacion'),
 ]
