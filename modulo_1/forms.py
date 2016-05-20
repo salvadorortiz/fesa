@@ -10,3 +10,9 @@ class ClienteForm(ModelForm):
 		model = Cliente
 		fields = ['codigo', 'nombre', 'DUI', 'telefono','telefono_alterno','correo','direccion']
 		
+
+class EmpresaForm(ModelForm):
+
+	class Meta:
+		model= Empresa
+		fields= ['codigo','nombre','nit','registro_iva','telefono','contacto','telefono_contacto','correo_contacto']

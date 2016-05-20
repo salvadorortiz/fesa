@@ -2,13 +2,13 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from modulo_1.forms import ClienteForm
+from modulo_1.forms import ClienteForm, EmpresaForm
 from modulo_1.models import Cliente
 import json
 import hashlib
 
 def RegistroClienteView(request):
-	data={'usuario': 'Kate', 'cliente_form': ClienteForm()}
+	data={'cliente_form': ClienteForm()}
 	return render(request,'registrocliente.html',data)
 
 def GuardarCliente(request):
@@ -51,3 +51,7 @@ def GuardarCambiosCliente(request):
 		return HttpResponse(json.dumps({}), content_type='application/json')
 	else:
 		return HttpResponse(json.dumps({'errors': form_cliente.errors}), content_type='application/json')
+
+def RegistroEmpresaView(request):
+	data={'empresa_form': EmpresaForm()}
+	return render(request,'registroempresa.html',data)

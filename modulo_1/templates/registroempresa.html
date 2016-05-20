@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Registro de empresa {% endblock %}
+
+{% block breadcrumbs %}
+   <!--  <li><a href="#">Inicio</a></li>
+    <li class="active">Ingresar</li> -->
+    <li class="active">
+	    <i class="fa fa-file"></i> Registro
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Empresa{% endblock %} 
+{% block subheading %}{% endblock %}
+
+
+{% block content %}
+	{% csrf_token %}
+    {% load widget_tweaks %}
+    <div class="row"> 
+        <div class="col-sm-12">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#empresa_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-build"></i> &nbsp;Registro de empresa</label>
+                <a href="#" onclick="$('#dt_empresas').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+             <div id="empresa_toggle" class="collapse in col-sm-12">
+                    <table id="dt_empresas">
+                        <thead>
+                            <th>Id empresa</th>
+                            <th>Código</th>
+                            <th>Nombre </th>
+                            <th>Teléfono</th>
+                            <th>Contacto</th>
+                            <th>Teléfono contacto</th>
+                            <th>Acciones</th>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+            </div>
+                
+        </div>
+        <hr>
+        <br>
+        <div class="col-sm-12">
+            <div id="div_errores"></div>
+        </div>
+        <form id="cliente_form">
+            <input type="hidden" value="" name="id_cliente" />
+        <div class="col-sm-12">
+             <div class="col-sm-1">
+                Código:
+            </div>
+            <div class="col-sm-2">
+                 <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-eye"></i></span>
+                        {{empresa_form.codigo|add_class:"form-control"}}
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <strong>Nombre:</strong>
+            </div>
+            <div class="col-sm-8">
+                <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-build"></i></span>
+                        {{empresa_form.nombre|add_class:"form-control"}}
+                </div>
+                
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Registro de documentos</h3>
+                </div>
+                 <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-1">
+                                <strong>NIT:</strong>
+                            </div>
+                            <div class="col-sm-4">
+                                {% render_field empresa_form.nit class+="form-control" placeholder="Escriba el NIT" %}
+                            </div>
+                            <div class="col-sm-2">
+                                <strong>Registro IVA</strong>
+                            </div>
+                            <div class="col-sm-5">
+                                {% render_field empresa_form.registro_iva class+="form-control" placeholder="Escriba el registro de IVA" %}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-1">
+                                <strong>Teléfono:</strong>
+                            </div>
+                            <div class="col-sm-5">
+                                {% render_field empresa_form.telefono class+="form-control" %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-12">
+                             <div class="col-sm-1">
+                                <strong>Contacto:</strong>
+                            </div>
+                            <div class="col-sm-11">
+                                {{empresa_form.contacto|add_class:"form-control"}}
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-2">
+                                <strong>Teléfono contacto:</strong>
+                            </div>
+                            <div class="col-sm-4">
+                                {{empresa_form.telefono_contacto|add_class:"form-control"}}
+                            </div>
+                             <div class="col-sm-2">
+                                Correo electrónico:
+                            </div>
+                            <div class="col-sm-4">
+                                {{empresa_form.correo_contacto|add_class:"form-control"}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="col-sm-12">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <center>
+                <button type="button" id="guardar_empresa" class="btn btn-primary">Guardar</button>
+                 <button type="button" id="guardar_cambios_empresa" style="display:none" class="btn btn-primary">Guardar Cambios</button>
+                <button type="button" id="cancelar_empresa" style="display:none" class="btn btn-default">Cancelar</button>
+                </center>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+   $(window).load(function() {
+        var dt_empresa = $('#dt_empresas').DataTable( {
+           /* "ajax": {
+                "url": "{%url 'dt_vista_precios' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },*/
+            "pageLength": 5,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"15%"},
+                {"targets":2, "width":"15%"},
+                {"targets":3, "width":"15%"},
+                {"targets":4, "width":"15%"},
+                {"targets":5, "width":"15%"},
+               // {"targets", "width":"15%"},
+                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_empresa\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+    });
+</script>
+{% endblock %}
