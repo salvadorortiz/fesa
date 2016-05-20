@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from modulo_1.models import *
 from django import forms
 from django.forms.fields import CharField
@@ -16,3 +18,7 @@ class EmpresaForm(ModelForm):
 	class Meta:
 		model= Empresa
 		fields= ['codigo','nombre','nit','registro_iva','telefono','contacto','telefono_contacto','correo_contacto']
+
+	def __init__(self,*args,**kwargs):
+		super(EmpresaForm,self).__init__(*args,**kwargs)
+		self.fields['codigo'].empty_label= 'Código'

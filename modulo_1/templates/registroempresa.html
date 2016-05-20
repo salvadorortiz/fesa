@@ -48,25 +48,25 @@
         <div class="col-sm-12">
             <div id="div_errores"></div>
         </div>
-        <form id="cliente_form">
-            <input type="hidden" value="" name="id_cliente" />
+        <form id="empresa_form">
+            <input type="hidden" value="" name="id_empresa" />
         <div class="col-sm-12">
              <div class="col-sm-1">
                 Código:
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-3">
                  <div class="form-group input-group">
                         <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                        {{empresa_form.codigo|add_class:"form-control"}}
+                        {% render_field empresa_form.codigo class+="form-control" placeholder="Código" %}
                 </div>
             </div>
             <div class="col-sm-1">
                 <strong>Nombre:</strong>
             </div>
-            <div class="col-sm-8">
+            <div class="col-sm-7">
                 <div class="form-group input-group">
-                        <span class="input-group-addon"><i class="fa fa-build"></i></span>
-                        {{empresa_form.nombre|add_class:"form-control"}}
+                        <span class="input-group-addon"><i class="fa fa-building"></i></span>
+                        {% render_field empresa_form.nombre class+="form-control" placeholder="Nombre" %}
                 </div>
                 
             </div>
@@ -74,7 +74,7 @@
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Registro de documentos</h3>
+                      <h3 class="panel-title"><i class="fa fa-pencil-square-o fa-fw"></i> Registro de documentos</h3>
                 </div>
                  <div class="panel-body">
                     <div class="row">
@@ -111,7 +111,7 @@
                                 <strong>Contacto:</strong>
                             </div>
                             <div class="col-sm-11">
-                                {{empresa_form.contacto|add_class:"form-control"}}
+                                {% render_field empresa_form.contacto class+="form-control" placeholder="Contacto" %}
                             </div>
                         </div>
                     </div>
@@ -128,7 +128,7 @@
                                 Correo electrónico:
                             </div>
                             <div class="col-sm-4">
-                                {{empresa_form.correo_contacto|add_class:"form-control"}}
+                                {% render_field empresa_form.correo_contacto class+="form-control" placeholder="Correo Electrónico" %}
                             </div>
                         </div>
                     </div>
@@ -155,13 +155,13 @@
 <script type="text/javascript">
    $(window).load(function() {
         var dt_empresa = $('#dt_empresas').DataTable( {
-           /* "ajax": {
-                "url": "{%url 'dt_vista_precios' %}",
+           "ajax": {
+                "url": "{%url 'dt_empresas' %}",
                 "type": "POST",
                 "data":  function( d ) {
                     d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
                 },
-            },*/
+            },
             "pageLength": 5,
             "ordering": true,
             "lengthChange": true,
@@ -169,13 +169,13 @@
             "paging": true,
             "columnDefs":[
                 {"targets":[0],"visible":false,"searchable":false},
-                {"targets":1, "width":"15%"},
-                {"targets":2, "width":"15%"},
+                {"targets":1, "width":"10%"},
+                {"targets":2, "width":"20%"},
                 {"targets":3, "width":"15%"},
-                {"targets":4, "width":"15%"},
+                {"targets":4, "width":"20%"},
                 {"targets":5, "width":"15%"},
                // {"targets", "width":"15%"},
-                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_empresa\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 6 ,"width": "5%",  "defaultContent": "<center><button name=\"edit_empresa\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -189,6 +189,123 @@
                 },
             }
         });
+
+        $('#id_telefono').mask('(000) 0000-0000', {placeholder: "(___) ____-____"});
+        $('#id_telefono_contacto').mask('(000) 0000-0000', {placeholder: "(___) ____-____"});
+        $('#id_nit').mask('0000-000000-000-0', {placeholder: "____-______-___-_"});
+        $("#id_nombre").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 100, // Characters limit
+            status: false, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+        $("#id_contacto").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 100, // Characters limit
+            status: true, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+        $("#id_codigo").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 20, // Characters limit
+            status: false, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+        $("#guardar_empresa").on('click',function(){
+                //alert("entro");
+                 jQuery.ajax({
+                    url: "{%url 'guardar_empresa'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(empresa_form).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#div_errores").html('');
+                            create_alert("<li>Empresa ingresada con éxito </li>","EXITO","notificaciones",true,5000);
+                            $("#dt_empresas").DataTable().ajax.reload();
+                        }else{
+                            show_errors(json, 'div_errores');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });  
+
+
+        $("#cancelar_empresa").on('click',function(){
+               $("#empresa_form").find("[id^='id_']").val('');
+               $('#dt_empresas').DataTable().$('tr.selected').removeClass('selected');
+               $("#guardar_cambios_empresa").hide();
+               $("#cancelar_empresa").hide();
+               $("#guardar_empresa").show();
+         });
+
+        $("#dt_empresas").on('click', "[name=edit_empresa]",function(){
+            $('#dt_empresas').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_empresas').DataTable().rows('.selected').data();
+            jQuery.ajax({
+                url: "{%url 'cargar_empresa'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_empresa="+data[0][0].toString(),
+                success: function(json){
+                    $("[name=id_empresa]").val(json['cliente'][0]);
+                    $("#id_codigo").val(json['cliente'][1]);
+                    $("#id_nombre").val(json['cliente'][2]);
+                    $("#id_nit").val(json['cliente'][3]);
+                    $("#id_registro_iva").val(json['cliente'][4]);
+                    $("#id_telefono").val(json['cliente'][5]);
+                    $("#id_contacto").val(json['cliente'][6]);
+                    $("#id_telefono_contacto").val(json['cliente'][7]);
+                    $("#id_correo_contacto").val(json['cliente'][8]);
+                    $("#guardar_cambios_empresa").show();
+                    $("#cancelar_empresa").show();
+                    $("#guardar_empresa").hide();
+                }
+            });
+        });
+
+        $("#guardar_cambios_empresa").on('click',function(){
+                //alert("entro");
+                 jQuery.ajax({
+                    url: "{%url 'guardar_cambios_empresa'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(empresa_form).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#div_errores").html('');
+                            create_alert("<li>Empresa actualizada con éxito </li>","EXITO","notificaciones",true,5000);
+                            $("#dt_empresas").DataTable().ajax.reload();
+                            $("#cancelar_empresa").click();
+                        }else{
+                            show_errors(json, 'div_errores');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });
     });
 </script>
 {% endblock %}

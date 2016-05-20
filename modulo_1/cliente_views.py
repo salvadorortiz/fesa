@@ -3,7 +3,7 @@ from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
 from modulo_1.forms import ClienteForm, EmpresaForm
-from modulo_1.models import Cliente
+from modulo_1.models import Cliente, Empresa
 import json
 import hashlib
 
@@ -55,3 +55,44 @@ def GuardarCambiosCliente(request):
 def RegistroEmpresaView(request):
 	data={'empresa_form': EmpresaForm()}
 	return render(request,'registroempresa.html',data)
+
+def dt_empresas(request):
+	str_query = "SELECT empresa_id,codigo,nombre,telefono,contacto,correo_contacto from modulo_1_empresa"
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	clientes = convert_fetchall(qs)
+	return HttpResponse(json.dumps(clientes), content_type='application/json')
+
+def GuardarEmpresa(request):
+	form_empresa=EmpresaForm(request.POST or None)
+	if form_empresa.is_valid():
+		form_empresa.save()
+		return HttpResponse(json.dumps({}), content_type='application/json')
+	else:
+		return HttpResponse(json.dumps({'errors': form_empresa.errors}), content_type='application/json')
+
+def CargarEmpresa(request):
+	obj_empresa=Empresa.objects.filter(empresa_id=int(request.POST['id_empresa'])).values_list('empresa_id','codigo','nombre','nit','registro_iva','telefono','contacto','telefono_contacto','correo_contacto')
+	lista_resultado=[]
+	for empresa in obj_empresa:
+		lista_resultado+=list(empresa)
+	return HttpResponse(json.dumps({'cliente': lista_resultado}), content_type='application/json')
+
+def GuardarCambiosEmpresa(request):
+	form_empresa=EmpresaForm(request.POST or None)
+	if form_empresa.is_valid():
+		#form_cliente.save()
+		obj_empresa= Empresa.objects.get(empresa_id=int(request.POST['id_empresa']))
+		obj_empresa.codigo=str(request.POST['codigo'])
+		obj_empresa.nombre= str(request.POST['nombre'])
+		obj_empresa.nit = str(request.POST['nit'])
+		obj_empresa.registro_iva = str(request.POST['registro_iva'])
+		obj_empresa.telefono= str(request.POST['telefono'])
+		obj_empresa.contacto = str(request.POST['contacto'])
+		obj_empresa.telefono_contacto= str(request.POST['telefono_contacto'])
+		obj_empresa.correo_contacto = str(request.POST['correo_contacto'])
+		obj_empresa.save(force_update=True)
+		return HttpResponse(json.dumps({}), content_type='application/json')
+	else:
+		return HttpResponse(json.dumps({'errors': form_empresa.errors}), content_type='application/json')

@@ -173,17 +173,14 @@ function correc_palabras(palabra){
 	/*
 		Corrección de ortográfia para el form.errors de Django.
 	*/
-
 	var arr_palabras=[
-				['escalafon','Escalafón'],
-				['descripcion','Descripción'],
-				['categoria_puesto', 'Categoría del puesto'],
-				['Unidad_GrupoUnidades','Unidad / Grupo de unidades'],
-				['tipo_funcion','Tipo de la función'],
-				['nivel_funcion','Nivel de la función'],
-				['__all__','Institución'],
-				[' Correo_contacto','Correo Electrónico del contacto'],
+				['telefono','Teléfono'],
+				['correo_contacto','Correo Electrónico del contacto'],
+				['telefono_contacto','Teléfono de contacto'],
+				['registro_iva','Registro de IVA']
+				//['']
 				];
+	
 	for(var i=0;i<arr_palabras.length;i++){
 		if(palabra==arr_palabras[i][0]){
 
