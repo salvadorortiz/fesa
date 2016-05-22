@@ -16,8 +16,8 @@ class Usuario(models.Model):
 	jefe_directo = models.CharField('Jefe Directo',max_length=100,blank=False,null=False,default='')
 	estado = models.BooleanField('Estado', default=True)
 	tipo_usuario =  models.CharField('Tipo Usuario',max_length=1,choices=TIPO,null=False,blank=False,default='')
-	user = models.CharField('Usuario',max_length=50,blank=False,null=False,default='')
-	password = models.CharField('Contraseña',max_length=100,blank=False,null=False,default='123')
+	usuario = models.CharField('Usuario',max_length=50,blank=False,null=False,default='')
+	password = models.CharField('Contraseña',max_length=100,blank=False,null=False,default='')
 	
 	def __unicode__(self):
 		return self.nombre

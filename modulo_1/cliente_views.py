@@ -6,6 +6,10 @@ from modulo_1.forms import ClienteForm, EmpresaForm
 from modulo_1.models import Cliente, Empresa
 import json
 import hashlib
+import sys
+
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 def RegistroClienteView(request):
 	data={'cliente_form': ClienteForm()}

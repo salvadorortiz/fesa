@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Creación de usuarios {% endblock %}
+
+{% block breadcrumbs %}
+   <!--  <li><a href="#">Inicio</a></li>
+    <li class="active">Ingresar</li> -->
+    <li class="active">
+	    <i class="fa fa-group"></i> Usuarios
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Creación de usuarios {% endblock %} 
+{% block subheading %}{% endblock %}
+
+{% block content %}
+	{% csrf_token %}
+    {% load widget_tweaks %}
+    <div class="row">
+        <div class="col-sm-12">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#usuarios_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-group"></i> &nbsp;Registro usuarios</label>
+                <a href="#" onclick="$('#dt_usuarios').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+             <div id="usuarios_toggle" class="collapse in col-sm-12">
+                    <table id="dt_usuarios">
+                        <thead>
+                            <th>id usuario</th>
+                            <th>Nombre</th>
+                            <th>Usuario </th>
+                            <th>Área</th>
+                            <th>Jefe inmediato</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Password</th>
+                            <th>Acciones</th>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+            </div>
+                
+        </div>
+        <hr>
+        <br>
+        <div class="col-sm-12">
+            <div id="div_errores"></div>
+        </div>
+        <form id="usuario_form">
+        <div class="col-sm-12">
+             <div class="col-sm-1">
+                <b>Área:</b>
+            </div>
+            <div class="col-sm-5">
+                {{usuario_form.area|add_class:"form-control"}}
+            </div>
+            <div class="col-sm-1">
+                <strong>Jefe inmediato:</strong>
+            </div>
+            <div class="col-sm-5">
+                {{usuario_form.jefe_directo|add_class:"form-control"}}
+            </div>
+        </div>
+        <div class="col-sm-12">
+        <br>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Información del usuario</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-1">
+                                <strong>Nombre:</strong>
+                            </div>
+                            <div class="col-sm-11">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                    {{usuario_form.nombre|add_class:"form-control"}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12">
+                             <div class="col-sm-1">
+                                <strong>Usuario:</strong>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                    {{usuario_form.usuario|add_class:"form-control"}}
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <strong>Contraseña:</strong>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                    {% render_field usuario_form.password class+="form-control" %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-1">
+                                <strong>Estado:</strong>
+                            </div>
+                            <div class="col-sm-1">
+                                {{usuario_form.estado|add_class:"form-control"}}
+                            </div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-1">
+                                <strong>Tipo:</strong>
+                            </div>
+                            <div class="col-sm-3">
+                                {{usuario_form.tipo_usuario|add_class:"form-control"}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="col-sm-12">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <center>
+                    <button type="button" id="btn_guardar" class="btn btn-primary">Guardar</button>
+                    <button type="button" id="btn_guardar_cambios" style="display:none" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default">Cancelar</button>
+                </center>
+            </div>
+            <div class="col-sm-3"></div>
+        </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+   $(window).load(function() {
+        var dt_usuarios = $('#dt_usuarios').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_usuarios' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            "pageLength": 5,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "order":[[6,"asc"],[1,"asc"],[5,"asc"],[3,"asc"]],
+            "columnDefs":[
+                {"targets":[0,7],"visible":false,"searchable":false},
+                {"targets":1, "width":"25%"},
+                {"targets":2, "width":"10%"},
+                {"targets":3, "width":"12.5%"},
+                {"targets":4, "width":"17.5%"},
+                {"targets":5, "width":"10%"},
+                {"targets":6, "width":"7.5%"},
+                {"targets":8 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_usuario\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        $(document).on('click', "[name=edit_usuario]",function(){
+            $('#dt_usuarios').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_usuarios').DataTable().rows('.selected').data()
+            $('#id_area').val(data[0][3]);
+            $('#id_jefe_directo').val(data[0][4]);
+            $('#id_nombre').val(data[0][1]);
+            $('#id_usuario').val(data[0][2]);
+            $('#id_password').val(data[0][7]);
+            switch(data[0][6]) {
+                case "<center><i class=\"fa fa-check\"></i></center>":
+                    document.getElementById("id_estado").checked = true;
+                    break;
+                case "<center><i class=\"fa fa-times\"></i></center>":
+                    document.getElementById("id_estado").checked = false;
+                    break;
+            }
+
+            switch(data[0][5]) {
+                case "Tipo A":
+                    $('#id_tipo_usuario').val("A");
+                    break;
+                case "Tipo B":
+                    $('#id_tipo_usuario').val("B");
+                    break;
+                case "Administrador":
+                    $('#id_tipo_usuario').val("R");
+                    break;
+            }
+            $("#btn_guardar_cambios").show();
+            $("#btn_cancelar").show();
+            $("#btn_guardar").hide();
+        });
+
+        $("#btn_cancelar").on('click',function(){
+            $('#dt_usuarios').DataTable().$('tr.selected').removeClass('selected');
+            $("#usuario_form").find("[id^='id_']").val('');
+            $("#btn_guardar_cambios").hide();
+            $("#btn_cancelar").hide();
+            $("#btn_guardar").show();
+            document.getElementById("id_estado").checked = false;
+        });
+
+        $("#btn_guardar").on('click',function(){
+             jQuery.ajax({
+                url: "{%url 'guardar_usuario'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(usuario_form).serialize(),
+                success: function(json){
+                    if(json['errors']==null){
+                        $("#div_errores").html('');
+                        create_alert("<li>Usuario ingresado con éxito </li>","EXITO","notificaciones",true,5000);
+                        $("#dt_usuarios").DataTable().ajax.reload();
+                        $("#btn_cancelar").click();
+                    }else{
+                        show_errors(json, 'div_errores');
+                    }
+                }
+            });
+        });
+
+        $("#btn_guardar_cambios").on('click',function(){
+            var usuario_id=$('#dt_usuarios').DataTable().rows('.selected').data()[0][0];
+            var estado = document.getElementById('id_estado').checked;
+            jQuery.ajax({
+                url: "{%url 'guardar_cambios_usuario'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&usuario_id="+usuario_id+"&"+$(usuario_form).serialize()+"&estado_usuario="+estado,
+                success: function(json){
+                    if(json['errors']==null){
+                        $("#div_errores").html('');
+                        create_alert("<li>Usuario actualizado con éxito </li>","EXITO","notificaciones",true,5000);
+                        $("#dt_usuarios").DataTable().ajax.reload();
+                        $("#btn_cancelar").click();
+                    }else{
+                        show_errors(json, 'div_errores');
+                    }
+                }
+            });
+        });
+
+
+    });
+</script>
+{% endblock %}

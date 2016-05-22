@@ -10,8 +10,7 @@ class ClienteForm(ModelForm):
 
 	class Meta:
 		model = Cliente
-		fields = ['codigo', 'nombre', 'DUI', 'telefono','telefono_alterno','correo','direccion']
-		
+		fields = ['codigo', 'nombre', 'DUI', 'telefono','telefono_alterno','correo','direccion']	
 
 class EmpresaForm(ModelForm):
 
@@ -22,3 +21,14 @@ class EmpresaForm(ModelForm):
 	def __init__(self,*args,**kwargs):
 		super(EmpresaForm,self).__init__(*args,**kwargs)
 		self.fields['codigo'].empty_label= 'Código'
+
+class UsuarioForm(ModelForm):
+
+	class Meta:
+		model = Usuario
+		fields = ['nombre', 'area', 'jefe_directo', 'estado','tipo_usuario','usuario','password']
+		
+	def __init__(self, *args, **kwargs):
+		super(UsuarioForm, self ).__init__(*args, **kwargs)
+		self.fields['tipo_usuario'].empty_label = "Seleccione el tipo de usuario"
+		

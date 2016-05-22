@@ -30,13 +30,19 @@
                         <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Precio</th>
+                        {%if request.session.type_user == 'R'%} 
                         <th>Acciones</th>
+                        {%endif%}
                     </thead>
                     <tbody>
                     </tbody>
                 </table> 
                 <hr>
             </div>
+            {%if request.session.type_user == 'R'%}
+            <div class="col-sm-12">
+                <div id="div_errores"></div>
+            </div>        
             <div class="col-sm-12">
                 <div class="col-sm-5">Complejo:</div>
                 <div class="col-sm-5">Cancha:</div>
@@ -55,7 +61,7 @@
                         <input type="text" class="form-control" id="txt_precio"/>
                     </div>
                 </div>
-            </div>        
+            </div>
             <div class="col-sm-12">
                 <div class="col-sm-3"></div>
                 <div class="col-sm-6">
@@ -66,6 +72,7 @@
                 </div>
                 <div class="col-sm-3"></div>
             </div>
+            {%endif%}
         </div>
     </div>
 {% endblock %}
@@ -76,7 +83,7 @@
         var id_cancha=-1;
         var dt_precios = $('#dt_precios').DataTable( {
             "ajax": {
-                "url": "{%url 'dt_vista_precios' %}",
+                "url": "{%url 'dt_precios' %}",
                 "type": "POST",
                 "data":  function( d ) {
                     d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
@@ -87,12 +94,15 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
+            "order":[[1,"asc"],[2,"asc"],[3,"asc"]],
             "columnDefs":[
                 {"targets":[0],"visible":false,"searchable":false},
                 {"targets":1, "width":"35%"},
                 {"targets":2, "width":"35%"},
                 {"targets":3, "width":"20%"},
+                {%if request.session.type_user == 'R'%}
                 {"targets": 4 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {%endif%}
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -110,8 +120,7 @@
         $(document).on('click', "[name=edit_precio]",function(){
             $('#dt_precios').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
-            var data = $('#dt_precios').DataTable().rows('.selected').data()
-            console.log(data);
+            var data = $('#dt_precios').DataTable().rows('.selected').data();
             $('#txt_complejo').val(data[0][1]);
             $('#txt_cancha').val(data[0][2]);
             $('#txt_precio').val(String(data[0][3]).replace('$',''));
@@ -119,6 +128,7 @@
         });
 
         $('#btn_cancelar').on('click', function(){
+            $('#dt_precios').DataTable().$('tr.selected').removeClass('selected');
             $('#txt_complejo').val("");
             $('#txt_cancha').val("");
             $('#txt_precio').val("");
@@ -127,23 +137,27 @@
 
         $('#btn_guardar').on('click', function(){
             if(id_cancha!=-1){
-                jQuery.ajax({
-                    url:"{%url 'guardar_precio' %}",
-                    type:"POST",
-                    processData:false,  
-                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+id_cancha+"&precio="+$('#txt_precio').val(),
-                    success:function(json){
-                        dt_precios.ajax.reload();
-                        create_alert("<li>Precio actualizado con éxito</li>","EXITO","notificaciones",true,5000);
-                    }
-                }); 
+                if($('#txt_precio').val()!=""){
+                    jQuery.ajax({
+                        url:"{%url 'guardar_precio' %}",
+                        type:"POST",
+                        processData:false,  
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+id_cancha+"&precio="+$('#txt_precio').val(),
+                        success:function(json){
+                            dt_precios.ajax.reload();
+                            create_alert("<li>Precio actualizado con éxito</li>","EXITO","notificaciones",true,5000);
+                        }
+                    }); 
 
-                $('#txt_complejo').val("");
-                $('#txt_cancha').val("");
-                $('#txt_precio').val("");
-                id_cancha=-1;
+                    $('#txt_complejo').val("");
+                    $('#txt_cancha').val("");
+                    $('#txt_precio').val("");
+                    id_cancha=-1;
+                }else{
+                   create_alert("<li><b>Precio:</b>Ingrese un precio válido</li>","ERROR","div_errores",false,0); 
+                }
             }else{
-                create_alert("<li>Seleccione una cancha para actualizar su precio</li>","ERROR","notificaciones",true,5000);
+                create_alert("<li>Seleccione una cancha para actualizar su precio</li>","ERROR","div_errores",false,0);
             }
         });
     });
