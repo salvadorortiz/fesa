@@ -32,6 +32,7 @@
     <script src="{% static 'js/flot-data.js' %}"></script>
     <script src="{% static 'js/jquery.mask.js' %}"></script>
     <script src="{% static 'js/jquery.maxlength.js' %}"></script>
+    <script src="{% static 'js/bootbox.min.js' %}"></script>
 
     <!-- DataTables JavaScript -->
     <script type="text/javascript" src="https://cdn.datatables.net/t/bs/dt-1.10.11/datatables.min.js"></script>
@@ -114,7 +115,10 @@
                             </li>
                         </ul>
                     </li>
-                    <li>
+                    <li >
+                        <a href="{%url 'catalogos'%}"><i class="fa fa-fw fa-list-alt"></i> Catálogos</a>
+                    </li>
+                    <!-- <li>
                         <a href="charts.html"><i class="fa fa-fw fa-bar-chart-o"></i> Menu dos</a>
                     </li>
                     <li>
@@ -136,7 +140,7 @@
                                 <a href="#">Dropdown Item</a>
                             </li>
                         </ul>
-                    </li>
+                    </li> -->
 
                 </ul>
             </div>

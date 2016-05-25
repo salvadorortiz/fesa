@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Catálogos {% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">
+	    <i class="fa fa-list-alt"></i> Catálogos
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Catálogos{% endblock %} 
+{% block subheading %}{% endblock %}
+{% block addExtraStyle %} 
+{% endblock %}
+
+{% block content %}
+	{% csrf_token %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div id="div_errores"></div>
+        </div>
+        <div class="col-sm-12">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-5">
+                <div class="form-group input-group">
+                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                    <input type="text" class="form-control" id="txt_nombre" placeholder="Nombre" />
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <div class="form-group input-group">
+                    <span class="input-group-addon"><i class="fa fa-hand-o-right"></i></span>
+                    <select id="cmb_tipo" class="form-control">
+                        <option value="-1">Seleccione el tipo de catálogo</option>
+                        <option value="1">Forma de pago</option>
+                        <option value="2">Forma de facturación</option>
+                        <option value="3">Tipo de alquiler</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="col-sm-3"></div>
+            <div class="col-sm-6">
+                <center>
+                    <button type="button" id="btn_guardar" class="btn btn-primary">Guardar</button>
+                    <button type="button" id="btn_guardar_cambios" style="display:none" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default">Cancelar</button>
+                </center>
+            </div>
+        </div>
+        <div class="col-sm-4">
+        <br>
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#pago_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-usd"></i> &nbsp;Formas de pago</label>
+                <a href="#" onclick="$('#dt_forma_pago').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+            <div id="pago_toggle" class="collapse in col-sm-12">
+                <table id="dt_forma_pago">
+                    <thead>
+                        <th>forma_pago_id</th>
+                        <th>Forma de pago</th>
+                        <th>Acciones</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+        </div>
+        <div class="col-sm-4">
+        <br>
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#factura_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-book"></i> &nbsp;Formas de facturación</label>
+                <a href="#" onclick="$('#dt_forma_facturacion').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+            <div id="factura_toggle" class="collapse in col-sm-12">
+                <table id="dt_forma_facturacion">
+                    <thead>
+                        <th>forma_facturacion_id</th>
+                        <th>Forma de facturación</th>
+                        <th>Acciones</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+        </div>
+        <div class="col-sm-4">
+        <br>
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                <label data-toggle="collapse" href="#alquiler_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-home"></i> &nbsp;Tipos de alquiler</label>
+                <a href="#" onclick="$('#dt_alquiler').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+            <div id="alquiler_toggle" class="collapse in col-sm-12">
+                <table id="dt_alquiler">
+                    <thead>
+                        <th>tipo_alquiler_id</th>
+                        <th>Tipo de alquiler</th>
+                        <th>Acciones</th>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+   $(window).load(function() {
+        var elemento = -1;
+        var tipo = -1;
+            
+        var dt_forma_pago = $('#dt_forma_pago').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_forma_pago' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            //"pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": false,
+            "order":[[1,"asc"]],
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"75%"},
+                {"targets": 2 ,"width": "25%",  "defaultContent": "<center><button type='button' name=\"delete_pago\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button> <button name=\"edit_pago\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        var dt_forma_facturacion = $('#dt_forma_facturacion').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_forma_facturacion' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            "pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": false,
+            "order":[[1,"asc"]],
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"75%"},
+                {"targets": 2 ,"width": "25%",  "defaultContent": "<center><button type='button' name=\"delete_facturacion\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button> <button name=\"edit_facturacion\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        var dt_alquiler = $('#dt_alquiler').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_alquiler' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            "pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": false,
+            "order":[[1,"asc"]],
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"75%"},
+                {"targets": 2 ,"width": "25%",  "defaultContent": "<center><button type='button' name=\"delete_alquiler\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button> <button name=\"edit_alquiler\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        $("#btn_guardar").on('click',function(){
+            if($("#cmb_tipo").val()!="-1" && $("#txt_nombre").val()!=""){
+                jQuery.ajax({
+                    url: "{%url 'guardar_catalogo'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&nombre="+$("#txt_nombre").val()+"&tipo="+$("#cmb_tipo").val(),
+                    success: function(json){
+                            create_alert("<li>Elemento ingresado con éxito </li>","EXITO","notificaciones",true,5000);
+                            $("#dt_forma_pago").DataTable().ajax.reload();
+                            $("#dt_forma_facturacion").DataTable().ajax.reload();
+                            $("#dt_alquiler").DataTable().ajax.reload();
+                            $("#btn_cancelar").click();
+                    }
+                });
+            }else{
+                create_alert("<li>Ingrese el nombre y el tipo del elemento</li>","ERROR","div_errores",false,0);
+            }
+        });
+
+        $("#btn_cancelar").on('click',function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $("#btn_guardar_cambios").hide();
+            $("#btn_cancelar").hide();
+            $("#btn_guardar").show();
+            $("#cmb_tipo").val("-1");
+            $("#cmb_tipo").attr("disabled",false);
+            $("#txt_nombre").val("");
+            elemento = -1;
+
+        });
+
+        $(document).on('click', "[name=edit_pago]",function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_forma_pago').DataTable().rows('.selected').data();
+            $('#txt_nombre').val(data[0][1]);
+            $("#cmb_tipo").val("1");
+            $("#cmb_tipo").attr("disabled",true);
+            $("#btn_guardar_cambios").show();
+            $("#btn_cancelar").show();
+            $("#btn_guardar").hide();
+            tipo = 1;
+            elemento = data[0][0];
+        });
+
+        $(document).on('click', "[name=edit_facturacion]",function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_forma_facturacion').DataTable().rows('.selected').data();
+            $('#txt_nombre').val(data[0][1]);
+            $("#cmb_tipo").val("2");
+            $("#cmb_tipo").attr("disabled",true);
+            $("#btn_guardar_cambios").show();
+            $("#btn_cancelar").show();
+            $("#btn_guardar").hide();
+            tipo = 2;
+            elemento = data[0][0];
+        });
+
+        $(document).on('click', "[name=edit_alquiler]",function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_alquiler').DataTable().rows('.selected').data();
+            $('#txt_nombre').val(data[0][1]);
+            $("#cmb_tipo").val("3");
+            $("#cmb_tipo").attr("disabled",true);
+            $("#btn_guardar_cambios").show();
+            $("#btn_cancelar").show();
+            $("#btn_guardar").hide();
+            tipo = 3;
+            elemento = data[0][0];
+        });
+
+        $(document).on('click', "[name=delete_pago]",function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_forma_pago').DataTable().rows('.selected').data();
+            bootbox.confirm("Se eliminará el elemento seleccionado, ¿Está seguro?", function(result) {
+                if(result){
+                    jQuery.ajax({
+                        url: "{%url 'eliminar_catalogo'%}",
+                        type: "POST",
+                        processData: false,
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id="+data[0][0]+"&tipo=1",
+                        success: function(json){
+                                create_alert("<li>Elemento eliminado con éxito </li>","EXITO","notificaciones",true,5000);
+                                $("#dt_forma_pago").DataTable().ajax.reload();
+                                $("#dt_forma_facturacion").DataTable().ajax.reload();
+                                $("#dt_alquiler").DataTable().ajax.reload();
+                                $("#btn_cancelar").click();
+                        }
+                    });
+                }else{
+                    $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+                    $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+                    $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+                }
+            });
+        });
+
+        $(document).on('click', "[name=delete_facturacion]",function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_forma_facturacion').DataTable().rows('.selected').data();
+            bootbox.confirm("Se eliminará el elemento seleccionado, ¿Está seguro?", function(result) {
+                if(result){
+                    jQuery.ajax({
+                        url: "{%url 'eliminar_catalogo'%}",
+                        type: "POST",
+                        processData: false,
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id="+data[0][0]+"&tipo=2",
+                        success: function(json){
+                                create_alert("<li>Elemento eliminado con éxito </li>","EXITO","notificaciones",true,5000);
+                                $("#dt_forma_pago").DataTable().ajax.reload();
+                                $("#dt_forma_facturacion").DataTable().ajax.reload();
+                                $("#dt_alquiler").DataTable().ajax.reload();
+                                $("#btn_cancelar").click();
+                        }
+                    });
+                }else{
+                    $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+                    $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+                    $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+                }
+            });
+        });
+
+        $(document).on('click', "[name=delete_alquiler]",function(){
+            $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_alquiler').DataTable().rows('.selected').data();
+            bootbox.confirm("Se eliminará el elemento seleccionado, ¿Está seguro?", function(result) {
+                if(result){
+                    jQuery.ajax({
+                        url: "{%url 'eliminar_catalogo'%}",
+                        type: "POST",
+                        processData: false,
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id="+data[0][0]+"&tipo=3",
+                        success: function(json){
+                                create_alert("<li>Elemento eliminado con éxito </li>","EXITO","notificaciones",true,5000);
+                                $("#dt_forma_pago").DataTable().ajax.reload();
+                                $("#dt_forma_facturacion").DataTable().ajax.reload();
+                                $("#dt_alquiler").DataTable().ajax.reload();
+                                $("#btn_cancelar").click();
+                        }
+                    });
+                }else{
+                    $('#dt_forma_pago').DataTable().$('tr.selected').removeClass('selected');
+                    $('#dt_forma_facturacion').DataTable().$('tr.selected').removeClass('selected');
+                    $('#dt_alquiler').DataTable().$('tr.selected').removeClass('selected');
+                }
+            });
+        });
+
+        $("#btn_guardar_cambios").on('click',function(){
+            if($("#txt_nombre").val()!=""){
+                jQuery.ajax({
+                    url: "{%url 'guardar_cambios_catalogo'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id="+elemento+"&tipo="+tipo+"&nombre="+$("#txt_nombre").val(),
+                    success: function(json){
+                        create_alert("<li>Elemento actualizado con éxito </li>","EXITO","notificaciones",true,5000);
+                        $("#dt_forma_pago").DataTable().ajax.reload();
+                        $("#dt_forma_facturacion").DataTable().ajax.reload();
+                        $("#dt_alquiler").DataTable().ajax.reload();
+                        $("#btn_cancelar").click();
+                        tipo = -1;
+                        elemento = -1;
+                    }
+                });
+            }else{
+                create_alert("<li><b>Nombre:</b>Este campo no puede ir vacío.</li>","ERROR","div_errores",false,0);
+            }
+        });
+    });
+
+</script>
+{% endblock %}

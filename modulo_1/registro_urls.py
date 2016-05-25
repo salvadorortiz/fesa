@@ -24,4 +24,13 @@ urlpatterns = [
     url(r'^usuarios_vista/', 'modulo_1.views.dt_usuarios',name='dt_usuarios'),
     url(r'^guardar_usuario/', 'modulo_1.views.GuardarUsuario',name='guardar_usuario'),
     url(r'^guardar_cambios_usuario/', 'modulo_1.views.GuardarCambiosUsuario',name='guardar_cambios_usuario'),
-]
+
+    #Catalogos
+    url(r'^catalogos/', 'modulo_1.views.CatalogosView',name='catalogos'),
+    url(r'^forma_pago/', 'modulo_1.views.dt_forma_pago',name='dt_forma_pago'),
+    url(r'^forma_facturacion/', 'modulo_1.views.dt_forma_facturacion',name='dt_forma_facturacion'),
+    url(r'^tipo_alquiler/', 'modulo_1.views.dt_alquiler',name='dt_alquiler'),
+    url(r'^guardar_catalogo/', 'modulo_1.views.GuardarCatalogo',name='guardar_catalogo'),
+    url(r'^eliminar_catalogo/', 'modulo_1.views.EliminarCatalogo',name='eliminar_catalogo'),
+    url(r'^guardar_cambios_catalogo/', 'modulo_1.views.GuardarCambiosCatalogo',name='guardar_cambios_catalogo'),
+    ]

@@ -4,7 +4,7 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from .models import Cancha,Usuario
+from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler
 from modulo_1.forms import UsuarioForm
 import json
 import hashlib
@@ -96,3 +96,60 @@ def GuardarCambiosUsuario(request):
 		return HttpResponse(json.dumps({}), content_type='application/json')
 	else:
 		return HttpResponse(json.dumps({'errors': form_usuario.errors}), content_type='application/json')
+
+def CatalogosView(request):
+	return render(request,'catalogos.html')
+
+def dt_forma_pago(request):
+	str_query = "SELECT * FROM modulo_1_formapago"
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	forma_pago = convert_fetchall(qs)
+	return HttpResponse(json.dumps(forma_pago), content_type='application/json')
+
+def dt_forma_facturacion(request):
+	str_query = "SELECT * FROM modulo_1_formafacturacion"
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	forma_facturacion = convert_fetchall(qs)
+	return HttpResponse(json.dumps(forma_facturacion), content_type='application/json')
+
+def dt_alquiler(request):
+	str_query = "SELECT * FROM modulo_1_tipoalquiler"
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	tipo_alquiler = convert_fetchall(qs)
+	return HttpResponse(json.dumps(tipo_alquiler), content_type='application/json')
+
+def GuardarCatalogo(request):
+	if request.POST['tipo']=="1":
+		FormaPago(nombre=request.POST['nombre']).save()
+	elif request.POST['tipo']=="2":
+		FormaFacturacion(nombre=request.POST['nombre']).save()
+	elif request.POST['tipo']=="3":
+		TipoAlquiler(nombre=request.POST['nombre']).save()
+
+	return HttpResponse(json.dumps({}), content_type='application/json')
+
+def EliminarCatalogo(request):
+	if request.POST['tipo']=="1":
+		FormaPago.objects.filter(forma_pago_id=request.POST['id']).delete()
+	elif request.POST['tipo']=="2":
+		FormaFacturacion.objects.filter(forma_facturacion_id=request.POST['id']).delete()
+	elif request.POST['tipo']=="3":
+		TipoAlquiler.objects.filter(tipo_alquiler_id=request.POST['id']).delete()
+
+	return HttpResponse(json.dumps({}), content_type='application/json')
+
+def GuardarCambiosCatalogo(request):
+	if request.POST['tipo']=="1":
+		FormaPago.objects.filter(forma_pago_id=request.POST['id']).update(nombre=request.POST['nombre'])
+	elif request.POST['tipo']=="2":
+		FormaFacturacion.objects.filter(forma_facturacion_id=request.POST['id']).update(nombre=request.POST['nombre'])
+	elif request.POST['tipo']=="3":
+		TipoAlquiler.objects.filter(tipo_alquiler_id=request.POST['id']).update(nombre=request.POST['nombre'])
+
+	return HttpResponse(json.dumps({}), content_type='application/json')

@@ -242,6 +242,7 @@
                             $("#div_errores").html('');
                             create_alert("<li>Empresa ingresada con éxito </li>","EXITO","notificaciones",true,5000);
                             $("#dt_empresas").DataTable().ajax.reload();
+                            $("#cancelar_empresa").click();
                         }else{
                             show_errors(json, 'div_errores');
                             //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);

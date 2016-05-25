@@ -6,19 +6,19 @@
    <!--  <li><a href="#">Inicio</a></li>
     <li class="active">Ingresar</li> -->
     <li class="active">
-	    <i class="fa fa-file"></i> Prueba breadcrumbs
+	    <i class="fa fa-file"></i> Inicio
 	</li>
 {% endblock %}
 
-{% block pagetitle %} Titulo :3c{% endblock %} 
-{% block subheading %} Por si queremos subtitulo{% endblock %}
+{% block pagetitle %} Página de inicio{% endblock %} 
+{% block subheading %} FESA{% endblock %}
 
 {% block content %}
 	{% csrf_token %}
     <div class="row">
-        <h1>Este será el index</h1>
+        <h1>Esta será la página de inicio</h1>
     </div>
-	Prueba del content en template
+	Contenido de la página de inicio
 {% endblock %}
 
 {% block addExtraScript %} 
