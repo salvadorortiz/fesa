@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Registro de complejo {% endblock %}
+
+{% block breadcrumbs %}
+   <!--  <li><a href="#">Inicio</a></li>
+    <li class="active">Ingresar</li> -->
+    <li class="active">
+	    <i class="fa fa-file"></i> Registro
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Complejos{% endblock %} 
+{% block subheading %}{% endblock %}
+
+
+{% block content %}
+	{% csrf_token %}
+    {% load widget_tweaks %}
+    <div class="row">
+        <div id="div_errores"></div>
+    </div>
+    <br>
+        <div class="row"> 
+            <div class="col-sm-12">
+               <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+                    <label data-toggle="collapse" href="#complejo_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-flag"></i> &nbsp;Registro de complejos</label>
+                    <a href="#" onclick="$('#dt_complejo').DataTable().ajax.reload();"style="float:right; color:white;">
+                        <i class="fa fa-refresh"></i>
+                    </a>
+                </div>
+                 <div id="complejo_toggle" class="collapse in col-sm-12">
+                        <table id="dt_complejo">
+                            <thead>
+                                <th>Id complejo</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                </div>
+                    
+            </div>
+        </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-flag fa-fw"></i> Complejos</h3>
+        </div>
+         <div class="panel-body">
+            <form id="form_complejo">
+            <input type="hidden" value="" name="id_complejo">
+            <div class="row"> 
+            <div class="col-sm-12">
+                <div class="col-sm-1">
+                    <strong>Nombre</strong>
+                </div>
+                <div class="col-sm-10">
+                    {{form_complejo.nombre| add_class:'form-control'}}
+                </div>
+            </div>
+            </div>
+            <br>
+            <div class="row">
+            <div class="col-sm-12">
+                <div class="col-sm-1">
+                    Dirección
+                </div>
+                <div class="col-sm-10">
+                     {% render_field form_complejo.direccion class+="form-control" resize="none" rows="2" placeholder="Dirección" %}
+                </div>
+            </div>
+            </div> 
+            </form>
+            <br>
+            <div class="row">
+                <div class="col-sm-12 text-center">
+                     <center>
+                        <button type="button" id="guardar_complejo" class="btn btn-primary">Guardar</button>
+                        <button type="button" id="guardar_cambios_complejo" style="display:none" class="btn btn-primary">Guardar Cambios</button>
+                        <button type="button" id="cancelar_complejo" style="display:none" class="btn btn-default">Cancelar</button>
+                    </center>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+   $(window).load(function() {
+         var dt_complejo = $('#dt_complejo').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_complejo' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            "pageLength": 5,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"85%"},
+                {"targets": 2 ,"width": "15%",  "defaultContent": "<center><button name=\"edit_complejo\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button></center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+         $("#id_direccion").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 250, // Characters limit
+            status: true, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+
+         $("#id_nombre").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 100, // Characters limit
+            status: false, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+          $("#guardar_complejo").on('click',function(){
+        //alert("entro");
+         jQuery.ajax({
+            url: "{%url 'guardar_complejo'%}",
+            type: "POST",
+            processData: false,
+            data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(form_complejo).serialize(),
+            success: function(json){
+                if(json['errors']==null){
+                    //console.log('if');
+                    $("#div_errores").html('');
+                    create_alert("<li>Complejo ingresado con éxito </li>","EXITO","notificaciones",true,5000);
+                    $("#dt_complejo").DataTable().ajax.reload();
+                }else{
+                    show_errors(json, 'div_errores');
+                    //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                }
+            }
+        });
+   });
+
+            $("#guardar_cambios_complejo").on('click',function(){
+                //alert("entro");
+                 jQuery.ajax({
+                    url: "{%url 'guardar_cambios_complejo'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(form_complejo).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#div_errores").html('');
+                            create_alert("<li>Complejo actualizado con éxito </li>","EXITO","notificaciones",true,5000);
+                            $("#dt_complejo").DataTable().ajax.reload();
+                            $("#cancelar_complejo").click();
+                        }else{
+                            show_errors(json, 'div_errores');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });
+
+             $("#cancelar_complejo").on('click',function(){
+                $("[name=id_complejo]").val("");
+                $("#id_nombre").val("");
+                $("#id_direccion").val("");
+                $('#dt_complejo').DataTable().$('tr.selected').removeClass('selected');
+               $("#guardar_cambios_complejo").hide();
+               $("#cancelar_complejo").hide();
+               $("#guardar_complejo").show();
+            });
+
+             $("#dt_complejo").on('click', "[name=edit_complejo]",function(){
+                   // alert("click");
+                    $('#dt_complejo').DataTable().$('tr.selected').removeClass('selected');
+                    $(this).parent().parent().parent().addClass('selected');
+                    var data = $('#dt_complejo').DataTable().rows('.selected').data();
+                    jQuery.ajax({
+                        url: "{%url 'cargar_complejo'%}",
+                        type: "POST",
+                        processData: false,
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_complejo="+data[0][0].toString(),
+                        success: function(json){
+                            $("[name=id_complejo]").val(json['complejo'][0]);
+                            $("#id_nombre").val(json['complejo'][1]);
+                            $("#id_direccion").val(json['complejo'][2]);
+                            $("#guardar_cambios_complejo").show();
+                            $("#cancelar_complejo").show();
+                            $("#guardar_complejo").hide();
+                        }
+                    });
+                   /* console.log(data);
+                    $('#txt_complejo').val(data[0][1]);
+                    $('#txt_cancha').val(data[0][2]);
+                    $('#txt_precio').val(String(data[0][3]).replace('$',''));
+                    id_cancha=data[0][0];*/
+                });
+
+
+    });
+
+  
+
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from modulo_1 import cliente_views
+from modulo_1 import cliente_views, datosbase_views
 
 urlpatterns = [
     url(r'^cliente/', 'modulo_1.cliente_views.RegistroClienteView',name='cliente_registrocliente'),
@@ -33,4 +33,11 @@ urlpatterns = [
     url(r'^guardar_catalogo/', 'modulo_1.views.GuardarCatalogo',name='guardar_catalogo'),
     url(r'^eliminar_catalogo/', 'modulo_1.views.EliminarCatalogo',name='eliminar_catalogo'),
     url(r'^guardar_cambios_catalogo/', 'modulo_1.views.GuardarCambiosCatalogo',name='guardar_cambios_catalogo'),
+    
+    #Complejo
+    url(r'^complejo/', 'modulo_1.datosbase_views.RegistroComplejo',name='base_registrocomplejo'),
+    url(r'^dt_complejo/', 'modulo_1.datosbase_views.ComplejoData',name='dt_complejo'),
+    url(r'^guardar_complejo/', 'modulo_1.datosbase_views.GuardarComplejo',name='guardar_complejo'),
+    url(r'^guardar_cambios_complejo/', 'modulo_1.datosbase_views.GuardarCambiosComplejo',name='guardar_cambios_complejo'),
+    url(r'^cargar_complejo/', 'modulo_1.datosbase_views.CargarComplejo',name='cargar_complejo'),
     ]

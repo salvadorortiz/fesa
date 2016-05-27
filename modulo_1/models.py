@@ -24,6 +24,7 @@ class Usuario(models.Model):
 
 class Complejo(models.Model):
 	complejo_id = models.AutoField(primary_key=True)
+	direccion = models.TextField('Dirección', max_length=250, blank=True, null=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 
 	def __unicode__(self):

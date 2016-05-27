@@ -32,3 +32,7 @@ class UsuarioForm(ModelForm):
 		super(UsuarioForm, self ).__init__(*args, **kwargs)
 		self.fields['tipo_usuario'].empty_label = "Seleccione el tipo de usuario"
 		
+class ComplejoForm(ModelForm):
+	class Meta:
+		model= Complejo
+		fields= ['nombre','direccion']
