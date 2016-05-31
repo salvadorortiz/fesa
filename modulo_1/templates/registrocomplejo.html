@@ -170,6 +170,75 @@
     </div>
 
 
+<!-- REGISTRO DE CANCHAS-->
+<div id="modal_cancha" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Registro de cancha</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="errores_cancha"></div>
+            </div>
+        </div>
+        <form id="form_cancha">
+        <div class="row">
+            <div class="col-sm-12">
+                {{form_cancha.complejo}}
+                <input type="hidden" name="cancha">
+                <div class="col-sm-2">
+                    <strong>Nombre</strong>
+                </div>
+                <div class="col-sm-5">
+                    {{form_cancha.nombre|add_class:"form-control"}}
+                </div>
+                <div class="col-sm-2">
+                    <strong>Horas posibles</strong>
+                </div>
+                <div class="col-sm-3">
+                    {{form_cancha.horas_posibles|add_class:"form-control"}}
+                </div>
+            </div>
+        </div>
+        </form>
+        <br>
+        <div class="row">
+            <div class="col-sm-12">
+                <center>
+                    <button type="button" id="guardar_cancha" class="btn btn-primary">Guardar</button>
+                    <button type="button" style="display:none" id="guardar_cambios_cancha" class="btn btn-primary">Guardar Cambos</button>
+                    <button type="button" style="display:none" id="cancelar_cancha" class="btn btn-default">Cancelar</button>
+                </center>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-12">
+                    <table id="dt_cancha">
+                        <thead>
+                            <th>Id cancha</th>
+                            <th>Id complejo</th>
+                            <th>Nombre cancha</th>
+                            <th>Acciones</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+               
+            </div>
+        </div>
+      </div>
+      <!--<div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>-->
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--FIN DE REGISTRO CANCHA-->
 {% endblock %}
 
 {% block addExtraScript %} 
@@ -202,7 +271,7 @@
             "columnDefs":[
                 {"targets":[0],"visible":false,"searchable":false},
                 {"targets":1, "width":"85%"},
-                {"targets": 2 ,"width": "15%",  "defaultContent": "<center><button name=\"edit_complejo\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button></center>" },
+                {"targets": 2 ,"width": "15%",  "defaultContent": "<center><button name=\"edit_complejo\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"agregar_canchas\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-futbol-o bigger-120\"></i></button></center>" },
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -251,6 +320,43 @@
             }
         });
 
+        //dt_cancha
+
+        var dt_cancha = $('#dt_cancha').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_cancha' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.complejo_id=$("#modal_cancha").find("#id_complejo").val()
+                },
+            },
+            "pageLength": 5,
+            "ordering": false,
+            "lengthChange": false,
+            "searching": false,
+            "paging": true,
+            "columnDefs":[
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"90%"},
+                {"targets": 3 ,"width":"10%",  "defaultContent": "<center><button name=\"edit_cancha\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button name=\"eliminar_cancha\" type='button' class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash bigger-120\"></i></button></center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+
+
+
          deshabilitar_horario();
 
          $("#id_direccion").maxlength({
@@ -267,6 +373,18 @@
 
 
          $("#id_nombre").maxlength({
+            events: ['blur'], // Array of events to be triggered
+            maxCharacters: 100, // Characters limit
+            status: false, // True to show status indicator below the element
+            statusClass: "status", // The class on the status div
+            statusText: "carácteres faltantes", // The status text
+            notificationClass: "notification",  // Will be added when maxlength is reached
+            showAlert: false, // True to show a regular alert message
+            alertText: "Ha excedido el límite de carácteres.", // Text in alert message
+            slider: true // True Use counter slider
+          });
+
+          $("#modal_cancha").find("#id_nombre").maxlength({
             events: ['blur'], // Array of events to be triggered
             maxCharacters: 100, // Characters limit
             status: false, // True to show status indicator below the element
@@ -449,6 +567,111 @@
                 var row = $(this).parent().parent().parent();
                 $("#tabla_horario_complejo").DataTable().row(row).remove().draw( false );
             });
+
+            $("#dt_complejo").on('click','[name=agregar_canchas]',function(){
+                 var row = $(this).parent().parent().parent();
+                 //console.log(row);
+                // row.css('background-color','blue');
+                data_row=$("#dt_complejo").DataTable().row(row).data();
+                //console.log(data_row);
+               if(data_row!=undefined){
+                    $("#modal_cancha").find("#id_complejo").val(data_row[0]);
+                    $("#dt_cancha").DataTable().ajax.reload();
+                    $("#modal_cancha").modal('show');
+                    //console.log(cadena);
+                }
+               
+            });
+
+            $("#guardar_cancha").on('click',function(){
+                jQuery.ajax({
+                    url: "{%url 'guardar_cancha'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(form_cancha).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#errores_cancha").html('');
+                            create_alert("<li>Cancha ingresada con éxito </li>","EXITO","errores_cancha",true,5000);
+                            $("#dt_cancha").DataTable().ajax.reload();
+                            $("#cancelar_cancha").click();
+                        }else{
+                            show_errors(json, 'errores_cancha');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });
+
+         $("#cancelar_cancha").on('click',function(){
+            $("#modal_cancha").find("#id_nombre").val("");
+            $("#modal_cancha").find("#id_horas_posibles").val("");
+            $("#dt_cancha").DataTable().ajax.reload();
+            $("#cancelar_cancha").hide();
+            $("#guardar_cambios_cancha").hide();
+            $("#guardar_cancha").show();
+         });
+
+         $("#guardar_cambios_cancha").on('click',function(){
+             jQuery.ajax({
+                    url: "{%url 'guardar_cambios_cancha'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(form_cancha).serialize(),
+                    success: function(json){
+                        if(json['errors']==null){
+                            //console.log('if');
+                            $("#errores_cancha").html('');
+                            create_alert("<li>Cancha actualizada con éxito </li>","EXITO","errores_cancha",true,5000);
+                            $("#dt_cancha").DataTable().ajax.reload();
+                            $("#cancelar_cancha").click();
+                        }else{
+                            show_errors(json, 'errores_cancha');
+                            //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
+                        }
+                    }
+                });
+           });
+
+         $("#dt_cancha").on('click','[name=edit_cancha]',function(){
+            $('#dt_cancha').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_cancha').DataTable().rows('.selected').data();
+            console.log(data[0]);
+            jQuery.ajax({
+                url: "{%url 'cargar_cancha'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+data[0][0].toString(),
+                success: function(json){
+                    $("[name=cancha]").val(json['cancha'][0]);
+                    $("#modal_cancha").find("#id_nombre").val(json['cancha'][1]);
+                    $("#id_horas_posibles").val(json['cancha'][2]);
+                    $("#guardar_cambios_cancha").show();
+                    $("#cancelar_cancha").show();
+                    $("#guardar_cancha").hide();
+                }
+            });
+         });
+
+         $("#dt_cancha").on('click','[name=eliminar_cancha]',function(){
+            console.log("eliminar_cancha");
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_cancha').DataTable().rows('.selected').data();
+            jQuery.ajax({
+                url: "{%url 'eliminar_cancha'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+data[0][0].toString(),
+                success: function(json){
+                    $("#cancelar_cancha").click();
+                    create_alert("<li>Cancha eliminada con éxito </li>","EXITO","errores_cancha",true,5000);
+                }
+            });
+            //console.log("salir");
+        });
+
     });
 
   

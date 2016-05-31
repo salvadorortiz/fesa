@@ -50,7 +50,7 @@ class Cancha(models.Model):
 	cancha_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 	complejo = models.ForeignKey('Complejo',verbose_name='Complejo',null=False,blank=False)
-	horas_posibles = models.IntegerField('Horas posibles', blank=True, default=0)
+	horas_posibles = models.IntegerField('Horas posibles', blank=False, default=0)
 
 	def __unicode__(self):
 		return self.nombre

@@ -3,8 +3,8 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from modulo_1.forms import ComplejoForm, HorarioForm
-from modulo_1.models import Complejo,HorarioComplejo
+from modulo_1.forms import ComplejoForm, HorarioForm, CanchaForm
+from modulo_1.models import Complejo,HorarioComplejo,Cancha
 from datetime import datetime
 import json
 import hashlib
@@ -13,6 +13,7 @@ def RegistroComplejo(request):
 	data={
 		'form_complejo': ComplejoForm(),
 		'form_horario': HorarioForm(),
+		'form_cancha': CanchaForm(),
 	}
 	return render(request,'registrocomplejo.html',data)
 
@@ -92,3 +93,51 @@ def HorarioComplejoData(request):
 	#print qs
 	clientes = convert_fetchall(qs)
 	return HttpResponse(json.dumps(clientes), content_type='application/json')
+
+def CanchaData(request):
+	if str(request.POST['complejo_id']) =="":
+		complejo= ' WHERE complejo_id=0'
+	else:
+		complejo= ' WHERE complejo_id='+str(request.POST['complejo_id'])
+	str_query = "SELECT cancha_id,complejo_id,nombre\
+					from modulo_1_cancha"+complejo
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	#print qs
+	clientes = convert_fetchall(qs)
+	return HttpResponse(json.dumps(clientes), content_type='application/json')
+
+def GuardarCancha(request):
+	form_cancha=CanchaForm(request.POST or None)
+	if form_cancha.is_valid():
+		form_cancha.save()
+		return HttpResponse(json.dumps({}), content_type='application/json')
+	else:
+		return HttpResponse(json.dumps({'errors': form_cancha.errors}), content_type='application/json')
+
+def GuardarCambiosCancha(request):
+	form_cancha=CanchaForm(request.POST or None)
+	if form_cancha.is_valid():
+		#form_cancha.save()
+		obj_cancha= Cancha.objects.get(cancha_id=int(request.POST['cancha']))
+		obj_cancha.nombre=str(request.POST['nombre'])
+		obj_cancha.horas_posibles= int(request.POST['horas_posibles'])
+		obj_cancha.save(force_update=True)
+		return HttpResponse(json.dumps({}), content_type='application/json')
+	else:
+		return HttpResponse(json.dumps({'errors': form_cancha.errors}), content_type='application/json')
+
+def CargarCancha(request):
+	obj_cancha=Cancha.objects.filter(cancha_id=int(request.POST['id_cancha'])).values_list('cancha_id','nombre','horas_posibles')
+	lista_resultado=[]
+	print obj_cancha
+	for cancha in obj_cancha:
+		lista_resultado+=list(cancha)
+	return HttpResponse(json.dumps({'cancha': lista_resultado}), content_type='application/json')
+
+
+def EliminarCancha(request):
+	print "entro :)"
+	Cancha.objects.filter(cancha_id=int(request.POST['id_cancha'])).delete()
+	return HttpResponse(json.dumps({}), content_type='application/json')

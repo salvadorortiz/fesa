@@ -177,7 +177,8 @@ function correc_palabras(palabra){
 				['telefono','Teléfono'],
 				['correo_contacto','Correo Electrónico del contacto'],
 				['telefono_contacto','Teléfono de contacto'],
-				['registro_iva','Registro de IVA']
+				['registro_iva','Registro de IVA'],
+				['horas_posibles','Horas posibles']
 				//['']
 				];
 	

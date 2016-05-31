@@ -56,3 +56,11 @@ class HorarioForm(ModelForm):
 		widgets={
 			'dia' : HiddenInput(),
 		}
+
+class CanchaForm(ModelForm):
+	class Meta:
+		model= Cancha
+		fields= ['nombre','complejo','horas_posibles']
+		widgets={
+			'complejo': HiddenInput(),
+		}
