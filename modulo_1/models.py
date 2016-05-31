@@ -50,11 +50,17 @@ class Cancha(models.Model):
 	cancha_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
 	complejo = models.ForeignKey('Complejo',verbose_name='Complejo',null=False,blank=False)
-	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	horas_posibles = models.IntegerField('Horas posibles', blank=True, default=0)
 
 	def __unicode__(self):
 		return self.nombre
+
+class PrecioXCancha(models.Model):
+	precio_cancha_id = models.AutoField(primary_key=True)
+	cancha = models.ForeignKey('Cancha',verbose_name='Cancha',null=False,blank=False)
+	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	dias = models.CharField('Días',max_length=200,blank=False,null=False,default='')
+	hora = models.CharField('Hora',max_length=50,blank=False,null=False,default='')
 
 class Cliente(models.Model):
 	cliente_id = models.AutoField(primary_key=True)

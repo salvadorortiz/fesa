@@ -27,12 +27,16 @@ def PreciosView(request):
 	return render(request,'precios.html')
 
 def dt_precios(request):
-	str_query = """SELECT ca.cancha_id,
-				   co.nombre AS nombre_complejo,
-				   ca.nombre AS nombre_cancha,
-				   '$'::text || ca.precio::text AS precio
-				   FROM modulo_1_cancha ca
-				   JOIN modulo_1_complejo co ON ca.complejo_id = co.complejo_id"""
+	str_query = """SELECT 
+					 ca.cancha_id
+					,pc.precio_cancha_id
+					,ca.nombre AS nombre_cancha
+					,pc.dias AS días
+					,pc.hora AS hora
+					,'$'::text || pc.precio::text AS precio
+				FROM 	modulo_1_cancha ca
+				JOIN 	modulo_1_complejo co ON ca.complejo_id ="""+ request.POST['complejo_id']+"""
+				JOIN modulo_1_precioxcancha pc ON pc.cancha_id = ca.cancha_id GROUP BY ca.cancha_id,pc.precio_cancha_id"""
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
@@ -50,8 +54,8 @@ def RegistroUsuarioView(request):
 def dt_usuarios(request):
 	str_query = """SELECT usuario_id,nombre,usuario,area,jefe_directo,
 					CASE tipo_usuario
-						WHEN 'A'::text THEN 'Tipo A'
-						WHEN 'B'::text THEN 'Tipo B'
+						WHEN 'A'::text THEN 'A'
+						WHEN 'B'::text THEN 'B'
 						WHEN 'R'::text THEN 'Administrador'
 					END AS tipo,
 					CASE estado
@@ -85,7 +89,8 @@ def GuardarCambiosUsuario(request):
 		obj_usuario.jefe_directo= str(request.POST['jefe_directo'])
 		obj_usuario.nombre = str(request.POST['nombre'])
 		obj_usuario.usuario= str(request.POST['usuario'])
-		obj_usuario.password = hashlib.sha1(request.POST['password']).hexdigest()
+		if obj_usuario.password != request.POST['password']:
+			obj_usuario.password = hashlib.sha1(request.POST['password']).hexdigest()
 		if request.POST['estado_usuario'] == "false":
 			obj_usuario.estado= False
 		else:

@@ -16,19 +16,93 @@
 {% block content %}
 	{% csrf_token %}
     <div class="row"> 
-        <div class="col-sm-12">
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
-                <label data-toggle="collapse" href="#requi_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-usd"></i> &nbsp;Guía de precios</label>
-                <a href="#" onclick="$('#dt_precios').DataTable().ajax.reload();"style="float:right; color:white;">
+        <div class="col-lg-12">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64; margin-bottom:5px;">
+                <label data-toggle="collapse" href="#santa_tecla" style="width:94%; color:white;">&nbsp;Centro del Deportista Integral &middot; Santa Tecla</label>
+                <a href="#" onclick="$('#dt_santa_tecla').DataTable().ajax.reload();" style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
                 </a>
             </div>
-            <div id="requi_toggle" class="collapse in col-sm-12">
-                <table id="dt_precios">
+            <div id="santa_tecla" class="collapse out col-lg-12">
+                <table id="dt_santa_tecla" class="stripe" style="width:100%;">
                     <thead>
                         <th>Cancha_id</th>
-                        <th>Complejo</th>
+                        <th>precio_cancha_id</th>
                         <th>Cancha</th>
+                        <th>Días</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                        {%if request.session.type_user == 'R'%} 
+                        <th>Acciones</th>
+                        {%endif%}
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+            <div style="clear:both;margin-top:0%;padding: 5px;background-color:#153F64; margin-bottom:5px;">
+                <label data-toggle="collapse" href="#anda" style="width:94%; color:white;">&nbsp;Complejo ANDA</label>
+                <a href="#" onclick="$('#dt_anda').DataTable().ajax.reload();" style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+            <div id="anda" class="collapse out col-sm-12">
+                <table id="dt_anda" class="stripe" style="width:100%;">
+                    <thead>
+                        <th>Cancha_id</th>
+                        <th>precio_cancha_id</th>
+                        <th>Cancha</th>
+                        <th>Días</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                        {%if request.session.type_user == 'R'%} 
+                        <th>Acciones</th>
+                        {%endif%}
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+            <div style="clear:both;margin-top:0%;padding: 5px;background-color:#153F64; margin-bottom:5px;">
+                <label data-toggle="collapse" href="#guazapa" style="width:94%; color:white;">&nbsp;Centro del Deportista Integral &middot; Guazapa</label>
+                <a href="#" onclick="$('#dt_guazapa').DataTable().ajax.reload();" style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+            <div id="guazapa" class="collapse out col-sm-12">
+                <table id="dt_guazapa" class="stripe" style="width:100%;">
+                    <thead>
+                        <th>Cancha_id</th>
+                        <th>precio_cancha_id</th>
+                        <th>Cancha</th>
+                        <th>Días</th>
+                        <th>Hora</th>
+                        <th>Precio</th>
+                        {%if request.session.type_user == 'R'%} 
+                        <th>Acciones</th>
+                        {%endif%}
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table> 
+                <hr>
+            </div>
+            <div style="clear:both;margin-top:0%;padding: 5px;background-color:#153F64; margin-bottom:5px;">
+                <label data-toggle="collapse" href="#bengoa" style="width:94%; color:white;">&nbsp;Centro del Deportista Integral &middot; Bengoa</label>
+                <a href="#" onclick="$('#dt_bengoa').DataTable().ajax.reload();" style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+            <div id="bengoa" class="collapse out col-sm-12">
+                <table id="dt_bengoa" class="stripe" style="width:100%;">
+                    <thead>
+                        <th>Cancha_id</th>
+                        <th>precio_cancha_id</th>
+                        <th>Cancha</th>
+                        <th>Días</th>
+                        <th>Hora</th>
                         <th>Precio</th>
                         {%if request.session.type_user == 'R'%} 
                         <th>Acciones</th>
@@ -40,10 +114,11 @@
                 <hr>
             </div>
             {%if request.session.type_user == 'R'%}
+            <br><br>
             <div class="col-sm-12">
                 <div id="div_errores"></div>
             </div>        
-            <div class="col-sm-12">
+            <div class="col-sm-12" id="modificar_precio">
                 <div class="col-sm-5">Complejo:</div>
                 <div class="col-sm-5">Cancha:</div>
                 <div class="col-sm-2"><b>Precio:</b></div>
@@ -66,7 +141,7 @@
                 <div class="col-sm-3"></div>
                 <div class="col-sm-6">
                     <center>
-                    <button type="button" class="btn btn-primary" id="btn_guardar">Guardar</button>
+                    <button type="button" class="btn btn-primary" style="background-color:#153F64" id="btn_guardar">Guardar</button>
                     <button type="button" class="btn btn-default" id="btn_cancelar">Cancelar</button>
                     </center>
                 </div>
@@ -81,12 +156,13 @@
 <script type="text/javascript">
    $(window).load(function() {
         var id_cancha=-1;
-        var dt_precios = $('#dt_precios').DataTable( {
+        var dt_santa_tecla = $('#dt_santa_tecla').DataTable( {
             "ajax": {
                 "url": "{%url 'dt_precios' %}",
                 "type": "POST",
                 "data":  function( d ) {
-                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.complejo_id = 3
                 },
             },
             "pageLength": 10,
@@ -94,14 +170,129 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[1,"asc"],[2,"asc"],[3,"asc"]],
+            "order":[[2,"asc"],[3,"asc"]],
             "columnDefs":[
-                {"targets":[0],"visible":false,"searchable":false},
-                {"targets":1, "width":"35%"},
-                {"targets":2, "width":"35%"},
-                {"targets":3, "width":"20%"},
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"25%"},
+                {"targets":3, "width":"35%"},
+                {"targets":4, "width":"30%","searchable":false},
+                {"targets":5, "width":"30%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 4 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {%endif%}
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        var dt_anda = $('#dt_anda').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_precios' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.complejo_id = 4
+                },
+            },
+            "pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "order":[[2,"asc"],[3,"asc"]],
+            "columnDefs":[
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"25%"},
+                {"targets":3, "width":"35%"},
+                {"targets":4, "width":"30%","searchable":false},
+                {"targets":5, "width":"30%","searchable":false},
+                {%if request.session.type_user == 'R'%}
+                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {%endif%}
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        var dt_guazapa = $('#dt_guazapa').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_precios' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.complejo_id = 2
+                },
+            },
+            "pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "order":[[2,"asc"],[3,"asc"]],
+            "columnDefs":[
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"25%"},
+                {"targets":3, "width":"35%"},
+                {"targets":4, "width":"30%","searchable":false},
+                {"targets":5, "width":"30%","searchable":false},
+                {%if request.session.type_user == 'R'%}
+                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {%endif%}
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        var dt_bengoa = $('#dt_bengoa').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_precios' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.complejo_id = 1
+                },
+            },
+            "pageLength": 10,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "order":[[2,"asc"],[3,"asc"]],
+            "columnDefs":[
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"20%"},
+                {"targets":3, "width":"30%"},
+                {"targets":4, "width":"20%","searchable":false},
+                {"targets":5, "width":"20%","searchable":false},
+                {%if request.session.type_user == 'R'%}
+                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -118,13 +309,20 @@
         });
 
         $(document).on('click', "[name=edit_precio]",function(){
-            $('#dt_precios').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_santa_tecla').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_anda').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_guazapa').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_bengoa').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
-            var data = $('#dt_precios').DataTable().rows('.selected').data();
+            var data = $('#dt_santa_tecla').DataTable().rows('.selected').data();
             $('#txt_complejo').val(data[0][1]);
             $('#txt_cancha').val(data[0][2]);
             $('#txt_precio').val(String(data[0][3]).replace('$',''));
             id_cancha=data[0][0];
+            //SCROLL 
+            $('html,body').animate({
+                scrollTop: $("#modificar_precio").offset().top
+            }, 1200);
         });
 
         $('#btn_cancelar').on('click', function(){

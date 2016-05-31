@@ -15,7 +15,8 @@
     <!-- Custom Fonts -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
     <!-- DataTables Style -->
-    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.11/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+
     <!-- JS -->
     <!-- jQuery -->
     <script src="{% static 'js/jquery.min.js' %}"></script>
@@ -23,7 +24,7 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <!-- Morris Charts JavaScript -->
     <script src="{% static 'js/raphael-min.js' %}"></script>
-    <script src="{% static 'js/morris.min.js' %}"></script> 
+    <script src="{% static 'js/morris.min.js' %}"></script>  
     <script src="{% static 'js/morris-data.js' %}"></script>
     <script src="{% static 'js/jquery.flot.js' %}"></script>
     <script src="{% static 'js/jquery.flot.tooltip.min.js' %}"></script>
@@ -33,9 +34,8 @@
     <script src="{% static 'js/jquery.mask.js' %}"></script>
     <script src="{% static 'js/jquery.maxlength.js' %}"></script>
     <script src="{% static 'js/bootbox.min.js' %}"></script>
-
     <!-- DataTables JavaScript -->
-    <script type="text/javascript" src="https://cdn.datatables.net/t/bs/dt-1.10.11/datatables.min.js"></script>
+    <script type="text/javascript" src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
 
     <!-- DataTables JavaScript -->
     <script src="{% static 'js/validaciones_form.js' %}"></script>
@@ -57,6 +57,10 @@
         .selected{
             background-color: #cdfcff;
         }
+
+        body{
+            background-color:#153F64;
+        }
     </style>
     {% block addExtraStyle %} {% endblock %}
     {% block addExtraScript %} {% endblock %}
@@ -66,8 +70,8 @@
 
     <div id="wrapper">
 
-        <!-- Navigation -->
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- Navigation 004687-->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="background-color:#153F64">
             <!-- Brand and toggle get grouped for better mobile display -->
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
@@ -96,8 +100,8 @@
                 </li>
             </ul>
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
-                <ul class="nav navbar-nav side-nav">
+            <div class="collapse navbar-collapse navbar-ex1-collapse" >
+                <ul class="nav navbar-nav side-nav" style="background-color:#153F64">
                     <li >
                         <a href="{%url 'precios_guia'%}"><i class="fa fa-fw fa-usd"></i> Precios</a>
                     </li>
