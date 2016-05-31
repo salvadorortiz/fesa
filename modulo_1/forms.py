@@ -3,7 +3,8 @@
 from modulo_1.models import *
 from django import forms
 from django.forms.fields import CharField
-from django.forms import ModelForm,Textarea
+from django.forms import ModelForm,Textarea,MultipleChoiceField,HiddenInput
+                                             
 
 class ClienteForm(ModelForm):
 	#your_name = forms.CharField(label='Your name', max_length=100)
@@ -36,3 +37,22 @@ class ComplejoForm(ModelForm):
 	class Meta:
 		model= Complejo
 		fields= ['nombre','direccion']
+
+class HorarioForm(ModelForm):
+	DIAS = 	(
+		('L','Lunes'),
+		('M','Martes'),
+		('X','Miércoles'),
+		('J','Jueves'),
+		('V','Viernes'),
+		('S','Sábado'),
+		('D','Domingo'),
+		)
+	#your_name = forms.CharField(label='Your name', max_length=100)
+	dia = forms.MultipleChoiceField(choices=DIAS, required=True, widget=forms.CheckboxSelectMultiple())
+	class Meta:
+		model= HorarioComplejo
+		fields = ['complejo','dia','hora_apertura','hora_cierre']
+		widgets={
+			'dia' : HiddenInput(),
+		}

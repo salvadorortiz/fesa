@@ -82,14 +82,110 @@
                         <button type="button" id="cancelar_complejo" style="display:none" class="btn btn-default">Cancelar</button>
                     </center>
                 </div>
+               </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-calendar fa-fw"></i> Horario de complejo</h3>
+        </div>
+         <div class="panel-body">
+            <form id="form_horario">
+            <input type="hidden" value="" name="id_complejo">
+            <div class="well">
+           <div class="row">
+                <div class="col-sm-12">
+                   
+                     <strong>Seleccione los d&iacute;as:</strong>
+                    <div class="panel panel-info">
+                      <div class="panel-heading" style="color:black;">
+                        <center>
+                        {% for checkbox in form_horario.dia %}                 
+                            {{ checkbox.tag }} {{ checkbox.choice_label }} &nbsp;&nbsp;&nbsp;
+                        {% endfor %}
+                        </center>
+                      </div>
+                    </div>
+                   
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="col-sm-1">
+                    </div>
+                    <div class="col-sm-3">
+                        <strong>Seleccione el rango de horas:</strong>
+                    </div>
+                    <div clas="col-sm-4">
+                    <p id="timeOnlyExample">
+                      {{form_horario.hora_apertura|add_class:"time start ui-timepicker-input"}}
+                      &nbsp;a&nbsp;
+                      {{form_horario.hora_cierre|add_class:"time end ui-timepicker-input"}}
+                    </p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                    <center>
+                        <button type="button" id="agregar_horario" class="btn btn-success">Añadir horario</button> 
+                    </center>
+                </div>
+            </div>
+             </div> <!--Well-->
+             <div class="row">
+             <div class="col-sm-3"></div>
+             <div class="col-sm-6">
+                 <table id="tabla_horario_complejo">
+                     <thead>
+                         <th>Id complejo</th>
+                         <th>Abreviatura</th>
+                         <th>Día</th>
+                         <th>Hora de apertura</th>
+                         <th>Hora de salida </th>
+                         <th>Acciones</th>
+                     </thead>
+                     <tbody>
+                         
+                     </tbody>
+                 </table>
+            </div>
+            <div class="col-sm-3"></div>
+        </div> 
+        </form>
+            <br>
+            <div class="row">
+                <div class="col-sm-12 text-center">
+                     <center>
+                        <button type="button" id="guardar_horario" class="btn btn-primary">Guardar Horario</button>
+                    </center>
+                </div>
             </div>
         </div>
     </div>
+
+
 {% endblock %}
 
 {% block addExtraScript %} 
 <script type="text/javascript">
    $(window).load(function() {
+
+        //$('#id_hora_apertura').timepicker();
+        //$('#id_hora_cierre').timepicker();
+        $('#timeOnlyExample .time').timepicker({
+           // 'showDuration': true,
+            'timeFormat': 'G:i'
+        });
+
+        var timeOnlyExampleEl = document.getElementById('timeOnlyExample');
+        var timeOnlyDatepair = new Datepair(timeOnlyExampleEl);
+        
          var dt_complejo = $('#dt_complejo').DataTable( {
             "ajax": {
                 "url": "{%url 'dt_complejo' %}",
@@ -120,6 +216,42 @@
                 },
             }
         });
+
+           var dt_horario_complejo = $('#tabla_horario_complejo').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_horario' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.complejo_id=$("[name=id_complejo]").val()
+                },
+            },
+            "pageLength": 7,
+            "ordering": false,
+            "lengthChange": false,
+            "searching": false,
+            "paging": true,
+            "columnDefs":[
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"30%"},
+                {"targets":3, "width":"20%"},
+                {"targets":4, "width":"20%"},
+                {"targets": 5 ,"width":"10%",  "defaultContent": "<center><button name=\"eliminar_reg\" type='button' class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash bigger-120\"></i></button></center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+         deshabilitar_horario();
 
          $("#id_direccion").maxlength({
             events: ['blur'], // Array of events to be triggered
@@ -159,6 +291,7 @@
                     $("#div_errores").html('');
                     create_alert("<li>Complejo ingresado con éxito </li>","EXITO","notificaciones",true,5000);
                     $("#dt_complejo").DataTable().ajax.reload();
+                    deshabilitar_horario();
                 }else{
                     show_errors(json, 'div_errores');
                     //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
@@ -181,6 +314,7 @@
                             create_alert("<li>Complejo actualizado con éxito </li>","EXITO","notificaciones",true,5000);
                             $("#dt_complejo").DataTable().ajax.reload();
                             $("#cancelar_complejo").click();
+                            deshabilitar_horario();
                         }else{
                             show_errors(json, 'div_errores');
                             //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
@@ -189,7 +323,61 @@
                 });
            });
 
+            $("#agregar_horario").on('click',function(){
+                var ingresar_row= true;
+                if($("#id_hora_apertura").val()!="" && $("#id_hora_cierre").val()!=""){
+                    $("[id^='id_dia']:checked").each(function(){
+                        //console.log($(this).val());
+                        ingresar_row=true;
+                        valor_checkbox= $(this).val();
+                        $("#tabla_horario_complejo").find('tbody').find('tr').each(function(){
+                           data_row=$("#tabla_horario_complejo").DataTable().row($(this)).data();
+                           if(data_row!=undefined){
+                                if(valor_checkbox==data_row[1]) ingresar_row=false;
+                           }
+                        });
+                        if(ingresar_row){
+                            $("#tabla_horario_complejo").DataTable().row.add( [
+                                0,
+                                valor_checkbox,
+                                obtener_dia(valor_checkbox),
+                                $("#id_hora_apertura").val(),
+                                $("#id_hora_cierre").val()
+
+                            ] ).draw( false );
+                        } 
+                        
+                       
+                    });
+                }else{
+                    create_alert("<li>Las horas de apertura y cierre son campos requeridos</li>","ERROR","notificaciones",true,5000);
+                }
+                    
+            });
+
+            $("#guardar_horario").on('click',function(){
+                cadena="";
+                 $("#tabla_horario_complejo").find('tbody').find('tr').each(function(){
+                   data_row=$("#tabla_horario_complejo").DataTable().row($(this)).data();
+                   if(data_row!=undefined){
+                        cadena+=data_row[1]+","+data_row[3]+","+data_row[4]+"||";
+                        //console.log(cadena);
+                    }
+                });
+
+                jQuery.ajax({
+                    url: "{%url 'guardar_horario'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cadena="+cadena+"&complejo_id="+$("[name=id_complejo]").val(),
+                    success: function(json){
+                        create_alert("<li>Horario guardado con éxito</li>","EXITO","notificaciones",true,5000);
+                    }
+                });
+            });
+
              $("#cancelar_complejo").on('click',function(){
+                
                 $("[name=id_complejo]").val("");
                 $("#id_nombre").val("");
                 $("#id_direccion").val("");
@@ -197,6 +385,7 @@
                $("#guardar_cambios_complejo").hide();
                $("#cancelar_complejo").hide();
                $("#guardar_complejo").show();
+               deshabilitar_horario();
             });
 
              $("#dt_complejo").on('click', "[name=edit_complejo]",function(){
@@ -216,6 +405,7 @@
                             $("#guardar_cambios_complejo").show();
                             $("#cancelar_complejo").show();
                             $("#guardar_complejo").hide();
+                            habilitar_horario();
                         }
                     });
                    /* console.log(data);
@@ -225,7 +415,40 @@
                     id_cancha=data[0][0];*/
                 });
 
+            function obtener_dia(valor){
+                if(valor=='L') return 'Lunes';
+                if(valor== 'M') return 'Martes';
+                if(valor== 'X') return 'Miércoles';
+                if(valor=='J') return 'Jueves';
+                if(valor== 'V') return 'Viernes';
+                if(valor == 'S') return 'Sábado';
+                if(valor=='D') return 'Domingo';
+            }
 
+            function habilitar_horario(){
+                $("#tabla_horario_complejo").DataTable().ajax.reload();
+                 $("[id^='id_dia']").removeAttr('disabled');
+                 $("#id_hora_cierre").removeAttr('disabled');
+                 $("#id_hora_apertura").removeAttr('disabled');
+                 $("#agregar_horario").removeAttr('disabled');
+                 $("#guardar_horario").removeAttr('disabled');
+            }
+
+            function deshabilitar_horario(){  
+                 $("[id^='id_dia']").removeAttr('checked');
+                 $("[id^='id_dia']").attr('disabled','disabled');
+                 $("[id^='id_hora']").val("");
+                 $("#id_hora_cierre").attr('disabled','disabled');
+                 $("#id_hora_apertura").attr('disabled','disabled');
+                 $("#agregar_horario").attr('disabled','disabled');
+                 $("#guardar_horario").attr('disabled','disabled');
+                 $("#tabla_horario_complejo").DataTable().ajax.reload();
+            }
+
+            $("#tabla_horario_complejo").on('click','[name=eliminar_reg]',function(){
+                var row = $(this).parent().parent().parent();
+                $("#tabla_horario_complejo").DataTable().row(row).remove().draw( false );
+            });
     });
 
   

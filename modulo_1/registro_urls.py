@@ -40,4 +40,6 @@ urlpatterns = [
     url(r'^guardar_complejo/', 'modulo_1.datosbase_views.GuardarComplejo',name='guardar_complejo'),
     url(r'^guardar_cambios_complejo/', 'modulo_1.datosbase_views.GuardarCambiosComplejo',name='guardar_cambios_complejo'),
     url(r'^cargar_complejo/', 'modulo_1.datosbase_views.CargarComplejo',name='cargar_complejo'),
+    url(r'^guardar_horario/', 'modulo_1.datosbase_views.GuardarHorario',name='guardar_horario'),
+     url(r'^dt_horario/', 'modulo_1.datosbase_views.HorarioComplejoData',name='dt_horario'),
     ]

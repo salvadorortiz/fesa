@@ -12,14 +12,16 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def RegistroClienteView(request):
-	data={'cliente_form': ClienteForm()}
+	codigo_cliente= Cliente.objects.count()+1
+	data={'cliente_form': ClienteForm(initial={'codigo': codigo_cliente})}
 	return render(request,'registrocliente.html',data)
 
 def GuardarCliente(request):
 	form_cliente=ClienteForm(request.POST or None)
 	if form_cliente.is_valid():
 		form_cliente.save()
-		return HttpResponse(json.dumps({}), content_type='application/json')
+		codigo_cliente= Cliente.objects.count()+1
+		return HttpResponse(json.dumps({'codigo': codigo_cliente}), content_type='application/json')
 	else:
 		return HttpResponse(json.dumps({'errors': form_cliente.errors}), content_type='application/json')
 	
@@ -52,7 +54,8 @@ def GuardarCambiosCliente(request):
 		obj_cliente.DUI= str(request.POST['DUI'])
 		obj_cliente.correo = str(request.POST['correo'])
 		obj_cliente.save(force_update=True)
-		return HttpResponse(json.dumps({}), content_type='application/json')
+		codigo_cliente= Cliente.objects.count()+1
+		return HttpResponse(json.dumps({'codigo': codigo_cliente}), content_type='application/json')
 	else:
 		return HttpResponse(json.dumps({'errors': form_cliente.errors}), content_type='application/json')
 
