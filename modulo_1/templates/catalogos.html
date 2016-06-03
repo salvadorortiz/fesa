@@ -19,6 +19,7 @@
         <div class="col-sm-12">
             <div id="div_errores"></div>
         </div>
+        <br>
         <div class="col-sm-12">
             <div class="col-sm-1"></div>
             <div class="col-sm-5">
@@ -43,22 +44,22 @@
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <center>
-                    <button type="button" id="btn_guardar" class="btn btn-primary" style="background-color:#153F64"><i class="fa fa-floppy-o"></i> Guardar</button>
-                    <button type="button" id="btn_guardar_cambios" style="display:none;background-color:#153F64" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
+                    <button type="button" id="btn_guardar" class="btn btn-primary" style="background-color:#337AB7"><i class="fa fa-floppy-o"></i> Guardar</button>
+                    <button type="button" id="btn_guardar_cambios" style="display:none;background-color:#337AB7" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
                     <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default"><i class="fa fa-times"></i> Cancelar</button>
                 </center>
             </div>
         </div>
         <div class="col-sm-4">
         <br>
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
                 <label data-toggle="collapse" href="#pago_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-usd"></i> &nbsp;Formas de pago</label>
                 <a href="#" onclick="$('#dt_forma_pago').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
                 </a>
             </div>
             <div id="pago_toggle" class="collapse in col-sm-12">
-                <table id="dt_forma_pago">
+                <table id="dt_forma_pago" class="stripe">
                     <thead>
                         <th>forma_pago_id</th>
                         <th>Forma de pago</th>
@@ -72,14 +73,14 @@
         </div>
         <div class="col-sm-4">
         <br>
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
                 <label data-toggle="collapse" href="#factura_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-book"></i> &nbsp;Formas de facturación</label>
                 <a href="#" onclick="$('#dt_forma_facturacion').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
                 </a>
             </div>
             <div id="factura_toggle" class="collapse in col-sm-12">
-                <table id="dt_forma_facturacion">
+                <table id="dt_forma_facturacion" class="stripe">
                     <thead>
                         <th>forma_facturacion_id</th>
                         <th>Forma de facturación</th>
@@ -93,14 +94,14 @@
         </div>
         <div class="col-sm-4">
         <br>
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
                 <label data-toggle="collapse" href="#alquiler_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-home"></i> &nbsp;Tipos de reserva</label>
                 <a href="#" onclick="$('#dt_alquiler').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
                 </a>
             </div>
             <div id="alquiler_toggle" class="collapse in col-sm-12">
-                <table id="dt_alquiler">
+                <table id="dt_alquiler" class="stripe">
                     <thead>
                         <th>tipo_alquiler_id</th>
                         <th>Tipo de reserva</th>
