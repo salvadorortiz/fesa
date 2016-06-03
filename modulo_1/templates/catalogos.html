@@ -34,7 +34,7 @@
                         <option value="-1">Seleccione el tipo de catálogo</option>
                         <option value="1">Forma de pago</option>
                         <option value="2">Forma de facturación</option>
-                        <option value="3">Tipo de resreva</option>
+                        <option value="3">Tipo de reserva</option>
                     </select>
                 </div>
             </div>
@@ -43,15 +43,15 @@
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <center>
-                    <button type="button" id="btn_guardar" class="btn btn-primary">Guardar</button>
-                    <button type="button" id="btn_guardar_cambios" style="display:none" class="btn btn-primary">Guardar Cambios</button>
-                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default">Cancelar</button>
+                    <button type="button" id="btn_guardar" class="btn btn-primary" style="background-color:#153F64"><i class="fa fa-floppy-o"></i> Guardar</button>
+                    <button type="button" id="btn_guardar_cambios" style="display:none;background-color:#153F64" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
+                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default"><i class="fa fa-times"></i> Cancelar</button>
                 </center>
             </div>
         </div>
         <div class="col-sm-4">
         <br>
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
                 <label data-toggle="collapse" href="#pago_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-usd"></i> &nbsp;Formas de pago</label>
                 <a href="#" onclick="$('#dt_forma_pago').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
@@ -72,7 +72,7 @@
         </div>
         <div class="col-sm-4">
         <br>
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
                 <label data-toggle="collapse" href="#factura_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-book"></i> &nbsp;Formas de facturación</label>
                 <a href="#" onclick="$('#dt_forma_facturacion').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
@@ -93,7 +93,7 @@
         </div>
         <div class="col-sm-4">
         <br>
-            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
                 <label data-toggle="collapse" href="#alquiler_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-home"></i> &nbsp;Tipos de reserva</label>
                 <a href="#" onclick="$('#dt_alquiler').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>

@@ -28,6 +28,8 @@
                     <thead>
                         <th>Cancha_id</th>
                         <th>precio_cancha_id</th>
+                        <th>complejo_id</th>
+                        <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
                         <th>Hora</th>
@@ -52,6 +54,8 @@
                     <thead>
                         <th>Cancha_id</th>
                         <th>precio_cancha_id</th>
+                        <th>complejo_id</th>
+                        <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
                         <th>Hora</th>
@@ -76,6 +80,8 @@
                     <thead>
                         <th>Cancha_id</th>
                         <th>precio_cancha_id</th>
+                        <th>complejo_id</th>
+                        <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
                         <th>Hora</th>
@@ -100,6 +106,8 @@
                     <thead>
                         <th>Cancha_id</th>
                         <th>precio_cancha_id</th>
+                        <th>complejo_id</th>
+                        <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
                         <th>Hora</th>
@@ -141,8 +149,8 @@
                 <div class="col-sm-3"></div>
                 <div class="col-sm-6">
                     <center>
-                    <button type="button" class="btn btn-primary" style="background-color:#153F64" id="btn_guardar">Guardar</button>
-                    <button type="button" class="btn btn-default" id="btn_cancelar">Cancelar</button>
+                    <button type="button" class="btn btn-primary" style="background-color:#153F64" id="btn_guardar"><i class="fa fa-floppy-o"></i> Guardar</button>
+                    <button type="button" class="btn btn-default" id="btn_cancelar"><i class="fa fa-times"></i> Cancelar</button>
                     </center>
                 </div>
                 <div class="col-sm-3"></div>
@@ -155,7 +163,7 @@
 {% block addExtraScript %} 
 <script type="text/javascript">
    $(window).load(function() {
-        var id_cancha=-1;
+        var precio_cancha_id=-1;
         var dt_santa_tecla = $('#dt_santa_tecla').DataTable( {
             "ajax": {
                 "url": "{%url 'dt_precios' %}",
@@ -170,15 +178,15 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[2,"asc"],[3,"asc"]],
+            "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
-                {"targets":[0,1],"visible":false,"searchable":false},
-                {"targets":2, "width":"25%"},
-                {"targets":3, "width":"35%"},
-                {"targets":4, "width":"30%","searchable":false},
-                {"targets":5, "width":"30%","searchable":false},
+                {"targets":[0,1,2,3],"visible":false,"searchable":false},
+                {"targets":4, "width":"35%"},
+                {"targets":5, "width":"30%"},
+                {"targets":6, "width":"30%","searchable":false},
+                {"targets":7, "width":"30%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -208,15 +216,15 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[2,"asc"],[3,"asc"]],
+            "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
-                {"targets":[0,1],"visible":false,"searchable":false},
-                {"targets":2, "width":"25%"},
-                {"targets":3, "width":"35%"},
-                {"targets":4, "width":"30%","searchable":false},
-                {"targets":5, "width":"30%","searchable":false},
+                {"targets":[0,1,2,3],"visible":false,"searchable":false},
+                {"targets":4, "width":"35%"},
+                {"targets":5, "width":"30%"},
+                {"targets":6, "width":"30%","searchable":false},
+                {"targets":7, "width":"30%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -246,15 +254,15 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[2,"asc"],[3,"asc"]],
+            "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
-                {"targets":[0,1],"visible":false,"searchable":false},
-                {"targets":2, "width":"25%"},
-                {"targets":3, "width":"35%"},
-                {"targets":4, "width":"30%","searchable":false},
-                {"targets":5, "width":"30%","searchable":false},
+                {"targets":[0,1,2,3],"visible":false,"searchable":false},
+                {"targets":4, "width":"35%"},
+                {"targets":5, "width":"30%"},
+                {"targets":6, "width":"30%","searchable":false},
+                {"targets":7, "width":"30%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -284,15 +292,15 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[2,"asc"],[3,"asc"]],
+            "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
-                {"targets":[0,1],"visible":false,"searchable":false},
-                {"targets":2, "width":"20%"},
-                {"targets":3, "width":"30%"},
-                {"targets":4, "width":"20%","searchable":false},
-                {"targets":5, "width":"20%","searchable":false},
+                {"targets":[0,1,2,3],"visible":false,"searchable":false},
+                {"targets":4, "width":"35%"},
+                {"targets":5, "width":"30%"},
+                {"targets":6, "width":"30%","searchable":false},
+                {"targets":7, "width":"30%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 6 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -315,10 +323,19 @@
             $('#dt_bengoa').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
             var data = $('#dt_santa_tecla').DataTable().rows('.selected').data();
-            $('#txt_complejo').val(data[0][1]);
-            $('#txt_cancha').val(data[0][2]);
-            $('#txt_precio').val(String(data[0][3]).replace('$',''));
-            id_cancha=data[0][0];
+            if (data.length == 0){
+                data = $('#dt_anda').DataTable().rows('.selected').data();
+                if (data.length == 0){
+                    data = $('#dt_guazapa').DataTable().rows('.selected').data();
+                    if (data.length == 0){
+                        data = $('#dt_bengoa').DataTable().rows('.selected').data();
+                    }
+                }
+            }
+            $('#txt_complejo').val(data[0][3]);
+            $('#txt_cancha').val(data[0][4]);
+            $('#txt_precio').val(String(data[0][7]).replace('$',''));
+            precio_cancha_id=data[0][1];
             //SCROLL 
             $('html,body').animate({
                 scrollTop: $("#modificar_precio").offset().top
@@ -326,23 +343,29 @@
         });
 
         $('#btn_cancelar').on('click', function(){
-            $('#dt_precios').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_santa_tecla').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_anda').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_guazapa').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_bengoa').DataTable().$('tr.selected').removeClass('selected');
             $('#txt_complejo').val("");
             $('#txt_cancha').val("");
             $('#txt_precio').val("");
-            id_cancha=-1;
+            precio_cancha_id=-1;
         });
 
         $('#btn_guardar').on('click', function(){
-            if(id_cancha!=-1){
+            if(precio_cancha_id!=-1){
                 if($('#txt_precio').val()!=""){
                     jQuery.ajax({
                         url:"{%url 'guardar_precio' %}",
                         type:"POST",
                         processData:false,  
-                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+id_cancha+"&precio="+$('#txt_precio').val(),
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&precio_cancha_id="+precio_cancha_id+"&precio="+$('#txt_precio').val(),
                         success:function(json){
-                            dt_precios.ajax.reload();
+                            dt_anda.ajax.reload();
+                            dt_santa_tecla.ajax.reload();
+                            dt_bengoa.ajax.reload();
+                            dt_guazapa.ajax.reload();
                             create_alert("<li>Precio actualizado con éxito</li>","EXITO","notificaciones",true,5000);
                         }
                     }); 
@@ -350,7 +373,7 @@
                     $('#txt_complejo').val("");
                     $('#txt_cancha').val("");
                     $('#txt_precio').val("");
-                    id_cancha=-1;
+                    precio_cancha_id=-1;
                 }else{
                    create_alert("<li><b>Precio:</b>Ingrese un precio válido</li>","ERROR","div_errores",false,0); 
                 }

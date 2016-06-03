@@ -4,7 +4,7 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler
+from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler,PrecioXCancha
 from modulo_1.forms import UsuarioForm
 import json
 import hashlib
@@ -30,13 +30,15 @@ def dt_precios(request):
 	str_query = """SELECT 
 					 ca.cancha_id
 					,pc.precio_cancha_id
+					,co.complejo_id
+					,co.nombre AS nombre_complejo
 					,ca.nombre AS nombre_cancha
 					,pc.dias AS días
 					,pc.hora AS hora
 					,'$'::text || pc.precio::text AS precio
 				FROM 	modulo_1_cancha ca
-				JOIN 	modulo_1_complejo co ON ca.complejo_id ="""+ request.POST['complejo_id']+"""
-				JOIN modulo_1_precioxcancha pc ON pc.cancha_id = ca.cancha_id GROUP BY ca.cancha_id,pc.precio_cancha_id"""
+				JOIN 	modulo_1_complejo co ON co.complejo_id = ca.complejo_id AND co.complejo_id ="""+ request.POST['complejo_id']+"""
+				JOIN modulo_1_precioxcancha pc ON pc.cancha_id = ca.cancha_id GROUP BY ca.cancha_id,pc.precio_cancha_id,co.complejo_id"""
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
@@ -44,7 +46,7 @@ def dt_precios(request):
 	return HttpResponse(json.dumps(canchas_lista), content_type='application/json')
 
 def GuardarPrecio(request):
-	Cancha.objects.filter(cancha_id=request.POST['id_cancha']).update(precio=request.POST['precio'])
+	PrecioXCancha.objects.filter(precio_cancha_id=request.POST['precio_cancha_id']).update(precio=request.POST['precio'])
 	return HttpResponse(json.dumps({}), content_type='application/json')
 
 def RegistroUsuarioView(request):
@@ -59,8 +61,8 @@ def dt_usuarios(request):
 						WHEN 'R'::text THEN 'Administrador'
 					END AS tipo,
 					CASE estado
-						WHEN true THEN '<center><i class="fa fa-check"></i></center>'
-						WHEN false THEN '<center><i class="fa fa-times"></i></center>'
+						WHEN true THEN '<center><p class="text-success">Activo</p></center>'
+						WHEN false THEN '<center><p class="text-danger">Inactivo</p></center>'
 					END AS estado,
 					password
 					FROM modulo_1_usuario"""

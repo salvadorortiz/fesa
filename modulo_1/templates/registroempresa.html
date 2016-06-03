@@ -19,7 +19,7 @@
     {% load widget_tweaks %}
     <div class="row"> 
         <div class="col-sm-12">
-           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
                 <label data-toggle="collapse" href="#empresa_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-build"></i> &nbsp;Registro de empresa</label>
                 <a href="#" onclick="$('#dt_empresas').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
@@ -140,9 +140,9 @@
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <center>
-                <button type="button" id="guardar_empresa" class="btn btn-primary">Guardar</button>
-                 <button type="button" id="guardar_cambios_empresa" style="display:none" class="btn btn-primary">Guardar Cambios</button>
-                <button type="button" id="cancelar_empresa" style="display:none" class="btn btn-default">Cancelar</button>
+                <button type="button" id="guardar_empresa" class="btn btn-primary" style="background-color:#153F64"><i class="fa fa-floppy-o"></i> Guardar</button>
+                 <button type="button" id="guardar_cambios_empresa" style="display:none;background-color:#153F64" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
+                <button type="button" id="cancelar_empresa" style="display:none" class="btn btn-default"><i class="fa fa-times"></i> Cancelar</button>
                 </center>
             </div>
             <div class="col-sm-3"></div>

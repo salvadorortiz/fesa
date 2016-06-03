@@ -11,14 +11,13 @@
 {% endblock %}
 
 {% block pagetitle %} Creación de usuarios {% endblock %} 
-{% block subheading %}{% endblock %}
 
 {% block content %}
 	{% csrf_token %}
     {% load widget_tweaks %}
     <div class="row">
         <div class="col-sm-12">
-           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#222">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#153F64">
                 <label data-toggle="collapse" href="#usuarios_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-group"></i> &nbsp;Registro usuarios</label>
                 <a href="#" onclick="$('#dt_usuarios').DataTable().ajax.reload();"style="float:right; color:white;">
                     <i class="fa fa-refresh"></i>
@@ -133,9 +132,9 @@
             <div class="col-sm-3"></div>
             <div class="col-sm-6">
                 <center>
-                    <button type="button" id="btn_guardar" class="btn btn-primary">Guardar</button>
-                    <button type="button" id="btn_guardar_cambios" style="display:none" class="btn btn-primary">Guardar Cambios</button>
-                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default">Cancelar</button>
+                    <button type="button" id="btn_guardar" class="btn btn-primary" style="background-color:#153F64"><i class="fa fa-floppy-o"></i> Guardar</button>
+                    <button type="button" id="btn_guardar_cambios" style="display:none;background-color:#153F64" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
+                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default"><i class="fa fa-times"></i> Cancelar</button>
                 </center>
             </div>
             <div class="col-sm-3"></div>
@@ -187,17 +186,18 @@
         $(document).on('click', "[name=edit_usuario]",function(){
             $('#dt_usuarios').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
-            var data = $('#dt_usuarios').DataTable().rows('.selected').data()
+            var data = $('#dt_usuarios').DataTable().rows('.selected').data();
+            console.log(data);
             $('#id_area').val(data[0][3]);
             $('#id_jefe_directo').val(data[0][4]);
             $('#id_nombre').val(data[0][1]);
             $('#id_usuario').val(data[0][2]);
             $('#id_password').val(data[0][7]);
             switch(data[0][6]) {
-                case "<center><i class=\"fa fa-check\"></i></center>":
+                case "<center><p class=\"text-success\">Activo</p></center>":
                     document.getElementById("id_estado").checked = true;
                     break;
-                case "<center><i class=\"fa fa-times\"></i></center>":
+                case "<center><p class=\"text-danger\">Inactivo</p></center>":
                     document.getElementById("id_estado").checked = false;
                     break;
             }
