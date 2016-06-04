@@ -32,7 +32,8 @@
                         <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
-                        <th>Hora</th>
+                        <th>Hora apertura</th>
+                        <th>Hora cierre</th>
                         <th>Precio</th>
                         {%if request.session.type_user == 'R'%} 
                         <th>Acciones</th>
@@ -58,7 +59,8 @@
                         <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
-                        <th>Hora</th>
+                        <th>Hora apertura</th>
+                        <th>Hora cierre</th>
                         <th>Precio</th>
                         {%if request.session.type_user == 'R'%} 
                         <th>Acciones</th>
@@ -84,7 +86,8 @@
                         <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
-                        <th>Hora</th>
+                        <th>Hora apertura</th>
+                        <th>Hora cierre</th>
                         <th>Precio</th>
                         {%if request.session.type_user == 'R'%} 
                         <th>Acciones</th>
@@ -110,7 +113,8 @@
                         <th>Complejo</th>
                         <th>Cancha</th>
                         <th>Días</th>
-                        <th>Hora</th>
+                        <th>Hora apertura</th>
+                        <th>Hora cierre</th>
                         <th>Precio</th>
                         {%if request.session.type_user == 'R'%} 
                         <th>Acciones</th>
@@ -178,15 +182,16 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[4,"asc"],[5,"asc"]],
+            "order":[[4,"asc"],[6,"asc"]],
             "columnDefs":[
                 {"targets":[0,1,2,3],"visible":false,"searchable":false},
-                {"targets":4, "width":"35%"},
-                {"targets":5, "width":"30%"},
-                {"targets":6, "width":"30%","searchable":false},
-                {"targets":7, "width":"30%","searchable":false},
+                {"targets":4, "width":"25%"},
+                {"targets":5, "width":"25%"},
+                {"targets":6, "width":"15%","searchable":false},
+                {"targets":7, "width":"15%","searchable":false},
+                {"targets":8, "width":"10%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 9 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -219,12 +224,13 @@
             "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
                 {"targets":[0,1,2,3],"visible":false,"searchable":false},
-                {"targets":4, "width":"35%"},
-                {"targets":5, "width":"30%"},
-                {"targets":6, "width":"30%","searchable":false},
-                {"targets":7, "width":"30%","searchable":false},
+                {"targets":4, "width":"25%"},
+                {"targets":5, "width":"25%"},
+                {"targets":6, "width":"15%","searchable":false},
+                {"targets":7, "width":"15%","searchable":false},
+                {"targets":8, "width":"10%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 9 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -257,12 +263,13 @@
             "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
                 {"targets":[0,1,2,3],"visible":false,"searchable":false},
-                {"targets":4, "width":"35%"},
-                {"targets":5, "width":"30%"},
-                {"targets":6, "width":"30%","searchable":false},
-                {"targets":7, "width":"30%","searchable":false},
+                {"targets":4, "width":"25%"},
+                {"targets":5, "width":"25%"},
+                {"targets":6, "width":"15%","searchable":false},
+                {"targets":7, "width":"15%","searchable":false},
+                {"targets":8, "width":"10%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 9 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {
@@ -295,12 +302,13 @@
             "order":[[4,"asc"],[5,"asc"]],
             "columnDefs":[
                 {"targets":[0,1,2,3],"visible":false,"searchable":false},
-                {"targets":4, "width":"35%"},
-                {"targets":5, "width":"30%"},
-                {"targets":6, "width":"30%","searchable":false},
-                {"targets":7, "width":"30%","searchable":false},
+                {"targets":4, "width":"25%"},
+                {"targets":5, "width":"25%"},
+                {"targets":6, "width":"15%","searchable":false},
+                {"targets":7, "width":"15%","searchable":false},
+                {"targets":8, "width":"10%","searchable":false},
                 {%if request.session.type_user == 'R'%}
-                {"targets": 8 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets": 9 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_precio\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
                 {%endif%}
             ],
             "language": {

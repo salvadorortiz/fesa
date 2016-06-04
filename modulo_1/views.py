@@ -33,8 +33,13 @@ def dt_precios(request):
 					,co.complejo_id
 					,co.nombre AS nombre_complejo
 					,ca.nombre AS nombre_cancha
-					,pc.dias AS días
-					,pc.hora AS hora
+					,CASE pc.dia
+						WHEN 'X' THEN 'Lunes-Viernes'::text
+						WHEN 'S' THEN 'Sábado'::text
+						WHEN 'D' THEN 'Domingo'::text
+					 END AS días
+					,pc.hora_apertura::text AS hora_apertura
+					,pc.hora_cierre::text AS hora_cierre
 					,'$'::text || pc.precio::text AS precio
 				FROM 	modulo_1_cancha ca
 				JOIN 	modulo_1_complejo co ON co.complejo_id = ca.complejo_id AND co.complejo_id ="""+ request.POST['complejo_id']+"""

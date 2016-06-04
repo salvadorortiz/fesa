@@ -38,7 +38,7 @@ class ComplejoForm(ModelForm):
 		model= Complejo
 		fields= ['nombre','direccion']
 
-class HorarioForm(ModelForm):
+"""class HorarioForm(ModelForm):
 	DIAS = 	(
 		('L','Lunes'),
 		('M','Martes'),
@@ -55,7 +55,7 @@ class HorarioForm(ModelForm):
 		fields = ['complejo','dia','hora_apertura','hora_cierre']
 		widgets={
 			'dia' : HiddenInput(),
-		}
+		}"""
 
 class CanchaForm(ModelForm):
 	class Meta:

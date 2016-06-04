@@ -30,7 +30,7 @@ class Complejo(models.Model):
 	def __unicode__(self):
 		return self.nombre
 
-class HorarioComplejo(models.Model):
+"""class HorarioComplejo(models.Model):
 	DIAS = 	(
 			('L','Lunes'),
 			('M','Martes'),
@@ -44,7 +44,7 @@ class HorarioComplejo(models.Model):
 	complejo = models.ForeignKey('Complejo', related_name='complejo', verbose_name='Complejo')
 	dia = models.CharField('Dias',max_length=1,choices=DIAS,null=False,blank=False,default='')
 	hora_apertura = models.TimeField(auto_now=False,auto_now_add=False)
-	hora_cierre = models.TimeField(auto_now=False,auto_now_add=False)
+	hora_cierre = models.TimeField(auto_now=False,auto_now_add=False)"""
 
 class Cancha(models.Model):
 	cancha_id = models.AutoField(primary_key=True)
@@ -56,11 +56,17 @@ class Cancha(models.Model):
 		return self.nombre
 
 class PrecioXCancha(models.Model):
+	DIAS = 	(
+			('X','Lunes-Viernes'),
+			('S','Sábado'),
+			('D','Domingo'),
+			)
 	precio_cancha_id = models.AutoField(primary_key=True)
 	cancha = models.ForeignKey('Cancha',verbose_name='Cancha',null=False,blank=False)
 	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=False, default=0.0)
-	dias = models.CharField('Días',max_length=200,blank=False,null=False,default='')
-	hora = models.CharField('Hora',max_length=50,blank=False,null=False,default='')
+	dia = models.CharField('Dia',max_length=1,choices=DIAS,null=False,blank=False,default='')
+	hora_apertura = models.TimeField(auto_now=False,auto_now_add=False)
+	hora_cierre = models.TimeField(auto_now=False,auto_now_add=False)
 
 class Cliente(models.Model):
 	cliente_id = models.AutoField(primary_key=True)
@@ -123,10 +129,10 @@ class Reserva(models.Model):
 	forma_pago = models.ForeignKey('FormaPago',verbose_name='Forma de pago',null=False,blank=False)
 	forma_facturacion = models.ForeignKey('FormaFacturacion',verbose_name='Forma de facturación',null=False,blank=False)
 	estado = models.CharField('Dias',max_length=1,choices=ESTADO,null=False,blank=False,default='')
-	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=False, default=0.0)
-	costo = models.DecimalField('Costo',max_digits=10, decimal_places=2, blank=False, default=0.0)
-	remesado = models.DecimalField('Remesado',max_digits=10, decimal_places=2, blank=False, default=0.0)
-	remanente = models.DecimalField('Remanente',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=True, null=True)
+	costo = models.DecimalField('Costo',max_digits=10, decimal_places=2, blank=True, null=True)
+	#remesado = models.DecimalField('Remesado',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	saldo = models.DecimalField('Saldo',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
 
 	def __unicode__(self):
@@ -139,3 +145,10 @@ class ReservaCancha(models.Model):
 	fecha = models.DateField(auto_now=False,auto_now_add=False)
 	hora = models.TimeField(auto_now=False,auto_now_add=False)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
+
+class RemesaXReserva(models.Model):
+	remesa_reserva_id = models.AutoField(primary_key=True)
+	reserva = models.ForeignKey('Reserva',verbose_name='Reserva',null=False,blank=False)
+	numero_remesa = models.CharField('Número de remesa',max_length=100,blank=False,null=False,default='')
+	monto = models.DecimalField('Monto',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	fecha = models.DateField(auto_now=False,auto_now_add=False)

@@ -10,14 +10,10 @@ from .models import *
 #class UsuarioAdmin(admin.ModelAdmin):
 #	list_display =('user','password','medico','paciente','estado')
 
-#admin.site.register(Medico, MedicoAdmin)
-#admin.site.register(Paciente)
-#admin.site.register(Consulta,ConsultaAdmin)
-#admin.site.register(Usuario,UsuarioAdmin)
+#admin.site.register(HorarioComplejo)
 
 admin.site.register(Usuario)
 admin.site.register(Complejo)
-admin.site.register(HorarioComplejo)
 admin.site.register(Cancha)
 admin.site.register(Cliente)
 admin.site.register(Empresa)

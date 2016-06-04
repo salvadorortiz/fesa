@@ -3,8 +3,8 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from modulo_1.forms import ComplejoForm, HorarioForm, CanchaForm
-from modulo_1.models import Complejo,HorarioComplejo,Cancha
+from modulo_1.forms import ComplejoForm,CanchaForm#,HorarioForm,
+from modulo_1.models import Complejo,Cancha#,HorarioComplejo
 from datetime import datetime
 import json
 import hashlib
@@ -12,7 +12,7 @@ import hashlib
 def RegistroComplejo(request):
 	data={
 		'form_complejo': ComplejoForm(),
-		'form_horario': HorarioForm(),
+		#'form_horario': HorarioForm(),
 		'form_cancha': CanchaForm(),
 	}
 	return render(request,'registrocomplejo.html',data)
@@ -53,7 +53,8 @@ def CargarComplejo(request):
 	return HttpResponse(json.dumps({'complejo': lista_resultado}), content_type='application/json')
 
 def GuardarHorario(request):
-	dias=request.POST['cadena'].split('||')
+	pass
+"""	dias=request.POST['cadena'].split('||')
 	print dias
 	HorarioComplejo.objects.filter(complejo_id=int(request.POST['complejo_id'])).delete()
 	for dia in dias:
@@ -67,7 +68,7 @@ def GuardarHorario(request):
 				obj_horario.save()
 			#print '\t',arr
 			#print datetime.strptime(str(arr[1]), '%H:%M%p').time()
-	return HttpResponse(json.dumps({}), content_type='application/json')
+	return HttpResponse(json.dumps({}), content_type='application/json')"""
 
 def HorarioComplejoData(request):
 	print "entro"
