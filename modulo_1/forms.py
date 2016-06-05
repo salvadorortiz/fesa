@@ -38,24 +38,20 @@ class ComplejoForm(ModelForm):
 		model= Complejo
 		fields= ['nombre','direccion']
 
-"""class HorarioForm(ModelForm):
+class HorarioCanchaForm(ModelForm):
 	DIAS = 	(
-		('L','Lunes'),
-		('M','Martes'),
-		('X','Miércoles'),
-		('J','Jueves'),
-		('V','Viernes'),
-		('S','Sábado'),
-		('D','Domingo'),
-		)
+			('X','Lunes-Viernes'),
+			('S','Sábado'),
+			('D','Domingo'),
+			)
 	#your_name = forms.CharField(label='Your name', max_length=100)
 	dia = forms.MultipleChoiceField(choices=DIAS, required=True, widget=forms.CheckboxSelectMultiple())
 	class Meta:
-		model= HorarioComplejo
-		fields = ['complejo','dia','hora_apertura','hora_cierre']
+		model= PrecioXCancha
+		fields = ['cancha','dia','hora_apertura','hora_cierre']
 		widgets={
 			'dia' : HiddenInput(),
-		}"""
+		}
 
 class CanchaForm(ModelForm):
 	class Meta:

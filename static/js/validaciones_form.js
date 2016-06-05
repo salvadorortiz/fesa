@@ -173,12 +173,15 @@ function correc_palabras(palabra){
 	/*
 		Corrección de ortográfia para el form.errors de Django.
 	*/
+	console.log(palabra);
 	var arr_palabras=[
 				['telefono','Teléfono'],
 				['correo_contacto','Correo Electrónico del contacto'],
 				['telefono_contacto','Teléfono de contacto'],
 				['registro_iva','Registro de IVA'],
-				['horas_posibles','Horas posibles']
+				['horas_posibles','Horas posibles'],
+				['hora_apertura','Hora de apertura'],
+				['hora_cierre','Hora de cierre']
 				//['']
 				];
 	

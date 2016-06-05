@@ -41,7 +41,10 @@ urlpatterns = [
     url(r'^guardar_cambios_complejo/', 'modulo_1.datosbase_views.GuardarCambiosComplejo',name='guardar_cambios_complejo'),
     url(r'^cargar_complejo/', 'modulo_1.datosbase_views.CargarComplejo',name='cargar_complejo'),
     url(r'^guardar_horario/', 'modulo_1.datosbase_views.GuardarHorario',name='guardar_horario'),
-     url(r'^dt_horario/', 'modulo_1.datosbase_views.HorarioComplejoData',name='dt_horario'),
+    url(r'^cargar_horario/', 'modulo_1.datosbase_views.CargarHorario',name='cargar_horario'),
+    url(r'^guardar_cambios_horario/', 'modulo_1.datosbase_views.GuardarCambiosHorario',name='guardar_cambios_horario'),
+    url(r'^eliminar_horario/', 'modulo_1.datosbase_views.EliminarHorarioCancha',name='eliminar_horario'),
+    url(r'^dt_horario/', 'modulo_1.datosbase_views.HorarioComplejoData',name='dt_horario'),
      #Cancha
      url(r'^dt_cancha/', 'modulo_1.datosbase_views.CanchaData',name='dt_cancha'),
      url(r'^guardar_cancha/', 'modulo_1.datosbase_views.GuardarCancha',name='guardar_cancha'),

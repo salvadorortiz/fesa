@@ -1,0 +1,248 @@
+<!-- REGISTRO DE HORARIO CANCHAS-->
+{% csrf_token %}
+{% load widget_tweaks %}
+<div id="modal_horario" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Horario de cancha</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="errores_horario"></div>
+            </div>
+        </div>
+        <form id="form_horario">
+            <input type="hidden" value="" id="id_preciocancha">
+            <input type="hidden" value="" name="cancha">
+            <div class="well">
+           <div class="row">
+                <div class="col-sm-12">
+                   
+                     <strong>Seleccione los d&iacute;as:</strong>
+                    <div class="panel panel-info">
+                      <div class="panel-heading" style="color:black;">
+                        <center>
+                        {% for checkbox in form_horario.dia %}                 
+                            {{ checkbox.tag }} {{ checkbox.choice_label }} &nbsp;&nbsp;&nbsp;
+                        {% endfor %}
+                        </center>
+                      </div>
+                    </div>
+                   
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="col-sm-1">
+                    </div>
+                    <div class="col-sm-3">
+                        <strong>Seleccione el rango de horas:</strong>
+                    </div>
+                    <div clas="col-sm-4">
+                    <p id="timeOnlyExample">
+                      <span class="col-sm-3">
+                      {{form_horario.hora_apertura|add_class:"time start ui-timepicker-input form-control"}}
+                      </span>
+                      <span class="col-sm-1">
+                      a
+                      </span>
+                      <span class="col-sm-3">
+                      {{form_horario.hora_cierre|add_class:"time end ui-timepicker-input form-control"}}
+                      </span>
+                    </p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                     <center>
+                        <button type="button" id="guardar_horario" class="btn btn-primary">Guardar</button>
+                        <button type="button" style="display:none" id="guardar_cambios_horario" class="btn btn-primary">Guardar Cambos</button>
+                        <button type="button" style="display:none" id="cancelar_horario" class="btn btn-default">Cancelar</button>
+                    </center>
+                </div>
+            </div>
+             </div> <!--Well-->
+             <div class="row">
+                <div class="col-sm-12">
+                     <table id="tabla_horario_complejo" class="stripe">
+                         <thead>
+                             <th>Id cancha</th>
+                             <th>Abreviatura</th>
+                             <th>Día</th>
+                             <th>Hora de apertura</th>
+                             <th>Hora de salida </th>
+                             <th>Acciones</th>
+                         </thead>
+                         <tbody>
+                             
+                         </tbody>
+                     </table>
+                </div>
+            </div> 
+        </form>
+      </div>
+      <!--<div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>-->
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<!--FIN DE REGISTRO CANCHA-->
+
+
+<script>
+
+        //$('#id_hora_apertura').timepicker();
+        //$('#id_hora_cierre').timepicker();
+        $('#timeOnlyExample .time').timepicker({
+           // 'showDuration': true,
+            'timeFormat': 'G:i'
+        });
+
+        var timeOnlyExampleEl = document.getElementById('timeOnlyExample');
+        var timeOnlyDatepair = new Datepair(timeOnlyExampleEl);
+
+
+    var dt_cancha = $('#tabla_horario_complejo').DataTable( {
+           "ajax": {
+                "url": "{%url 'dt_horario' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                    d.cancha_id=$("#form_horario").find("[name=cancha]").val()
+                },
+            },
+            "pageLength": 5,
+            "ordering": false,
+            "lengthChange": false,
+            "searching": false,
+            "paging": true,
+            "columnDefs":[
+                {"targets":[0,1],"visible":false,"searchable":false},
+                {"targets":2, "width":"50%"},
+                {"targets":3, "width":"20%"},
+                {"targets":4, "width":"20%"},
+                {"targets": 5 ,"width":"10%",  "defaultContent": "<center><button name=\"edit_horario\" type='button' class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"eliminar_horario\" type='button' class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash bigger-120\"></i></button></center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        $("#tabla_horario_complejo").on('click','[name=edit_horario]',function(){
+            $('#tabla_horario_complejo').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#tabla_horario_complejo').DataTable().rows('.selected').data();
+            console.log(data[0]);
+            console.log(data[0][0]);
+            jQuery.ajax({
+                url: "{%url 'cargar_horario'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_preciocancha="+data[0][0].toString(),
+                success: function(json){
+                  $("#cancelar_horario").click();
+                  $("#form_horario").find(":checkbox[value="+json['dia'].toString()+"]").prop("checked","true");
+                  $("#form_horario").find("[name=dia]").attr('disabled','disabled');
+                  $("#id_hora_apertura").val(json['hora_apertura']);
+                  $("#id_preciocancha").val(json['id_preciocancha']);
+                  $("#id_hora_cierre").val(json['hora_cierre']);
+                  $("#guardar_horario").hide();
+                  $("#guardar_cambios_horario").show();
+                  $("#cancelar_horario").show(); 
+                }
+            });
+        });
+
+        $("#cancelar_horario").on('click',function(){
+          $("#form_horario").find("[name=dia]").removeAttr('disabled');
+          $("#form_horario").find("[name=dia]").removeAttr('checked');
+          $("#id_preciocancha").val("");
+          $("#id_hora_apertura").val('');
+          $("#id_hora_cierre").val('');
+          $("#guardar_horario").show();
+          $("#cancelar_horario").hide();
+          $("#guardar_cambios_horario").hide();
+          $("#tabla_horario_complejo").DataTable().ajax.reload();
+        });
+
+        $("#guardar_cambios_horario").on('click',function(){
+            jQuery.ajax({
+                url: "{%url 'guardar_cambios_horario'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(form_horario).serialize()+"&id_preciocancha="+$("#id_preciocancha").val()+"&dia="+$("#form_horario").find("[name=dia]:checked").val(),
+                success: function(json){
+                    if(json['errors']==null){
+                        $("#errores_horario").html('');
+                            create_alert("<li>Horario actualizado con éxito</li>","EXITO","errores_horario",true,5000);
+                          $("#tabla_horario_complejo").DataTable().ajax.reload();
+                          $("#cancelar_horario").click();
+                    }else{
+                      show_errors(json, 'errores_horario');
+                    }     
+                }
+            });
+        });
+
+        $("#tabla_horario_complejo").on('click','[name=eliminar_horario]',function(){
+           $('#tabla_horario_complejo').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#tabla_horario_complejo').DataTable().rows('.selected').data();
+            console.log(data[0]);
+            console.log(data[0][0]);
+            jQuery.ajax({
+                url: "{%url 'eliminar_horario'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_preciocancha="+data[0][0].toString(),
+                success: function(json){
+                  $("#errores_horario").html('');
+                    create_alert("<li>Horario eliminado con éxito</li>","EXITO","errores_horario",true,5000);
+                  $("#tabla_horario_complejo").DataTable().ajax.reload();
+                  $("#cancelar_horario").click();
+                }
+            });
+        });
+
+        $("#guardar_horario").on('click',function(){
+            console.log('entro');
+            var allVals = [];
+             $("#form_horario").find('[name=dia]:checked').each(function() {
+               allVals.push($(this).val());
+             });
+            jQuery.ajax({
+                url: "{%url 'guardar_horario'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&"+$(form_horario).serialize()+"&dias="+allVals,
+                success: function(json){
+                    if(json['errors']==null){
+                            //console.log('if');
+                            $("#errores_horario").html('');
+                            create_alert("<li>Horario actualizado con éxito</li>","EXITO","errores_horario",true,5000);
+                            $("#tabla_horario_complejo").DataTable().ajax.reload();
+                            $("#cancelar_horario").click();
+                        }else{
+                            show_errors(json, 'errores_horario');
+                        }
+                   
+                }
+            });
+        });
+</script>

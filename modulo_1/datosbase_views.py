@@ -1,10 +1,10 @@
 #-*- coding: utf-8 -*-
 from django.shortcuts import render
-from funciones_generales import convert_fetchall
+from funciones_generales import convert_fetchall, time_in_range
 from django.db import connection
 from django.http import HttpResponse
-from modulo_1.forms import ComplejoForm,CanchaForm#,HorarioForm,
-from modulo_1.models import Complejo,Cancha#,HorarioComplejo
+from modulo_1.forms import ComplejoForm,CanchaForm,HorarioCanchaForm
+from modulo_1.models import Complejo,Cancha,PrecioXCancha
 from datetime import datetime
 import json
 import hashlib
@@ -12,7 +12,7 @@ import hashlib
 def RegistroComplejo(request):
 	data={
 		'form_complejo': ComplejoForm(),
-		#'form_horario': HorarioForm(),
+		'form_horario': HorarioCanchaForm(),
 		'form_cancha': CanchaForm(),
 	}
 	return render(request,'registrocomplejo.html',data)
@@ -53,41 +53,107 @@ def CargarComplejo(request):
 	return HttpResponse(json.dumps({'complejo': lista_resultado}), content_type='application/json')
 
 def GuardarHorario(request):
-	pass
-"""	dias=request.POST['cadena'].split('||')
-	print dias
-	HorarioComplejo.objects.filter(complejo_id=int(request.POST['complejo_id'])).delete()
-	for dia in dias:
-		arr= dia.split(',')
-		if len(arr) == 3:
-				obj_horario=HorarioComplejo()
-				obj_horario.complejo_id=int(request.POST['complejo_id'])
-				obj_horario.hora_apertura=datetime.strptime(str(arr[1]), '%H:%M').time()
-				obj_horario.hora_cierre= datetime.strptime(str(arr[2]), '%H:%M').time()
-				obj_horario.dia=str(arr[0])
-				obj_horario.save()
-			#print '\t',arr
-			#print datetime.strptime(str(arr[1]), '%H:%M%p').time()
-	return HttpResponse(json.dumps({}), content_type='application/json')"""
+	errores={}
+	if request.POST['hora_cierre'] == '':
+		errores.update({'hora_cierre': ['Es un campo obligatorio']})
+	if request.POST['hora_apertura'] == '':
+		errores.update({'hora_apertura': ['Es un campo obligatorio']})
+	if 'dia' not in request.POST.keys():
+		errores.update({'dia': ['Es un campo obligatorio']})
 
+	if errores=={}:
+		print request.POST['dias']
+		
+		apertura= datetime.strptime(str(request.POST['hora_apertura']), '%H:%M').time()
+		cierre= datetime.strptime(str(request.POST['hora_cierre']), '%H:%M').time()
+
+		for dia in request.POST['dias'].split(','):
+			flag=True
+			arr_horarios= PrecioXCancha.objects.filter(cancha_id=int(request.POST['cancha']))
+			for horario in arr_horarios:
+				if str(dia) == str(horario.dia):
+					if horario.hora_apertura==apertura and horario.hora_cierre==cierre:
+						flag=False
+					if time_in_range(horario.hora_apertura, horario.hora_cierre, apertura) is True:
+						flag=False
+					if time_in_range(horario.hora_apertura, horario.hora_cierre, cierre) is True:
+						flag=False
+
+			if flag is True:
+				obj_preciocancha=PrecioXCancha()
+				obj_preciocancha.cancha= Cancha.objects.get(cancha_id=int(request.POST['cancha']))
+				obj_preciocancha.hora_apertura=apertura
+				obj_preciocancha.hora_cierre=cierre
+				obj_preciocancha.dia= str(dia)
+				obj_preciocancha.save()
+		
+		return HttpResponse(json.dumps({}), content_type='application/json')
+	else:
+		return HttpResponse(json.dumps({'errors': errores}), content_type='application/json')
+
+def CargarHorario(request):
+	obj_preciocancha=PrecioXCancha.objects.get(precio_cancha_id=int(request.POST['id_preciocancha']))
+	respuesta={
+		'id_preciocancha': int(obj_preciocancha.precio_cancha_id),
+		'dia': str(obj_preciocancha.dia),
+		'hora_apertura': obj_preciocancha.hora_apertura.strftime("%H:%M"),
+		'hora_cierre': obj_preciocancha.hora_cierre.strftime("%H:%M"),
+	}
+	return HttpResponse(json.dumps(respuesta), content_type='application/json')
+
+def GuardarCambiosHorario(request):
+	errores={}
+	if request.POST['hora_cierre'] == '':
+		errores.update({'hora_cierre': ['Es un campo obligatorio']})
+	if request.POST['hora_apertura'] == '':
+		errores.update({'hora_apertura': ['Es un campo obligatorio']})
+	
+	if errores=={}:
+		
+		apertura= datetime.strptime(str(request.POST['hora_apertura']), '%H:%M').time()
+		cierre= datetime.strptime(str(request.POST['hora_cierre']), '%H:%M').time()
+
+		flag=True
+		arr_horarios= PrecioXCancha.objects.filter(cancha_id=int(request.POST['cancha']))
+		for horario in arr_horarios:
+			if str(request.POST['dia']) == str(horario.dia):
+				if horario.hora_apertura==apertura and horario.hora_cierre==cierre:
+					flag=False
+				if time_in_range(horario.hora_apertura, horario.hora_cierre, apertura) is True:
+					flag=False
+				if time_in_range(horario.hora_apertura, horario.hora_cierre, cierre) is True:
+					flag=False
+
+		if flag is True:
+			obj_preciocancha=PrecioXCancha.objects.get(precio_cancha_id=int(request.POST['id_preciocancha']))
+			obj_preciocancha.cancha= Cancha.objects.get(cancha_id=int(request.POST['cancha']))
+			obj_preciocancha.hora_apertura=apertura
+			obj_preciocancha.hora_cierre=cierre
+			obj_preciocancha.dia= str(request.POST['dia'])
+			obj_preciocancha.save(force_update=True)
+	
+		return HttpResponse(json.dumps({}), content_type='application/json')
+	else:
+		return HttpResponse(json.dumps({'errors': errores}), content_type='application/json')
+	
+def EliminarHorarioCancha(request):
+	PrecioXCancha.objects.filter(precio_cancha_id=int(request.POST['id_preciocancha'])).delete()
+	return HttpResponse(json.dumps({}), content_type='application/json')
+	
 def HorarioComplejoData(request):
 	print "entro"
-	if str(request.POST['complejo_id']) =="":
-		complejo= ' WHERE complejo_id=0'
+	if str(request.POST['cancha_id']) =="":
+		complejo= ' WHERE cancha_id=0'
 	else:
-		complejo= ' WHERE complejo_id='+str(request.POST['complejo_id'])
-	str_query = "SELECT complejo_id,dia,CASE\
-					when dia='L' THEN 'Lunes'\
-					when dia='M' THEN 'Martes'\
-					when dia='X' THEN 'Miércoles'\
-					when dia='J' THEN 'Jueves'\
-					when dia='V' THEN 'Viernes'\
+		complejo= ' WHERE cancha_id='+str(request.POST['cancha_id'])
+	str_query = "SELECT precio_cancha_id,dia,CASE\
+					when dia='X' THEN 'Lunes-Viernes'\
 					when dia='S' THEN 'Sábado'\
 					when dia='D' THEN 'Domingo'\
 					END AS dia_semena,\
 					to_char(hora_apertura, 'HH24:MI') AS hora_apertura,\
 					to_char(hora_cierre, 'HH24:MI') As hora_cierre\
-					from modulo_1_horariocomplejo"+complejo
+					from modulo_1_precioxcancha"+complejo
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
