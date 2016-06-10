@@ -158,7 +158,7 @@
 {% block addExtraScript %} 
 <script type="text/javascript">
    $(window).load(function() {
-        
+       
          var dt_complejo = $('#dt_complejo').DataTable( {
             "ajax": {
                 "url": "{%url 'dt_complejo' %}",
@@ -198,7 +198,7 @@
                 "type": "POST",
                 "data":  function( d ) {
                     d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
-                    d.complejo_id=$("#form_cancha").find("#id_complejo").val()
+                    d.complejo_id=$("#form_cancha").find("[name=id_complejo]").val()
                 },
             },
             "pageLength": 5,
@@ -224,7 +224,7 @@
             }
         });
 
-        // deshabilitar_horario();
+         deshabilitar_cancha();
 
          $("#id_direccion").maxlength({
             events: ['blur'], // Array of events to be triggered
@@ -276,7 +276,7 @@
                     $("#div_errores").html('');
                     create_alert("<li>Complejo ingresado con éxito </li>","EXITO","notificaciones",true,5000);
                     $("#dt_complejo").DataTable().ajax.reload();
-                    deshabilitar_horario();
+                    deshabilitar_cancha();
                 }else{
                     show_errors(json, 'div_errores');
                     //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
@@ -299,7 +299,7 @@
                             create_alert("<li>Complejo actualizado con éxito </li>","EXITO","notificaciones",true,5000);
                             $("#dt_complejo").DataTable().ajax.reload();
                             $("#cancelar_complejo").click();
-                            deshabilitar_horario();
+                            deshabilitar_cancha();
                         }else{
                             show_errors(json, 'div_errores');
                             //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
@@ -314,11 +314,12 @@
                 $("[name=id_complejo]").val("");
                 $("#id_nombre").val("");
                 $("#id_direccion").val("");
+                $("form_complejo").find('input').val("");
                 $('#dt_complejo').DataTable().$('tr.selected').removeClass('selected');
                $("#guardar_cambios_complejo").hide();
                $("#cancelar_complejo").hide();
                $("#guardar_complejo").show();
-               deshabilitar_horario();
+               deshabilitar_cancha();
             });
 
              $("#dt_complejo").on('click', "[name=edit_complejo]",function(){
@@ -340,7 +341,7 @@
                             $("#guardar_cambios_complejo").show();
                             $("#cancelar_complejo").show();
                             $("#guardar_complejo").hide();
-                            habilitar_horario();
+                            habilitar_cancha();
                         }
                     });
                    /* console.log(data);
@@ -381,6 +382,22 @@
             $("#guardar_cambios_cancha").hide();
             $("#guardar_cancha").show();
          });
+
+         function deshabilitar_cancha(){
+            $("#cancelar_cancha").click();
+            $("#dt_cancha").DataTable().ajax.reload();
+            $("#form_cancha").find("#id_nombre").attr('disabled','disabled');
+            $("#form_cancha").find("#id_horas_posibles").attr('disabled','disabled');
+            $("#guardar_cancha").attr('disabled','disabled');
+        }
+
+        function habilitar_cancha(){
+            $("#cancelar_cancha").click();
+            $("#dt_cancha").DataTable().ajax.reload();
+            $("#form_cancha").find("#id_nombre").removeAttr('disabled');
+            $("#form_cancha").find("#id_horas_posibles").removeAttr('disabled');
+            $("#guardar_cancha").removeAttr('disabled');
+        }
 
          $("#guardar_cambios_cancha").on('click',function(){
              jQuery.ajax({
