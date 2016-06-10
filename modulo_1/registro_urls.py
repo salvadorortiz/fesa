@@ -45,11 +45,20 @@ urlpatterns = [
     url(r'^guardar_cambios_horario/', 'modulo_1.datosbase_views.GuardarCambiosHorario',name='guardar_cambios_horario'),
     url(r'^eliminar_horario/', 'modulo_1.datosbase_views.EliminarHorarioCancha',name='eliminar_horario'),
     url(r'^dt_horario/', 'modulo_1.datosbase_views.HorarioComplejoData',name='dt_horario'),
-     #Cancha
-     url(r'^dt_cancha/', 'modulo_1.datosbase_views.CanchaData',name='dt_cancha'),
-     url(r'^guardar_cancha/', 'modulo_1.datosbase_views.GuardarCancha',name='guardar_cancha'),
-     url(r'^guardar_cambios_cancha/', 'modulo_1.datosbase_views.GuardarCambiosCancha',name='guardar_cambios_cancha'),
-     url(r'^cargar_cancha/', 'modulo_1.datosbase_views.CargarCancha',name='cargar_cancha'),
-     #eliminar_cancha
-     url(r'^eliminar_cancha/', 'modulo_1.datosbase_views.EliminarCancha',name='eliminar_cancha'),
+    #Cancha
+    url(r'^dt_cancha/', 'modulo_1.datosbase_views.CanchaData',name='dt_cancha'),
+    url(r'^guardar_cancha/', 'modulo_1.datosbase_views.GuardarCancha',name='guardar_cancha'),
+    url(r'^guardar_cambios_cancha/', 'modulo_1.datosbase_views.GuardarCambiosCancha',name='guardar_cambios_cancha'),
+    url(r'^cargar_cancha/', 'modulo_1.datosbase_views.CargarCancha',name='cargar_cancha'),
+    #eliminar_cancha
+    url(r'^eliminar_cancha/', 'modulo_1.datosbase_views.EliminarCancha',name='eliminar_cancha'),
+
+    #Reservas
+    url(r'^reservas/', 'modulo_1.views.ReservasView',name='reservas'),
+    url(r'^dt_eventos/', 'modulo_1.views.dt_eventos',name='dt_eventos'),
+    url(r'^cargar_combos/', 'modulo_1.views.CargarCombos',name='cargar_combos'),
+    url(r'^info_evento/', 'modulo_1.views.InformacionEvento',name='info_evento'),
+    url(r'^clientes_autocomplete/', 'modulo_1.views.ClientesAutocomplete',name='clientes_autocomplete'),
+    url(r'^guardar_evento/', 'modulo_1.views.GuardarEvento',name='guardar_evento'),
+    url(r'^guardar_cambios_evento/', 'modulo_1.views.GuardarCambiosEvento',name='guardar_cambios_evento'),
     ]

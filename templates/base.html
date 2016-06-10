@@ -39,7 +39,10 @@
     
     <!--Time picker-->
     <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.timepicker.css' %}" />
-    <!-- JS -->
+    <!-- JQ UI -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.structure.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery-ui.theme.min.css' %}" />
     <!-- jQuery 
     <script src="{% static 'js/jquery.min.js' %}"></script>
     -->
@@ -78,6 +81,7 @@
     <script src="{% static 'js/datepair.js' %}"></script>
     <script src="{% static 'js/jquery.datepair.js' %}"></script>
     <script src="{% static 'js/Datepair.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
     <!-- Validaciones JavaScript -->
     <script src="{% static 'js/validaciones_form.js' %}"></script>
 
@@ -175,29 +179,38 @@
                             </div>
                             <!-- /input-group -->
                         </li>
+                        {%if request.session.type_user == 'R'%}
                         <li >
                             <a href="{%url 'precios_guia'%}"><i class="fa fa-fw fa-usd"></i> Precios</a>
                         </li>
                         <li>
-                            <a href="{%url 'usuario_registrousuario'%}"><i class="fa fa-group"></i> Usuarios</a>
+                            <a href="{%url 'usuario_registrousuario'%}"><i class="fa fa-fw fa-group"></i> Usuarios</a>
                         </li>
+                        {%endif%}
                         <li>
                             <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Registro<span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
-                                    <a href="{%url 'cliente_registrocliente'%}"><i class="fa fa-child"></i>&nbsp;Cliente natural</a>
+                                    <a href="{%url 'cliente_registrocliente'%}"><i class="fa fa-fw fa-child"></i>&nbsp;Cliente natural</a>
                                 </li>
                                 <li>
-                                    <a href="{%url 'empresa_registroempresa'%}"><i class="fa fa-building"></i>&nbsp;Empresa</a>
+                                    <a href="{%url 'empresa_registroempresa'%}"><i class="fa fa-fw fa-building"></i>&nbsp;Empresa</a>
                                 </li>
-                                 <li>
-                                    <a href="{%url 'base_registrocomplejo'%}"><i class="fa fa-flag"></i>&nbsp;Complejos</a>
+                                {%if request.session.type_user == 'R'%}
+                                <li>
+                                    <a href="{%url 'base_registrocomplejo'%}"><i class="fa fa-fw fa-flag"></i>&nbsp;Complejos</a>
                                 </li>
+                                {%endif%}
                             </ul>
                             <!-- /.nav-second-level -->
                         </li>
+                        {%if request.session.type_user == 'R'%}
                         <li >
                             <a href="{%url 'catalogos'%}"><i class="fa fa-fw fa-list-alt"></i> Catálogos</a>
+                        </li>
+                        {%endif%}
+                        <li >
+                            <a href="{%url 'reservas'%}"><i class="fa fa-fw fa-calendar"></i> Reservas</a>
                         </li>
                     </ul>
                 </div>

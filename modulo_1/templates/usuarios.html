@@ -3,8 +3,6 @@
 {% block title%} Creación de usuarios {% endblock %}
 
 {% block breadcrumbs %}
-   <!--  <li><a href="#">Inicio</a></li>
-    <li class="active">Ingresar</li> -->
     <li class="active">
 	    <i class="fa fa-group"></i> Usuarios
 	</li>
@@ -187,7 +185,6 @@
             $('#dt_usuarios').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
             var data = $('#dt_usuarios').DataTable().rows('.selected').data();
-            console.log(data);
             $('#id_area').val(data[0][3]);
             $('#id_jefe_directo').val(data[0][4]);
             $('#id_nombre').val(data[0][1]);

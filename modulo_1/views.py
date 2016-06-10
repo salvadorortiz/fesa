@@ -4,7 +4,7 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler,PrecioXCancha
+from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler,PrecioXCancha,Reserva,Cliente,Empresa
 from modulo_1.forms import UsuarioForm
 import json
 import hashlib
@@ -165,3 +165,165 @@ def GuardarCambiosCatalogo(request):
 		TipoAlquiler.objects.filter(tipo_alquiler_id=request.POST['id']).update(nombre=request.POST['nombre'])
 
 	return HttpResponse(json.dumps({}), content_type='application/json')
+
+def ReservasView(request):
+	return render(request,'reservas.html')
+
+def dt_eventos(request):
+	str_query = """SELECT 
+						 r.reserva_id
+						,r.nombre_evento
+						,CASE
+							WHEN c.cliente_id IS NOT NULL THEN c.nombre
+							ELSE e.nombre
+						 END cliente
+						,CASE
+							WHEN c.cliente_id IS NOT NULL THEN c.telefono
+							ELSE e.telefono_contacto
+						 END telefono
+						,CASE
+							WHEN c.cliente_id IS NOT NULL THEN c.correo
+							ELSE e.correo_contacto
+						 END correo
+						,u.usuario
+					FROM
+						modulo_1_reserva r
+						JOIN modulo_1_usuario u ON u.usuario_id = r.usuario_id
+						LEFT JOIN modulo_1_cliente c ON c.cliente_id = r.cliente_id
+						LEFT JOIN modulo_1_empresa e ON e.empresa_id = r.empresa_id"""
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	tipo_alquiler = convert_fetchall(qs)
+	return HttpResponse(json.dumps(tipo_alquiler), content_type='application/json')
+
+def CargarCombos(request):
+	formas_pago = FormaPago.objects.all()
+	formas_facturacion = FormaFacturacion.objects.all()
+	tipos_alquiler = TipoAlquiler.objects.all()
+	str_forma_pago = ""
+	str_forma_facturacion = ""
+	str_tipo_alquiler = ""
+
+	for forma_pago in formas_pago:
+		str_forma_pago += "<option value='"+str(forma_pago.forma_pago_id)+"'>"+forma_pago.nombre+"</option>"
+	for forma_facturacion in formas_facturacion:
+		str_forma_facturacion += "<option value='"+str(forma_facturacion.forma_facturacion_id)+"'>"+forma_facturacion.nombre+"</option>"
+	for tipo_alquiler in tipos_alquiler:
+		str_tipo_alquiler += "<option value='"+str(tipo_alquiler.tipo_alquiler_id)+"'>"+tipo_alquiler.nombre+"</option>"
+	#for tipo_alquiler in tipos_alquiler:
+	#	if request.session['type_user'] == 'B' and (tipo_alquiler.tipo_alquiler_id == 3 or tipo_alquiler.tipo_alquiler_id == 4):
+	#		str_tipo_alquiler += "<option value='"+str(tipo_alquiler.tipo_alquiler_id)+"'>"+tipo_alquiler.nombre+"</option>"
+	#	elif request.session['type_user'] == 'R' or request.session['type_user'] == 'A':
+	#		str_tipo_alquiler += "<option value='"+str(tipo_alquiler.tipo_alquiler_id)+"'>"+tipo_alquiler.nombre+"</option>"
+
+	data={
+		'forma_pago': str_forma_pago,
+		'forma_facturacion': str_forma_facturacion,
+		'tipo_alquiler': str_tipo_alquiler,
+	}
+
+	return HttpResponse(json.dumps(data), content_type='application/json')
+
+def InformacionEvento(request):
+	reserva = Reserva.objects.get(reserva_id = request.POST['id_evento'])
+	cliente = ""
+	cliente_id = ""
+	if reserva.cliente_id != None:
+		cliente = reserva.cliente.nombre
+		cliente_id = reserva.cliente.cliente_id
+	else:
+		cliente = reserva.empresa.nombre
+		cliente_id = reserva.empresa.empresa_id
+
+	evento = {
+			'reserva':reserva.reserva_id,
+			'nombre':reserva.nombre_evento,
+			'estado':reserva.estado,
+			'precio':str(reserva.precio),
+			'costo':str(reserva.costo),
+			'saldo':str(reserva.saldo),
+			'notas':reserva.notas,
+			'facturacion':reserva.forma_facturacion_id,
+			'pago':reserva.forma_pago_id,
+			'alquiler':reserva.tipo_alquiler_id,
+			'cliente':cliente,
+			'cliente_id':cliente_id
+			}
+
+	return HttpResponse(json.dumps(evento), content_type='application/json')
+
+def ClientesAutocomplete(request):
+	clientes = Cliente.objects.filter(nombre__icontains=request.GET['term'])
+	empresas = Empresa.objects.filter(nombre__icontains=request.GET['term'])
+	results = []
+	for cliente in clientes:
+		cliente_json = {}
+		cliente_json['id'] = cliente.cliente_id
+		cliente_json['label'] = cliente.nombre
+		results.append(cliente_json)
+	for empresa in empresas:
+		empresa_json = {}
+		empresa_json['id'] = empresa.empresa_id
+		empresa_json['label'] = empresa.nombre
+		results.append(empresa_json)
+
+	data = json.dumps(results)
+	return HttpResponse(data, content_type='application/json')
+
+def GuardarEvento(request):
+	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
+	cliente = Cliente.objects.filter(cliente_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
+	empresa = Empresa.objects.filter(empresa_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
+	if request.session['type_user'] == 'B' and (request.POST['reserva'] != "3" and request.POST['reserva'] != "4"):
+		respuesta = {
+					'error': True,
+					'mensaje':"<li><b>Tipo de reserva:</b> No posee permisos para realizar este tipo de reserva (sólo prestamos o PEF).</li>"
+		}
+		return HttpResponse(json.dumps(respuesta), content_type='application/json')
+
+	if len(cliente)>0:
+		reserva = Reserva(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+					notas=request.POST['notas'],usuario=usuario[0]).save()
+		respuesta ={'error':False,'mensaje':"<li>Evento ingresado con éxito </li>",'id_evento':Reserva.objects.latest('reserva_id').reserva_id}
+	elif len(empresa)>0:
+		reserva = Reserva(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+					notas=request.POST['notas'],usuario=usuario[0]).save()
+		respuesta ={'error':False,'mensaje':"<li>Evento ingresado con éxito </li>",'id_evento':Reserva.objects.latest('reserva_id').reserva_id}
+	else:
+		respuesta = {
+					'error': True,
+					'mensaje':"<li><b>Cliente:</b> El cliente o la empresa no se encuentra registrado</li>"
+		}
+
+	return HttpResponse(json.dumps(respuesta), content_type='application/json')
+
+def GuardarCambiosEvento(request):
+	cliente = Cliente.objects.filter(cliente_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
+	empresa = Empresa.objects.filter(empresa_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
+	respuesta = {'error':False,'mensaje':"<li>Evento actualizado con éxito </li>"}
+	
+	if request.session['type_user'] == 'B' and (request.POST['reserva'] != "3" and request.POST['reserva'] != "4"):
+		respuesta = {
+					'error': True,
+					'mensaje':"<li><b>Tipo de reserva:</b> No posee permisos para realizar este tipo de reserva (sólo prestamos o PEF).</li>"
+		}
+		return HttpResponse(json.dumps(respuesta), content_type='application/json')
+
+	if len(cliente)>0:
+		reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+					notas=request.POST['notas'])
+	elif len(empresa)>0:
+		reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+					notas=request.POST['notas'])
+	else:
+		respuesta = {
+					'error': True,
+					'mensaje':"<li><b>Cliente:</b> El cliente o la empresa no se encuentra registrado</li>"
+		}
+
+	return HttpResponse(json.dumps(respuesta), content_type='application/json')

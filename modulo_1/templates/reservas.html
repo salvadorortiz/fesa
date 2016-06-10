@@ -1,0 +1,459 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block title%} Reservas {% endblock %}
+
+{% block breadcrumbs %}
+    <li class="active">
+	    <i class="fa fa-calendar"></i> Reservas
+	</li>
+{% endblock %}
+
+{% block pagetitle %} Reservas {% endblock %} 
+
+{% block content %}
+	{% csrf_token %}
+    {% load widget_tweaks %}
+    <div class="row">
+        <div class="col-sm-12">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                <label data-toggle="collapse" href="#eventos_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-calendar-o"></i> &nbsp;Eventos</label>
+                <a href="#" onclick="$('#dt_eventos').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+             <div id="eventos_toggle" class="collapse in col-sm-12">
+                    <table id="dt_eventos" class="stripe">
+                        <thead>
+                            <th>reserva id</th>
+                            <th>Evento</th>
+                            <th>Cliente</th>
+                            <th>Telefono</th>
+                            <th>Correo</th>
+                            <th>Usuario</th>
+                            <th>Acciones</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+            </div>
+                
+        </div>
+        <hr>
+        <div class="col-sm-12">
+            <div id="div_errores"></div>
+        </div>
+        <div class="col-sm-12">
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Registro de nuevos eventos</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-1">
+                                <b>Nombre</b>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                    <input type="text" class="form-control" id="txt_nombre_evento" placeholder="Nombre del evento" />
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <strong>Cliente</strong>
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="hidden" id="id_cliente" value="-1">
+                                <input type="text" class="form-control" id="txt_cliente" placeholder="Nombre del cliente" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-1">
+                                <b>Tipo reserva</b>
+                            </div>
+                            <div class="col-sm-3">
+                                <select id="cmb_reserva" class="form-control">
+                                    <option value="-1">Seleccione tipo de reserva</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-1">
+                                <strong>Forma pago</strong>
+                            </div>
+                            <div class="col-sm-3">
+                                <select id="cmb_pago" class="form-control">
+                                    <option value="-1">Seleccione forma de pago</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-1">
+                                <strong>Forma facturación</strong>
+                            </div>
+                            <div class="col-sm-3">
+                                <select id="cmb_facturacion" class="form-control">
+                                    <option value="-1">Seleccione forma de facturación</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-8">
+                                <br>
+                                <textarea id="txt_notas" rows="2" class="form-control" placeholder="Notas"></textarea>
+                            </div>
+                            <div class="col-sm-1">
+                                <br>
+                                <strong>Estado</strong>
+                            </div>
+                            <div class="col-sm-3">
+                                <br>
+                                <select id="cmb_estado" class="form-control">
+                                    <option value="-1">Seleccione el estado</option>
+                                    <option value="C">Confirmado</option>
+                                    <option value="T">Tentativo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-6">
+                                <center>
+                                    <button type="button" id="btn_guardar" class="btn btn-primary" style="background-color:#337AB7"><i class="fa fa-floppy-o"></i> Guardar</button>
+                                    <button type="button" id="btn_guardar_cambios" style="display:none;background-color:#337AB7" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
+                                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default"><i class="fa fa-times"></i> Cancelar</button>
+                                </center>
+                            </div>
+                            <div class="col-sm-3"></div>
+                        </div>
+                    </div>
+                </div><!--/panel-body-->
+            </div><!--/panel-->
+        </div><!--/div-12-->
+        <div class="col-sm-12">
+           <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                <label data-toggle="collapse" href="#eventos_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-calendar-o"></i> &nbsp;Reservas</label>
+                <a href="#" onclick="$('#dt_reservas').DataTable().ajax.reload();"style="float:right; color:white;">
+                    <i class="fa fa-refresh"></i>
+                </a>
+            </div>
+             <div id="eventos_toggle" class="collapse in col-sm-12">
+                    <table id="dt_reservas" class="stripe">
+                        <thead>
+                            <th>reserva id</th>
+                            <th>complejo id</th>
+                            <th>cancha id</th>
+                            <th>Complejo</th>
+                            <th>Cancha</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Acciones</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+            </div>
+                
+        </div>
+        <hr>
+        <div class="col-sm-12">
+            <div id="div_errores"></div>
+        </div>
+        <div class="col-sm-12">
+            <br>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Registro de nuevas reservas al evento</h3>
+                </div>
+                <div class="panel-body">
+                    <!-- <div class="row">
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-1">
+                                <b>Nombre</b>
+                            </div>
+                            <div class="col-sm-5">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
+                                    <input type="text" class="form-control" id="txt_nombre_evento" placeholder="Nombre del evento" />
+                                </div>
+                            </div>
+                            <div class="col-sm-1">
+                                <strong>Cliente</strong>
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="hidden" id="id_cliente" value="-1">
+                                <input type="text" class="form-control" id="txt_cliente" placeholder="Nombre del cliente" />
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-1">
+                                <b>Complejo</b>
+                            </div>
+                            <div class="col-sm-4">
+                                <select id="cmb_reserva" class="form-control">
+                                    <option value="-1">Seleccione el complejo</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-1">
+                                <strong>Cancha</strong>
+                            </div>
+                            <div class="col-sm-4">
+                                <select id="cmb_pago" class="form-control">
+                                    <option value="-1">Seleccione la cancha</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-1">
+                                <b>Fecha</b>
+                            </div>
+                            <div class="col-sm-2">
+                                <input type="text" id="txt_fecha" class="form-control" placeholder="DD/MM/AAAA">
+                            </div>
+                            <div class="col-sm-2"></div>
+                            <div class="col-sm-1">
+                                <strong>Cancha</strong>
+                            </div>
+                            <div class="col-sm-4">
+                                <select id="cmb_pago" class="form-control">
+                                    <option value="-1">Seleccione la cancha</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="col-sm-12">
+                                <br>
+                                <textarea id="txt_notas" rows="3" class="form-control" placeholder="Notas"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <br>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-6">
+                                <center>
+                                    <button type="button" id="btn_guardar" class="btn btn-primary" style="background-color:#337AB7"><i class="fa fa-floppy-o"></i> Guardar</button>
+                                    <button type="button" id="btn_guardar_cambios" style="display:none;background-color:#337AB7" class="btn btn-primary"><i class="fa fa-floppy-o"></i> Guardar Cambios</button>
+                                    <button type="button" id="btn_cancelar" style="display:none" class="btn btn-default"><i class="fa fa-times"></i> Cancelar</button>
+                                </center>
+                            </div>
+                            <div class="col-sm-3"></div>
+                        </div>
+                    </div>
+                </div><!--/panel-body-->
+            </div><!--/panel-->
+        </div><!--/div-12-->
+    </div>
+{% endblock %}
+
+{% block addExtraScript %} 
+<script type="text/javascript">
+    var usuario_log = "{{request.session.user_log}}";
+    var tipo_usuario = "{{request.session.type_user}}";
+    var evento_seleccionado = -1;
+
+    $(window).load(function() {
+        cargar_combos();
+        $( "#txt_fecha" ).datepicker( $.datepicker.regional[ "es" ] );
+
+        $( "#txt_cliente" ).autocomplete({
+            source: "{%url 'clientes_autocomplete'%}",
+            minLength: 2,
+            select: function ( event, ui ) {
+                $('#id_cliente').val( ui.item.id );
+            }
+        });
+
+        var dt_eventos = $('#dt_eventos').DataTable( {
+            "ajax": {
+                "url": "{%url 'dt_eventos' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },
+            "pageLength": 5,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "order":[[6,"asc"],[1,"asc"],[5,"asc"],[3,"asc"]],
+            "columnDefs":[
+                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":1, "width":"20%"},
+                {"targets":2, "width":"20%"},
+                {"targets":3, "width":"12.5%"},
+                {"targets":4, "width":"15%"},
+                {"targets":5, "width":"10%"},
+                {"targets":6 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+        var dt_reservas = $('#dt_reservas').DataTable( {
+            /*"ajax": {
+                "url": "{%url 'dt_eventos' %}",
+                "type": "POST",
+                "data":  function( d ) {
+                    d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                },
+            },*/
+            "pageLength": 5,
+            "ordering": true,
+            "lengthChange": true,
+            "searching": true,
+            "paging": true,
+            "order":[[5,"asc"],[6,"asc"]],
+            "columnDefs":[
+                {"targets":[0,1,2],"visible":false,"searchable":false},
+                {"targets":3, "width":"25%%"},
+                {"targets":4, "width":"25%"},
+                {"targets":5, "width":"20%"},
+                {"targets":6, "width":"20%"},
+                {"targets":7 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+            ],
+            "language": {
+                "lengthMenu": "Mostrando _MENU_ filas por página",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando página _PAGE_ de _PAGES_",
+                "infoEmpty": "Mostrando página 0 de 0",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "oPaginate": {
+                    "sNext":     "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+            }
+        });
+
+        function cargar_combos(){
+            jQuery.ajax({
+                url: "{%url 'cargar_combos'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val(),
+                success: function(json){
+                    $("#cmb_facturacion").append(json['forma_facturacion']);
+                    $("#cmb_pago").append(json['forma_pago']);
+                    $("#cmb_reserva").append(json['tipo_alquiler']);
+                }
+            });
+        }
+
+        $(document).on('click', "[name=edit_evento]",function(){
+            $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_eventos').DataTable().rows('.selected').data();
+            jQuery.ajax({
+                url: "{%url 'info_evento'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_evento="+data[0][0],
+                success: function(json){
+                    $('#txt_nombre_evento').val(json['nombre']);
+                    $('#txt_cliente').val(json['cliente']);
+                    $('#id_cliente').val( json['cliente_id']);
+                    $('#cmb_reserva').val(json['alquiler']);
+                    $('#cmb_pago').val(json['pago']);
+                    $('#cmb_facturacion').val(json['facturacion']);
+                    $('#cmb_estado').val(json['estado']);
+                    $('#txt_notas').val(json['notas']);
+                    evento_seleccionado = data[0][0];
+
+                    if(data[0][5] != usuario_log && tipo_usuario != "R"){ //SOLO PUEDE VISUALIZAR MÁS NO MODIFICAR
+                        $(document).find("[id^='txt_']").prop('disabled', true);
+                        $(document).find("[id^='cmb_']").prop('disabled', true);
+                        $("#btn_cancelar").show();
+                        $("#btn_guardar").hide();
+                    }else if(data[0][5] == usuario_log || tipo_usuario == "R"){ // ES SU EVENTO Y PUEDE MODIFICAR
+                        $("#btn_cancelar").show();
+                        $("#btn_guardar_cambios").show();
+                        $("#btn_guardar").hide();
+                    }
+                }
+            });
+        });
+
+        $("#btn_cancelar").on('click',function(){
+            $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+            $(document).find("[id^='txt_']").val('');
+            $(document).find("[id^='cmb_']").val('-1');
+            $(document).find("[id^='txt_']").prop('disabled', false);
+            $(document).find("[id^='cmb_']").prop('disabled', false);
+            $('#id_cliente').val('-1');
+            $("#btn_guardar_cambios").hide();
+            $("#btn_cancelar").hide();
+            $("#btn_guardar").show();
+            evento_seleccionado = -1;
+        });
+
+        $("#btn_guardar").on('click',function(){
+            if($('#cmb_estado').val()=="-1" || $('#cmb_reserva').val()=="-1" || $('#cmb_pago').val()=="-1" || $('#cmb_estado').val()=="-1" || $('#txt_nombre_evento').val()==""){
+                create_alert("<li><b>Campos requeridos:</b> nombre evento, tipo reserva, forma pago, forma facturación y estado son campos requeridos.</li>","ERROR","div_errores",false,0);
+            }else{
+                jQuery.ajax({
+                    url: "{%url 'guardar_evento'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&nombre="+$('#txt_nombre_evento').val()+"&cliente_id="+$('#id_cliente').val()+"&nombre_cliente="+$('#txt_cliente').val()+"&reserva="+$('#cmb_reserva').val()+"&pago="+$('#cmb_pago').val()+"&facturacion="+$('#cmb_facturacion').val()+"&estado="+$('#cmb_estado').val()+"&notas="+$('#txt_notas').val(),
+                    success: function(json){
+                        if(json['error']==true){
+                            create_alert(json['mensaje'],"ERROR","div_errores",false,0);
+                        }else{
+                            create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
+                            $("#div_errores").html('');
+                            $("#dt_eventos").DataTable().ajax.reload();
+                            $("#btn_guardar_cambios").show();
+                            $("#btn_cancelar").show();
+                            $("#btn_guardar").hide();
+                            evento_seleccionado = json['id_evento'];
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#btn_guardar_cambios").on('click',function(){
+            if($('#cmb_estado').val()=="-1" || $('#cmb_reserva').val()=="-1" || $('#cmb_pago').val()=="-1" || $('#cmb_estado').val()=="-1" || $('#txt_nombre_evento').val()==""){
+                create_alert("<li><b>Campos requeridos:</b> nombre evento, tipo reserva, forma pago, forma facturación y estado son campos requeridos.</li>","ERROR","div_errores",false,0);
+            }else{
+                jQuery.ajax({
+                    url: "{%url 'guardar_cambios_evento'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&nombre="+$('#txt_nombre_evento').val()+"&cliente_id="+$('#id_cliente').val()+"&nombre_cliente="+$('#txt_cliente').val()+"&reserva="+$('#cmb_reserva').val()+"&pago="+$('#cmb_pago').val()+"&facturacion="+$('#cmb_facturacion').val()+"&estado="+$('#cmb_estado').val()+"&notas="+$('#txt_notas').val()+"&id_evento="+evento_seleccionado,
+                    success: function(json){
+                        if(json['error']==true){
+                            create_alert(json['mensaje'],"ERROR","div_errores",false,0);
+                        }else{
+                            create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
+                            $("#div_errores").html('');
+                            $("#dt_eventos").DataTable().ajax.reload();
+                            $("#btn_guardar_cambios").show();
+                            $("#btn_cancelar").show();
+                            $("#btn_guardar").hide();
+                        }
+                    }
+                });
+            }
+        });
+
+
+    });
+</script>
+{% endblock %}

@@ -120,11 +120,14 @@ class Reserva(models.Model):
 	ESTADO = 	(
 				('C','Confirmado'),
 				('T','Tentativo'),
+				('R','Realizado'),
+				('N','No realizado')
 				)
 	reserva_id = models.AutoField(primary_key=True)
 	nombre_evento = models.CharField('Nombre del evento',max_length=100,blank=False,null=False,default='')
 	cliente = models.ForeignKey('Cliente',verbose_name='Cliente',null=True,blank=True) 
 	empresa = models.ForeignKey('Empresa',verbose_name='Empresa',null=True,blank=True)
+	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	tipo_alquiler = models.ForeignKey('TipoAlquiler',verbose_name='Tipo de alquiler',null=False,blank=False)
 	forma_pago = models.ForeignKey('FormaPago',verbose_name='Forma de pago',null=False,blank=False)
 	forma_facturacion = models.ForeignKey('FormaFacturacion',verbose_name='Forma de facturación',null=False,blank=False)
@@ -142,6 +145,7 @@ class ReservaCancha(models.Model):
 	reserva_cancha_id = models.AutoField(primary_key=True)
 	cancha = models.ForeignKey('Cancha',verbose_name='Cancha',null=False,blank=False)
 	reserva = models.ForeignKey('Reserva',verbose_name='Reserva',null=False,blank=False)
+	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	fecha = models.DateField(auto_now=False,auto_now_add=False)
 	hora = models.TimeField(auto_now=False,auto_now_add=False)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
@@ -149,6 +153,7 @@ class ReservaCancha(models.Model):
 class RemesaXReserva(models.Model):
 	remesa_reserva_id = models.AutoField(primary_key=True)
 	reserva = models.ForeignKey('Reserva',verbose_name='Reserva',null=False,blank=False)
+	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	numero_remesa = models.CharField('Número de remesa',max_length=100,blank=False,null=False,default='')
 	monto = models.DecimalField('Monto',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	fecha = models.DateField(auto_now=False,auto_now_add=False)
