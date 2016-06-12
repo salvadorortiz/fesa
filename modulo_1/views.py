@@ -4,7 +4,7 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
-from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler,PrecioXCancha,Reserva,Cliente,Empresa
+from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler,PrecioXCancha,Reserva,Cliente,Empresa,Complejo,ReservaCancha
 from modulo_1.forms import UsuarioForm
 import json
 import hashlib
@@ -167,7 +167,10 @@ def GuardarCambiosCatalogo(request):
 	return HttpResponse(json.dumps({}), content_type='application/json')
 
 def ReservasView(request):
-	return render(request,'reservas.html')
+	data = []
+	for complejo in Complejo.objects.all():
+		data.append({'id':complejo.complejo_id,'nombre':complejo.nombre})
+	return render(request,'reservas.html',{'data':data})
 
 def dt_eventos(request):
 	str_query = """SELECT 
@@ -327,3 +330,58 @@ def GuardarCambiosEvento(request):
 		}
 
 	return HttpResponse(json.dumps(respuesta), content_type='application/json')
+
+def CargarCanchas(request):
+	str_cancha="<option value=\"-1\">Seleccione la cancha</option>"
+	for cancha in Cancha.objects.filter(complejo_id=request.POST['id']):
+		str_cancha += "<option value=\""+str(cancha.cancha_id)+"\">"+cancha.nombre+"</option>"
+	return HttpResponse(json.dumps({'str_cancha':str_cancha}), content_type='application/json')
+
+def dt_reservas(request):
+	str_query = """SELECT 
+						 rc.reserva_cancha_id
+						,co.complejo_id
+						,ca.cancha_id
+						,co.nombre
+						,ca.nombre
+						,rc.fecha::text AS fecha
+						,rc.hora_inicio::text AS inicio
+						,rc.hora_fin::text AS fin
+						,'$'::text || rc.precio_sugerido::text AS precio_sugerido
+					FROM
+						modulo_1_reserva r
+						JOIN modulo_1_reservacancha rc ON rc.reserva_id = r.reserva_id
+						JOIN modulo_1_cancha ca ON ca.cancha_id = rc.cancha_id
+						JOIN modulo_1_complejo co ON co.complejo_id = ca.complejo_id
+					WHERE r.reserva_id = """+request.POST['evento']
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	tipo_alquiler = convert_fetchall(qs)
+	return HttpResponse(json.dumps(tipo_alquiler), content_type='application/json')
+
+def GuardarPrecio(request):
+	Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(precio=request.POST['precio_evento'],costo=request.POST['costo_evento'])
+	return HttpResponse(json.dumps({}), content_type='application/json')
+
+def GuardarReserva(request):
+	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
+	ReservaCancha(cancha_id=request.POST['cancha'],reserva_id=request.POST['evento'],usuario=usuario[0],fecha=request.POST['fecha'],
+				hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],notas=request.POST['notas'],
+				precio_sugerido=request.POST['precio_sugerido']).save()
+	return HttpResponse(json.dumps({'error':False}), content_type='application/json')
+
+def InformacionReserva(request):
+	reserva = ReservaCancha.objects.get(reserva_cancha_id = request.POST['id_reserva'])
+
+	reserva_cancha = {
+			'complejo':reserva.cancha.complejo_id,
+			'cancha':reserva.cancha.cancha_id,
+			'fecha':str(reserva.fecha),
+			'inicio':str(reserva.hora_inicio),
+			'fin':str(reserva.hora_fin),
+			'precio_sugerido':str(reserva.precio_sugerido),
+			'notas':reserva.notas,
+			}
+
+	return HttpResponse(json.dumps(reserva_cancha), content_type='application/json')

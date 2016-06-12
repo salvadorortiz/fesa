@@ -61,4 +61,9 @@ urlpatterns = [
     url(r'^clientes_autocomplete/', 'modulo_1.views.ClientesAutocomplete',name='clientes_autocomplete'),
     url(r'^guardar_evento/', 'modulo_1.views.GuardarEvento',name='guardar_evento'),
     url(r'^guardar_cambios_evento/', 'modulo_1.views.GuardarCambiosEvento',name='guardar_cambios_evento'),
+    url(r'^cargar_canchas/', 'modulo_1.views.CargarCanchas',name='cargar_canchas'),
+    url(r'^dt_reservas/', 'modulo_1.views.dt_reservas',name='dt_reservas'),
+    url(r'^guardar_precio/', 'modulo_1.views.GuardarPrecio',name='guardar_precio'),
+    url(r'^guardar_reserva/', 'modulo_1.views.GuardarReserva',name='guardar_reserva'),
+    url(r'^edit_reserva/', 'modulo_1.views.InformacionReserva',name='edit_reserva'),
     ]

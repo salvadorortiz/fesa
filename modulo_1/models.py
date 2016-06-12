@@ -134,8 +134,8 @@ class Reserva(models.Model):
 	estado = models.CharField('Dias',max_length=1,choices=ESTADO,null=False,blank=False,default='')
 	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=True, null=True)
 	costo = models.DecimalField('Costo',max_digits=10, decimal_places=2, blank=True, null=True)
-	#remesado = models.DecimalField('Remesado',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	saldo = models.DecimalField('Saldo',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	fecha_ingreso = models.DateField('Fecha de ingreso',auto_now_add=True)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
 
 	def __unicode__(self):
@@ -147,7 +147,9 @@ class ReservaCancha(models.Model):
 	reserva = models.ForeignKey('Reserva',verbose_name='Reserva',null=False,blank=False)
 	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	fecha = models.DateField(auto_now=False,auto_now_add=False)
-	hora = models.TimeField(auto_now=False,auto_now_add=False)
+	hora_inicio = models.TimeField(auto_now=False,auto_now_add=False)
+	hora_fin = models.TimeField(auto_now=False,auto_now_add=False)
+	precio_sugerido = models.DecimalField('Precio Sugerido',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
 
 class RemesaXReserva(models.Model):
@@ -156,4 +158,5 @@ class RemesaXReserva(models.Model):
 	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	numero_remesa = models.CharField('Número de remesa',max_length=100,blank=False,null=False,default='')
 	monto = models.DecimalField('Monto',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	fecha_ingreso = models.DateField('Fecha de ingreso',auto_now_add=True)
 	fecha = models.DateField(auto_now=False,auto_now_add=False)
