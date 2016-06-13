@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
