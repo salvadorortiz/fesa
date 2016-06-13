@@ -11,14 +11,20 @@ class ClienteForm(ModelForm):
 
 	class Meta:
 		model = Cliente
-		fields = ['codigo', 'nombre', 'DUI', 'telefono','telefono_alterno','correo','direccion']	
+		fields = ['codigo', 'nombre', 'DUI','ingresado_por', 'telefono','telefono_alterno','correo','direccion']	
+		widgets={
+			'ingresado_por' : HiddenInput(),
+		}
 
 class EmpresaForm(ModelForm):
 
 	class Meta:
 		model= Empresa
-		fields= ['codigo','nombre','nit','registro_iva','telefono','contacto','telefono_contacto','correo_contacto']
-
+		fields= ['codigo','nombre','nit','ingresado_por','registro_iva','telefono','contacto','telefono_contacto','correo_contacto']
+		widgets={
+			'ingresado_por' : HiddenInput(),
+		}
+		
 	def __init__(self,*args,**kwargs):
 		super(EmpresaForm,self).__init__(*args,**kwargs)
 		self.fields['codigo'].empty_label= 'Código'

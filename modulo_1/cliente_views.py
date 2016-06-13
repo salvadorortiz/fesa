@@ -14,7 +14,7 @@ sys.setdefaultencoding('utf-8')
 
 def RegistroClienteView(request):
 	codigo_cliente= Cliente.objects.count()+1
-	data={'cliente_form': ClienteForm(initial={'codigo': codigo_cliente})}
+	data={'cliente_form': ClienteForm(initial={'codigo': codigo_cliente,'ingresado_por': request.session['user_log']})}
 	return render(request,'registrocliente.html',data)
 
 def GuardarCliente(request):
@@ -61,7 +61,7 @@ def GuardarCambiosCliente(request):
 		return HttpResponse(json.dumps({'errors': form_cliente.errors}), content_type='application/json')
 
 def RegistroEmpresaView(request):
-	data={'empresa_form': EmpresaForm()}
+	data={'empresa_form': EmpresaForm(initial={'ingresado_por': request.session['user_log']})}
 	return render(request,'registroempresa.html',data)
 
 def dt_empresas(request):

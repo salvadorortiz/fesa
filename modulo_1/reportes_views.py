@@ -34,7 +34,16 @@ def ReporteReservaData(request):
 		filtro+=" AND complejo_id = " + str(request.POST['complejo_id'])
 
 	str_query = "SELECT * FROM dt_repo_reserva" + filtro
-	print str_query
+	#print str_query
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	#print convert_fetchall(qs)
+	return HttpResponse(json.dumps(convert_fetchall(qs)), content_type='application/json')
+
+def ReporteClientesData(request):
+	str_query = "SELECT * FROM dt_repo_clientes"
+	#print str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()

@@ -113,9 +113,29 @@
             <div class="tab-pane" id="tab2">
               2
             </div>
-            
+ <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->           
             <div class="tab-pane" id="tab3">
-                3
+                <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                        <label data-toggle="collapse" href="#cliente_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-flag"></i> &nbsp;Reporte de clientes</label>
+                        <a href="#" onclick="$('#dt_repo_clientes').DataTable().ajax.reload();"style="float:right; color:white;">
+                            <i class="fa fa-refresh"></i>
+                        </a>
+                    </div>
+                    <hr>
+                     <div id="cliente_toggle" class="collapse in col-sm-12">
+                            <table id="dt_repo_clientes" class="stripe">
+                                <thead>
+                                    <th>Tipo</th>
+                                    <th>Nombre</th>
+                                    <th>Ingresado por </th>
+                                    <th>Primer evento</th>
+                                    <th>Último evento</th>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
             </div>
         </div>  
     </div>
@@ -178,6 +198,41 @@
            $("#filtrar_repo_reserva").on('click',function(){
                 $("#dt_repo_reserva").DataTable().ajax.reload();
            });
+        //--- Reporte de clientes
+            var dt_repo_clientes = $('#dt_repo_clientes').DataTable( {
+                "ajax": {
+                    "url": "{%url 'repo_clientes' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                    },
+                },
+                "pageLength": 15,
+                "ordering": false,
+                "lengthChange": true,
+                "searching": true,
+                "paging": true,
+                "columnDefs":[
+                    //{"targets":[0,1,2,3,4],"visible":false,"searchable":false},
+                    {"targets":0, "width":"5%"},
+                    {"targets":1, "width":"25%"},
+                    {"targets":2, "width":"20%"},
+                    {"targets":3, "width":"25%"},
+                    {"targets":4, "width":"25%"},
+                ],
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Mostrando página 0 de 0",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
+            });
+
     });
 
 </script>

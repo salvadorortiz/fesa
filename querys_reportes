@@ -30,3 +30,19 @@ INNER JOIN modulo_1_tipoalquiler ta ON ta.tipo_alquiler_id = res.tipo_alquiler_i
 LEFT JOIN modulo_1_cliente c ON c.cliente_id=res.cliente_id
 LEFT JOIN modulo_1_empresa e ON e.empresa_id=res.empresa_id
 ORDER BY recan.fecha DESC
+
+
+CREATE VIEW dt_repo_clientes AS 
+SELECT '<i class="fa fa-child"></i>' AS tipo, c.nombre As nombre_cliente, c.ingresado_por,
+(SELECT nombre_evento from modulo_1_reserva where cliente_id=c.cliente_id
+order by fecha_ingreso asc limit 1) AS primer_evento,
+(SELECT nombre_evento from modulo_1_reserva where cliente_id=c.cliente_id
+order by fecha_ingreso desc limit 1) AS ultimo_evento
+FROM modulo_1_cliente c
+UNION
+SELECT '<i class="fa fa-building"></i>' AS tipo, c.nombre As nombre_cliente, c.ingresado_por,
+(SELECT nombre_evento from modulo_1_reserva where empresa_id=c.empresa_id
+order by fecha_ingreso asc limit 1) AS primer_evento,
+(SELECT nombre_evento from modulo_1_reserva where empresa_id=c.empresa_id
+order by fecha_ingreso desc limit 1) AS ultimo_evento
+FROM modulo_1_empresa c
