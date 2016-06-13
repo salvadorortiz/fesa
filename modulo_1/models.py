@@ -77,7 +77,8 @@ class Cliente(models.Model):
 	telefono_alterno = models.CharField('Teléfono alterno', max_length=15, validators=[phone_regex], blank=True,null=True)
 	correo = models.EmailField('Correo electrónico', max_length=60, blank=True, validators=[validate_email],null=True)
 	direccion = models.TextField('Dirección', max_length=250, blank=True, null=True)
-
+	ingresado_por= models.CharField('IngresadoPor',max_length=20,blank=True,null=True,default='')
+	
 	def __unicode__(self):
 		return self.nombre
 
@@ -91,6 +92,7 @@ class Empresa(models.Model):
 	contacto = models.CharField('Persona de contacto',max_length=100,blank=False,null=False,default='')
 	telefono_contacto = models.CharField('Teléfono de contacto', max_length=50, validators=[phone_regex], blank=False, null=False)
 	correo_contacto = models.EmailField('Correo electrónico de contacto', max_length=60, blank=True, validators=[validate_email])
+	ingresado_por= models.CharField('IngresadoPor',max_length=20,blank=True,null=True,default='')
 
 	def __unicode__(self):
 		return self.nombre
