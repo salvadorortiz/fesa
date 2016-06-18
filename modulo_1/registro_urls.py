@@ -66,4 +66,10 @@ urlpatterns = [
     url(r'^guardar_precio/', 'modulo_1.views.GuardarPrecio',name='guardar_precio'),
     url(r'^guardar_reserva/', 'modulo_1.views.GuardarReserva',name='guardar_reserva'),
     url(r'^edit_reserva/', 'modulo_1.views.InformacionReserva',name='edit_reserva'),
+    url(r'^calcular_precio/', 'modulo_1.views.CalcularPrecio',name='calcular_precio'),
+    url(r'^guardar_cambios_reserva/', 'modulo_1.views.GuardarCambiosReserva',name='guardar_cambios_reserva'),
+    url(r'^dt_remesas/', 'modulo_1.views.dt_remesas',name='dt_remesas'),
+    url(r'^guardar_remesa/', 'modulo_1.views.GuardarRemesa',name='guardar_remesa'),
+    url(r'^guardar_cambios_remesa/', 'modulo_1.views.GuardarCambiosRemesa',name='guardar_cambios_remesa'),
+    url(r'^eliminar_remesa/', 'modulo_1.views.EliminarRemesa',name='eliminar_remesa'),
     ]

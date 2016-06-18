@@ -1,0 +1,234 @@
+{% csrf_token %}
+{% load widget_tweaks %}
+<div id="modal_remesa" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Registro de remesas del evento</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div id="errores_remesa"></div>
+            </div>
+        </div>
+        <form id="form_remesa">
+            <div class="well">
+              <div class="row">
+                  <div class="col-lg-3"></div>
+                  <div class="col-lg-3">
+                      <b>Número de remesa</b>
+                  </div>
+                  <div class="col-lg-6">
+                      <input type="text" id="txt_numero_remesa" class="form-control" placeholder="Número de remesa" maxlength="100">
+                  </div>
+              </div>
+              <br>
+              <div class="row">
+                  <div class="col-lg-2">
+                      <b>Monto</b>
+                  </div>
+                  <div class="col-lg-4">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-usd"></i></span>
+                        <input type="text" id="txt_monto" class="form-control" maxlength="10">
+                    </div>
+                  </div>
+                  <div class="col-lg-2">
+                      <b>Fecha</b>
+                  </div>
+                  <div class="col-lg-4">
+                    <input type="text" id="txt_fecha_remesa" class="form-control" placeholder="AAAA-MM-DD">
+                  </div>
+              </div>
+              <br>
+              <div class="row">
+                  <div class="col-sm-12">
+                       <center>
+                          <button type="button" id="btn_guardar_remesa" class="btn btn-primary">Guardar</button>
+                          <button type="button" style="display:none" id="btn_guardar_cambios_remesa" class="btn btn-primary">Guardar Cambios</button>
+                          <button type="button" style="display:none" id="btn_cancelar_remesa" class="btn btn-default">Cancelar</button>
+                      </center>
+                  </div>
+              </div>
+            </div> <!--Well-->
+             <div class="row">
+                <div class="col-sm-12">
+                     <table id="dt_remesas" class="stripe" style="width:100%">
+                         <thead>
+                             <th>ID remesa</th>
+                             <th>ID reserva</th>
+                             <th>Número remesa</th>
+                             <th>Monto</th>
+                             <th>Fecha</th>
+                             <th>Acciones</th>
+                         </thead>
+                         <tbody>
+                         </tbody>
+                     </table>
+                </div>
+            </div> 
+        </form>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script type="text/javascript">
+var remesa_seleccionada = -1;
+$(window).load(function() {
+  $( "#txt_fecha_remesa" ).datepicker();
+
+  var dt_remesas = $('#dt_remesas').DataTable( {
+    "ajax": {
+        "url": "{%url 'dt_remesas' %}",
+        "type": "POST",
+        "data":  function( d ) {
+            d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+            d.evento = evento_seleccionado
+        },
+    },
+    //"pageLength": 5,
+    "ordering": true,
+    "lengthChange": true,
+    "searching": false,
+    "paging": false,
+    "order":[[4,"asc"]],
+    "columnDefs":[
+        {"targets":[0,1],"visible":false,"searchable":false},
+        {"targets":2, "width":"30%"},
+        {"targets":3, "width":"25%"},
+        {"targets":4, "width":"30%"},
+        {"targets":5 ,"width": "15%",  "defaultContent": "<center><button type='button' name=\"edit_remesa\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button name=\"eliminar_remesa\" type='button' class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash bigger-120\"></i></button></center>" },
+    ],
+    "language": {
+        "lengthMenu": "Mostrando _MENU_ filas por página",
+        "zeroRecords": "No se encontraron resultados",
+        "info": "Mostrando página _PAGE_ de _PAGES_",
+        "infoEmpty": "Mostrando página 0 de 0",
+        "infoFiltered": "(filtered from _MAX_ total records)",
+        "oPaginate": {
+            "sNext":     "Siguiente",
+            "sPrevious": "Anterior"
+        },
+    }
+  });
+
+  $("#btn_cancelar_remesa").on('click',function(){
+    $("#dt_remesas").DataTable().ajax.reload();
+    $('#txt_numero_remesa').val("");
+    $('#txt_monto').val("");
+    $('#txt_fecha_remesa').val("");
+    $("#btn_guardar_cambios_remesa").hide();
+    $("#btn_cancelar_remesa").hide();
+    var data = $('#dt_eventos').DataTable().rows('.selected').data();
+    if(data[0][5] == usuario_log || tipo_usuario == "R"){
+        $("#btn_guardar_remesa").show();
+    }
+    remesa_seleccionada = -1;
+  });
+
+  $("#btn_guardar_remesa").on('click',function(){
+    if(!($('#txt_numero_remesa').val()=="" || $('#txt_monto').val()=="" || $("#txt_fecha_remesa").val()=="")){
+        jQuery.ajax({
+          url: "{%url 'guardar_remesa'%}",
+          type: "POST",
+          processData: false,
+          data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&numero_remesa="+$('#txt_numero_remesa').val()+"&fecha="+$('#txt_fecha_remesa').val()+"&monto="+$('#txt_monto').val()+"&evento="+evento_seleccionado,
+          success: function(json){
+                      $("#errores_remesa").html('');
+                      create_alert(json['mensaje'],"EXITO","errores_remesa",true,5000);
+                      $("#dt_remesas").DataTable().ajax.reload();
+                      $('#txt_fecha_remesa').val("");
+                      $('#txt_monto').val("");
+                      $('#txt_numero_remesa').val("");
+                    },
+          error:function(json){
+              create_alert("<li><b>Datos incorrectos: </b>Monto o fecha no válidos</li>","ERROR","errores_remesa",false,0);
+          }
+        });
+    }else{
+       create_alert("<li><b>Campos requeridos: </b> número de remesa, monto y fecha son campos requeridos.</li>","ERROR","errores_remesa",false,0);
+    }
+  });
+
+  $("#dt_remesas").on('click', "[name=edit_remesa]",function(){
+    $('#dt_remesas').DataTable().$('tr.selected').removeClass('selected');
+    $(this).parent().parent().parent().addClass('selected');
+    var data = $('#dt_remesas').DataTable().rows('.selected').data();
+    remesa_seleccionada = data[0][0];
+    $('#txt_numero_remesa').val(data[0][2]);
+    $('#txt_monto').val(data[0][3]);
+    $('#txt_fecha_remesa').val(data[0][4]);
+    $("#btn_cancelar_remesa").show();
+    data = $('#dt_eventos').DataTable().rows('.selected').data();
+    if(data[0][5] == usuario_log || tipo_usuario == "R"){
+        $("#btn_guardar_cambios_remesa").show();
+    }
+    $("#btn_guardar_remesa").hide();
+  });
+
+  $("#btn_guardar_cambios_remesa").on('click',function(){
+    if(!($('#txt_numero_remesa').val()=="" || $('#txt_monto').val()=="" || $("#txt_fecha_remesa").val()=="")){
+        jQuery.ajax({
+          url: "{%url 'guardar_cambios_remesa'%}",
+          type: "POST",
+          processData: false,
+          data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&numero_remesa="+$('#txt_numero_remesa').val()+"&fecha="+$('#txt_fecha_remesa').val()+"&monto="+$('#txt_monto').val()+"&remesa="+remesa_seleccionada+"&evento="+evento_seleccionado,
+          success: function(json){
+                      $("#errores_remesa").html('');
+                      create_alert(json['mensaje'],"EXITO","errores_remesa",true,5000);
+                      remesa_seleccionada=-1;
+                      $("#dt_remesas").DataTable().ajax.reload();
+                      $('#txt_fecha_remesa').val("");
+                      $('#txt_monto').val("");
+                      $('#txt_numero_remesa').val("");
+                      $("#btn_cancelar_remesa").hide();
+                      $("#btn_guardar_cambios_remesa").hide();
+                      var data = $('#dt_eventos').DataTable().rows('.selected').data();
+                      if(data[0][5] == usuario_log || tipo_usuario == "R"){
+                          $("#btn_guardar_remesa").show();
+                      }
+                    },
+          error:function(json){
+              create_alert("<li><b>Datos incorrectos: </b>Monto o fecha no válidos</li>","ERROR","errores_remesa",false,0);
+          }
+        });
+    }else{
+       create_alert("<li><b>Campos requeridos: </b> número de remesa, monto y fecha son campos requeridos.</li>","ERROR","errores_remesa",false,0);
+    }
+  });
+
+  $("#dt_remesas").on('click', "[name=eliminar_remesa]",function(){
+    $('#dt_remesas').DataTable().$('tr.selected').removeClass('selected');
+    $(this).parent().parent().parent().addClass('selected');
+    var data = $('#dt_remesas').DataTable().rows('.selected').data();
+    remesa_seleccionada = data[0][0];
+    var data_aux = $('#dt_eventos').DataTable().rows('.selected').data();
+    if(data_aux[0][5] == usuario_log || tipo_usuario == "R"){
+      bootbox.confirm("Se eliminará la remesa seleccionada, ¿Está seguro?", function(result) {
+        if(result){
+          jQuery.ajax({
+              url: "{%url 'eliminar_remesa'%}",
+              type: "POST",
+              processData: false,
+              data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&remesa="+remesa_seleccionada+"&evento="+evento_seleccionado,
+              success: function(json){
+                      create_alert("<li>Remesa eliminado con éxito </li>","EXITO","errores_remesa",true,5000);
+                      $("#dt_remesas").DataTable().ajax.reload();
+                      $("#btn_cancelar_remesa").click();
+              }
+          });
+        }else{
+          $("#dt_remesas").DataTable().ajax.reload();
+        }
+      });
+    }else{
+      create_alert("<li>No posee permisos para eliminar esta remesa</li>","ERROR","errores_remesa",false,0);
+    }
+  });
+
+
+});
+</script>

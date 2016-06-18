@@ -112,6 +112,8 @@
                                     <option value="-1">Seleccione el estado</option>
                                     <option value="C">Confirmado</option>
                                     <option value="T">Tentativo</option>
+                                    <option value="R">Realizado</option>
+                                    <option value="N">No realizado</option>
                                 </select>
                             </div>
                         </div>
@@ -175,7 +177,7 @@
                                 <b>Complejo</b>
                             </div>
                             <div class="col-sm-4">
-                                <select id="cmb_complejo" class="form-control">
+                                <select id="cmb_complejo" class="form-control" onchange="calcular_precio()">
                                     <option value="-1">Seleccione el complejo</option>
                                     {% for complejo in data %}
                                     <option value="{{complejo.id}}">{{complejo.nombre}}</option>
@@ -187,7 +189,7 @@
                                 <strong>Cancha</strong>
                             </div>
                             <div class="col-sm-4">
-                                <select id="cmb_cancha" class="form-control">
+                                <select id="cmb_cancha" class="form-control" onchange="calcular_precio()">
                                     <option value="-1">Seleccione la cancha</option>
                                 </select>
                             </div>
@@ -198,28 +200,28 @@
                                 <b>Fecha</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_fecha" class="form-control" placeholder="AAAA-MM-DD">
+                                <input type="text" id="txt_fecha" class="form-control" placeholder="AAAA-MM-DD" onchange="calcular_precio()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Desde</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_hora_inicio" class="form-control" placeholder="HH:MM">
+                                <input type="text" id="txt_hora_inicio" class="form-control" placeholder="HH:MM" onchange="calcular_precio()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Hasta</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_hora_fin" class="form-control" placeholder="HH:MM">
+                                <input type="text" id="txt_hora_fin" class="form-control" placeholder="HH:MM" onchange="calcular_precio()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Precio sugerido</b>
                             </div>
                             <div class="col-sm-2">
                                 <div class="form-group input-group">
-                            <span class="input-group-addon"><i class="fa fa-usd"></i></span>
-                            <input type="text" id="txt_precio_sugerido" class="form-control" disabled>
-                        </div>
+                                    <span class="input-group-addon"><i class="fa fa-usd"></i></span>
+                                    <input type="text" id="txt_precio_sugerido" class="form-control" disabled>
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-12">
@@ -253,7 +255,7 @@
                       <h3 class="panel-title"><i class="fa fa-usd fa-fw"></i> Registro de precio y costo del evento</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="col-sm-2"></div>
+                    <div class="col-sm-1"></div>
                     <div class="col-sm-1">
                         <b>Precio</b>
                     </div>
@@ -272,11 +274,21 @@
                             <input type="text" id="txt_costo_evento" class="form-control">
                         </div>
                     </div>
+                    <div class="col-sm-1">
+                        <b>Saldo</b>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group input-group">
+                            <span class="input-group-addon"><i class="fa fa-usd"></i></span>
+                            <input type="text" id="txt_saldo_evento" class="form-control" disabled>
+                        </div>
+                    </div>
                     <button type="button" id="btn_guardar_precio" class="btn btn-primary" style="background-color:#337AB7"><i class="fa fa-floppy-o"></i> Guardar</button>
                 </div>
             </div>
         </div>
     </div>
+{%include 'remesas.html'%}
 {% endblock %}
 
 {% block addExtraScript %} 
@@ -284,11 +296,12 @@
     var usuario_log = "{{request.session.user_log}}";
     var tipo_usuario = "{{request.session.type_user}}";
     var evento_seleccionado = -1;
+    var reserva_seleccionada = -1;
 
     $(window).load(function() {
         cargar_combos();
         $( "#txt_fecha" ).datepicker({
-            'minDate': 0
+            //'minDate': 0
         });
 
         $('#txt_hora_inicio').timepicker({
@@ -340,7 +353,7 @@
                 {"targets":3, "width":"12.5%"},
                 {"targets":4, "width":"15%"},
                 {"targets":5, "width":"10%"},
-                {"targets":6 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets":6 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"registro_remesa\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-credit-card bigger-120\"></i></button></center>" },
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -435,6 +448,10 @@
                         $('#txt_costo_evento').val(json['costo']);
                     }else{
                         $('#txt_costo_evento').val("");
+                    }if(json['saldo']!="None"){
+                        $('#txt_saldo_evento').val(json['saldo']);
+                    }else{
+                        $('#txt_saldo_evento').val("");
                     }
                     evento_seleccionado = data[0][0];
                     $("#dt_reservas").DataTable().ajax.reload();
@@ -473,7 +490,9 @@
             $("#btn_cancelar_reserva").hide();
             $("#btn_guardar_precio").show();
             evento_seleccionado = -1;
+            reserva_seleccionada = -1;
             $("#txt_precio_sugerido").prop('disabled', true);
+            $("#txt_saldo_evento").prop('disabled', true);
             dt_reservas.ajax.reload();
         });
 
@@ -551,7 +570,6 @@
             if(evento_seleccionado==-1){
                 create_alert("<li>Seleccione un evento para ingresar reservas</li>","ERROR","div_errores_reservas",false,0);
             }else if(!($('#cmb_complejo').val()=="-1" || $('#cmb_cancha').val()=="-1" || $("#txt_fecha").val()=="" || $('#txt_hora_inicio').val()=="" || $('#txt_hora_fin').val()=="")){
-                $('#txt_precio_sugerido').val(100.00);
                 jQuery.ajax({
                     url: "{%url 'guardar_reserva'%}",
                     type: "POST",
@@ -562,7 +580,7 @@
                             create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
                         }else{
                             create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
-                            $("#div_errores").html('');
+                            /*$("#div_errores").html('');
                             $("#dt_reservas").DataTable().ajax.reload();
                             $('#cmb_complejo').val("-1");
                             $('#cmb_cancha').val("-1");
@@ -570,6 +588,7 @@
                             $('#txt_hora_inicio').val("");
                             $('#txt_hora_fin').val("");
                             $('#txt_notas_reserva').val("");
+                            $('#txt_precio_sugerido').val("");*/
                         }
                     },
                     error:function(json){
@@ -586,6 +605,7 @@
             $('#dt_reservas').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
             var data = $('#dt_reservas').DataTable().rows('.selected').data();
+            reserva_seleccionada = data[0][0];
             var cancha = "-1";
             jQuery.ajax({
                 url: "{%url 'edit_reserva'%}",
@@ -619,8 +639,33 @@
             });
         });
 
+        $("#btn_guardar_cambios_reserva").on('click',function(){
+            if(!($('#cmb_complejo').val()=="-1" || $('#cmb_cancha').val()=="-1" || $("#txt_fecha").val()=="" || $('#txt_hora_inicio').val()=="" || $('#txt_hora_fin').val()=="")){
+                jQuery.ajax({
+                    url: "{%url 'guardar_cambios_reserva'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&reserva="+reserva_seleccionada,
+                    success: function(json){
+                        if(json['error']==true){
+                            create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
+                        }else{
+                            create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
+                            $("#div_errores").html('');
+                            $("#btn_cancelar_reserva").click();
+                        }
+                    },
+                    error:function(json){
+                        create_alert("<li><b>Datos incorrectos: </b>Fecha u horas no válidas</li>","ERROR","div_errores_reservas",false,0);
+                    }
+                });
+            }else{
+               create_alert("<li><b>Campos requeridos:</b> complejo, cancha, fecha, hora inicio y hora fin son campos requeridos.</li>","ERROR","div_errores_reservas",false,0);
+            }
+        });
+
         $("#btn_cancelar_reserva").on('click',function(){
-            $('#dt_reservas').DataTable().$('tr.selected').removeClass('selected');
+            $("#dt_reservas").DataTable().ajax.reload();
             $('#cmb_complejo').val("-1");
             $('#cmb_complejo').change();
             $('#txt_fecha').val("");
@@ -634,8 +679,47 @@
             if(data[0][5] == usuario_log || tipo_usuario == "R"){
                 $("#btn_guardar_reserva").show();
             }
+            reserva_seleccionada = -1;
         });
 
+        $(document).on('click', "[name=registro_remesa]",function(){
+            $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_eventos').DataTable().rows('.selected').data();
+            evento_seleccionado = data[0][0];
+            if(data[0][5] != usuario_log && tipo_usuario != "R"){
+                $("#btn_guardar_remesa").hide();
+            }else{
+                $("#btn_guardar_remesa").show();
+            }
+            $("#dt_remesas").DataTable().ajax.reload();
+            $("#modal_remesa").modal('show');
+        });
+        
+        $("#modal_remesa").on('hide.bs.modal', function (e) {
+            //$('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+            //evento_seleccionado = -1;
+            $("#btn_cancelar").click();
+            $("#btn_cancelar_remesa").hide();
+            $("#btn_guardar_cambios_remesa").hide();
+        });
     });
+
+    function calcular_precio(){
+        if(!($('#cmb_complejo').val()=="-1" || $('#cmb_cancha').val()=="-1" || $("#txt_fecha").val()=="" || $('#txt_hora_inicio').val()=="" || $('#txt_hora_fin').val()=="")){
+            jQuery.ajax({
+                url: "{%url 'calcular_precio'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val(),
+                success: function(json){
+                    $('#txt_precio_sugerido').val(json['precio_sugerido']);
+                },
+                error:function(json){
+                    create_alert("<li><b>Datos incorrectos: </b>Fecha u horas no válidas</li>","ERROR","div_errores_reservas",false,0);
+                }
+            });
+        }
+    }
 </script>
 {% endblock %}
