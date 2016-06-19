@@ -5,3 +5,6 @@ def login(request):
 
 def home(request):
 	return render(request,'index.html')
+
+def change_pass(request):
+	return render(request,'cambiar_password.html')

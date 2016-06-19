@@ -103,7 +103,9 @@
         //$('#id_hora_cierre').timepicker();
         $('#timeOnlyExample .time').timepicker({
            // 'showDuration': true,
-            'timeFormat': 'G:i'
+            'timeFormat': 'H:i',
+            'forceRoundTime': true,
+            'scrollDefault': '08:30'
         });
 
         var timeOnlyExampleEl = document.getElementById('timeOnlyExample');

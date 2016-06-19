@@ -27,6 +27,18 @@ def Autenticacion(request):
 		respuesta=json.dumps({'error':True})
 	return HttpResponse(respuesta,content_type='application/json')
 
+def GuardarPassword(request):
+	usuario= Usuario.objects.filter(usuario=request.session['user_log'], password=hashlib.sha1(request.POST['actual']).hexdigest())
+	if(len(usuario)==1):
+		if request.POST['nueva']==request.POST['repetir']:
+			usuario.update(password=hashlib.sha1(request.POST['nueva']).hexdigest())
+			respuesta=json.dumps({'error':False})
+		else:
+			respuesta=json.dumps({'error':True,'mensaje':'<li><b>Contraseña nueva incorrecta:</b> Las contraseñas nuevas no coinciden.</li>'})
+	else:
+		respuesta=json.dumps({'error':True,'mensaje':'<li><b>Contraseña incorrecta:</b> La contraseña ingresada no coincide.</li>'})
+	return HttpResponse(respuesta,content_type='application/json')
+
 def PreciosView(request):
 	return render(request,'precios.html')
 
@@ -364,22 +376,32 @@ def dt_reservas(request):
 	tipo_alquiler = convert_fetchall(qs)
 	return HttpResponse(json.dumps(tipo_alquiler), content_type='application/json')
 
-def GuardarPrecio(request):
+def GuardarPrecioEvento(request):
 	Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(precio=request.POST['precio_evento'],costo=request.POST['costo_evento'])
+	CalcularSaldo(request.POST['id_evento'])
 	return HttpResponse(json.dumps({}), content_type='application/json')
 
 def GuardarReserva(request):
-	reservas = ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'])
-	for reserva in reservas:
-		print reserva.precio_sugerido
-
-
-
-
+	reservas = 	ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],hora_inicio__gte=request.POST['inicio'],
+		hora_inicio__lt=request.POST['fin']) | ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],
+		hora_fin__gt=request.POST['inicio'],hora_fin__lte=request.POST['fin'])
+	mensaje = ""
+	tab = "&nbsp;"*5	
+	if len(reservas) > 0:
+		for reserva in reservas:
+			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
+			mensaje += "<b>Igresado por:</b> "+reserva.usuario.nombre+"<br>"
+			mensaje += "<b>Conflicto con la reserva:</b><br>"
+			mensaje += tab+"<b>Complejo:</b> "+reserva.cancha.complejo.nombre+"<br>"
+			mensaje += tab+"<b>Cancha:</b> "+reserva.cancha.nombre+"<br>"
+			mensaje += tab+"<b>Fecha:</b> "+str(reserva.fecha)+"<br>"
+			mensaje += tab+"<b>Hora: </b>"+reserva.hora_inicio.strftime("%H:%M")+" - "+reserva.hora_fin.strftime("%H:%M")+"</li><br><br>"
+		return HttpResponse(json.dumps({'error':True,'mensaje':mensaje}), content_type='application/json')
+	
 	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
-	#ReservaCancha(cancha_id=request.POST['cancha'],reserva_id=request.POST['evento'],usuario=usuario[0],fecha=request.POST['fecha'],
-	#			hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],notas=request.POST['notas'],
-	#			precio_sugerido=request.POST['precio_sugerido']).save()
+	ReservaCancha(cancha_id=request.POST['cancha'],reserva_id=request.POST['evento'],usuario=usuario[0],fecha=request.POST['fecha'],
+				hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],notas=request.POST['notas'],
+				precio_sugerido=request.POST['precio_sugerido']).save()
 	mensaje = "<li>Reserva ingresada con éxito</li>"
 	return HttpResponse(json.dumps({'error':False,'mensaje':mensaje}), content_type='application/json')
 

@@ -63,7 +63,7 @@ urlpatterns = [
     url(r'^guardar_cambios_evento/', 'modulo_1.views.GuardarCambiosEvento',name='guardar_cambios_evento'),
     url(r'^cargar_canchas/', 'modulo_1.views.CargarCanchas',name='cargar_canchas'),
     url(r'^dt_reservas/', 'modulo_1.views.dt_reservas',name='dt_reservas'),
-    url(r'^guardar_precio/', 'modulo_1.views.GuardarPrecio',name='guardar_precio'),
+    url(r'^guardar_precio_evento/', 'modulo_1.views.GuardarPrecioEvento',name='guardar_precio_evento'),
     url(r'^guardar_reserva/', 'modulo_1.views.GuardarReserva',name='guardar_reserva'),
     url(r'^edit_reserva/', 'modulo_1.views.InformacionReserva',name='edit_reserva'),
     url(r'^calcular_precio/', 'modulo_1.views.CalcularPrecio',name='calcular_precio'),
@@ -72,4 +72,5 @@ urlpatterns = [
     url(r'^guardar_remesa/', 'modulo_1.views.GuardarRemesa',name='guardar_remesa'),
     url(r'^guardar_cambios_remesa/', 'modulo_1.views.GuardarCambiosRemesa',name='guardar_cambios_remesa'),
     url(r'^eliminar_remesa/', 'modulo_1.views.EliminarRemesa',name='eliminar_remesa'),
+    url(r'^guardar_password/', 'modulo_1.views.GuardarPassword',name='guardar_password'),
     ]

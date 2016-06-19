@@ -149,6 +149,11 @@
                         <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i> {{request.session.user_log}} <!-- <b class="caret"></b> -->
                     </a>
                     <ul class="dropdown-menu">
+                        <li>
+                            <a href="{%url 'change_pass'%}">
+                                <i class="fa fa-fw fa-key"></i> Cambiar Contraseña
+                            </a>
+                        </li>
                         {%if request.session.type_user == 'R'%}
                         <li>
                             <a href="#" onClick="parent.location='/admin'">
@@ -159,7 +164,7 @@
                         {%endif%}
                         <li>
                             <a href="{%url 'login'%}">
-                                <i class="fa fa-fw fa-power-off"></i> Log Out
+                                <i class="fa fa-fw fa-power-off"></i> Cerrar Sesión
                             </a>
                         </li>
                     </ul>

@@ -206,13 +206,13 @@
                                 <b>Desde</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_hora_inicio" class="form-control" placeholder="HH:MM" onchange="calcular_precio()">
+                                <input type="text" id="txt_hora_inicio" class="time start ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Hasta</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_hora_fin" class="form-control" placeholder="HH:MM" onchange="calcular_precio()">
+                                <input type="text" id="txt_hora_fin" class="time end ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Precio sugerido</b>
@@ -305,11 +305,18 @@
         });
 
         $('#txt_hora_inicio').timepicker({
-            'timeFormat': 'H:i'
+            'timeFormat': 'H:i',
+            'forceRoundTime': true,
+            'scrollDefault': '08:30'
+        });
+
+        $('#txt_hora_inicio').on('changeTime', function() {
+            $('#txt_hora_fin').val($(this).val());
         });
 
         $('#txt_hora_fin').timepicker({
-            'timeFormat': 'H:i'
+            'timeFormat': 'H:i',
+            'forceRoundTime': true
         });
 
         $( "#txt_cliente" ).autocomplete({
@@ -499,7 +506,7 @@
         $("#btn_guardar_precio").on('click',function(){
             if(evento_seleccionado!=-1){
                 jQuery.ajax({
-                    url: "{%url 'guardar_precio'%}",
+                    url: "{%url 'guardar_precio_evento'%}",
                     type: "POST",
                     processData: false,
                     data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&precio_evento="+$('#txt_precio_evento').val()+"&costo_evento="+$('#txt_costo_evento').val()+"&id_evento="+evento_seleccionado,

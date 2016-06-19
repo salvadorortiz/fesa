@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$','fesa.views.login', name='login'),
     url(r'^home','fesa.views.home', name='home'),
+    url(r'^password','fesa.views.change_pass', name='change_pass'),
     url(r'^registro/', include(registro_urls)),
     url(r'^reportes/', include(reportes_urls)),
 ]
