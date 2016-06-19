@@ -46,3 +46,26 @@ order by fecha_ingreso asc limit 1) AS primer_evento,
 (SELECT nombre_evento from modulo_1_reserva where empresa_id=c.empresa_id
 order by fecha_ingreso desc limit 1) AS ultimo_evento
 FROM modulo_1_empresa c
+
+
+Create or replace view dt_repo_remesa as
+SELECT res.reserva_id,
+ to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) as fecha_ingreso,
+res.nombre_evento, 
+Case
+	WHEN c.cliente_id is null then e.nombre
+	ELSE c.nombre
+end as nombre_cliente, 
+u.nombre as nombre_usuario,
+'$'|| COALESCE(to_char(res.precio,'9G999.99'),to_char(0,'9G999.99')) as precio,
+'$'|| COALESCE(to_char(res.costo,'9G999.99'),to_char(0,'9G999.99')) as costo, 
+'$'|| COALESCE(to_char(res.precio - res.costo,'9G999.99'),to_char(0,'9G999.99')) as utilidad,
+'$'|| COALESCE(to_char((select sum(monto) from modulo_1_remesaxreserva where reserva_id=res.reserva_id),'9G999.99'),to_char(0,'9G999.99')) as remesado,
+'$'|| COALESCE(to_char(res.precio - (select sum(monto) from modulo_1_remesaxreserva where reserva_id=res.reserva_id),'9G999.99'),to_char(0,'9G999.99')) as remanente
+, res.usuario_id as usuario
+FROM modulo_1_remesaxreserva rr 
+inner join modulo_1_reserva res on res.reserva_id = rr.reserva_id
+inner join modulo_1_usuario u on u.usuario_id=res.usuario_id
+left join modulo_1_cliente c on res.cliente_id=c.cliente_id
+left join modulo_1_empresa e on res.empresa_id=e.empresa_id 
+group by res.reserva_id,c.cliente_id,e.nombre,res.nombre_evento,res.usuario_id,u.nombre

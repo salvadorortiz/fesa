@@ -25,6 +25,7 @@
             <li class="active"><a href="#tab1" data-toggle="tab">Resumen complejo</a></li>
             <li><a href="#tab2" data-toggle="tab">Reporte utilidad</a></li>
             <li><a href="#tab3" data-toggle="tab">Clientes</a></li>
+            <li><a href="#tab4" data-toggle="tab">Ocupación de canchas</a></li>
         </ul>
         <hr>
         <div class="tab-content">
@@ -111,7 +112,124 @@
             </div>
 <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
             <div class="tab-pane" id="tab2">
-              2
+                <div class="row">
+                    <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Filtrar por...</h3>
+                            </div>
+                            <div class="panel-body" id="panel_remesa">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-2">
+                                                <strong>Fecha de reserva</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-1">Desde: </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" id="fecha_desde">
+                                            </div>
+                                            <div class="col-sm-1">Hasta: </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" id="fecha_hasta">
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-2">
+                                                <strong>Seleccione un usuario</strong>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <select class="form-control" id="cmb_usuario">
+                                                    {{cmb_usuario|safe}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <center>
+                                                    <button type="button" id="filtrar_repo_remesa" class="btn btn-success"><i class="fa fa-search"></i>&nbsp;&nbsp; Filtrar</button>
+                                                </center>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                        <label data-toggle="collapse" href="#remesa_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-money"></i> &nbsp;Reporte de utilidad</label>
+                        <a href="#" onclick="$('#dt_repo_remesa').DataTable().ajax.reload();"style="float:right; color:white;">
+                            <i class="fa fa-refresh"></i>
+                        </a>
+                    </div>
+                </div>
+
+                    <hr>
+                  <div class="row">    
+                     <div id="remesa_toggle" class="collapse in col-sm-12">
+                            <table style="width:100%" id="dt_repo_remesa" class="stripe">
+                                <thead>
+                                    <th>Remesa id</th>
+                                    <th>Fecha</th>
+                                    <th>Evento</th>
+                                    <th>Cliente</th>
+                                    <th>Usuario</th>
+                                    <th>Precio</th>
+                                    <th>Costo</th>
+                                    <th>Utilidad</th>
+                                    <th>Remesado</th>
+                                    <th>Remanente</th>
+                                    <th>Usuario</th>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+                 <hr>
+                 <div class="row">
+                    <div class="col-sm-2"></div>
+                         <div class="col-lg-8 col-md-6">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-money fa-2x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="huge"></div>
+                                            <div>Resultados totales:</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <div class="panel-footer">
+                                         <table style="width:100%" id="dt_repo_total" class="stripe">
+                                            <thead>
+                                                <th>Precio total</th>
+                                                <th>Costo total</th>
+                                                <th>Utilidad total</th>
+                                                <th>Remanente total</th>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>     
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    <div class="col-sm-2"></div>
+                </div>
             </div>
  <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->           
             <div class="tab-pane" id="tab3">
@@ -123,7 +241,7 @@
                     </div>
                     <hr>
                      <div id="cliente_toggle" class="collapse in col-sm-12">
-                            <table id="dt_repo_clientes" class="stripe">
+                            <table style="width:100%" id="dt_repo_clientes" class="stripe">
                                 <thead>
                                     <th>Tipo</th>
                                     <th>Nombre</th>
@@ -137,6 +255,11 @@
                             </table>
                     </div>
             </div>
+<!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->            
+            <div class="tab-pane" id="tab4">
+              4
+            </div>
+<!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
         </div>  
     </div>
 
@@ -233,6 +356,81 @@
                 }
             });
 
+        // --- Repo de remesas
+            var dt_repo_remesa = $('#dt_repo_remesa').DataTable( {
+                "ajax": {
+                    "url": "{%url 'repo_remesas' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                        d.fecha_desde= $("#panel_remesa").find("#fecha_desde").val(),
+                        d.fecha_hasta=$("#panel_remesa").find("#fecha_hasta").val(),
+                        d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val()
+                    },
+                },
+                "pageLength": 15,
+                "ordering": false,
+                "lengthChange": true,
+                "searching": true,
+                "paging": true,
+                "columnDefs":[
+                    {"targets":[0,10],"visible":false,"searchable":false},
+                    {"targets":1, "width":"10%"},
+                    {"targets":[2,3], "width":"15%"},
+                    {"targets":[4,5,6,7,8,9], "width":"10%"},
+                ],
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Mostrando página 0 de 0",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
+            });
+
+             $("#filtrar_repo_remesa").on('click',function(){
+                $("#dt_repo_remesa").DataTable().ajax.reload();
+                $("#dt_repo_total").DataTable().ajax.reload();
+           });
+
+            var dt_repo_total = $('#dt_repo_total').DataTable( {
+                "ajax": {
+                    "url": "{%url 'repo_total' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                        d.fecha_desde= $("#panel_remesa").find("#fecha_desde").val(),
+                        d.fecha_hasta=$("#panel_remesa").find("#fecha_hasta").val(),
+                        d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val()
+                    },
+                },
+                "pageLength": 1,
+                "ordering": false,
+                "lengthChange": false,
+                "searching": false,
+                "paging": false,
+                "columnDefs":[
+                   // {"targets":[],"visible":false,"searchable":false},
+                   // {"targets":1, "width":"10%"},
+                    //{"targets":[2,3], "width":"15%"},
+                    {"targets":[0,1,2,3], "width":"25%"},
+                ],
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Mostrando página 0 de 0",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
+            });
     });
 
 </script>

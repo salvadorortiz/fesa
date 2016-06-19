@@ -7,4 +7,6 @@ urlpatterns = [
 	#Reporte de reservas
 	url(r'^reservas/', 'modulo_1.reportes_views.ReporteReservaData',name='repo_reserva'),
 	url(r'^clientes/', 'modulo_1.reportes_views.ReporteClientesData',name='repo_clientes'),
+	url(r'^remesas/', 'modulo_1.reportes_views.ReporteRemesasData',name='repo_remesas'),
+	url(r'^total/', 'modulo_1.reportes_views.ReporteRemesasTotalData',name='repo_total'),
 ]
