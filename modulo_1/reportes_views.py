@@ -4,7 +4,7 @@ from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
 from modulo_1.forms import ClienteForm, EmpresaForm
-from modulo_1.models import Cliente, Empresa,Complejo,Usuario
+from modulo_1.models import Cliente, Empresa,Complejo,Usuario,TipoAlquiler
 import json
 import hashlib
 import sys
@@ -13,6 +13,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def ReportesView(request):
+	#ReporteHorasCancha()
 	complejos= Complejo.objects.all()
 	print complejos
 	cmb_complejo="<option value=''>Seleccione un complejo</option>"
@@ -132,3 +133,81 @@ def convert_fetchall_total(cursor):
 	dict_cursor['draw']= len(list_aux)//10
 	dict_cursor['data']=list_aux
 	return dict_cursor
+
+def ReporteHorasCancha(request):
+	total_horas_posibles=0
+	total_horas_usadas=0
+	#print "\n \n -----------------------------------"
+	filtro=" WHERE 1=1"
+
+	if str(request.POST['fecha_desde'])!= '':
+		filtro+=" AND fecha_reserva >= '" + str(request.POST['fecha_desde']) + "'" 
+
+	if str(request.POST['fecha_hasta'])!='':
+		filtro+=" AND fecha_reserva <= '" + str(request.POST['fecha_hasta']) + "'"
+
+	if str(request.POST['complejo_id'])!='':
+		filtro+=" AND complejo_id = " + str(request.POST['complejo_id'])
+
+	str_query = "SELECT * FROM dt_repo_horas" + filtro
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	#print qs
+	qs_alquiler= TipoAlquiler.objects.all().order_by('nombre')
+	#print qs_alquiler
+	tuples_resultado=[]
+	for item in qs:
+	#	print "\n -->",item
+		#verifica que no exista alguna tupla con sus datos 
+		if verificar_existencia(item,tuples_resultado):
+			for tipo_a in qs_alquiler:
+				tupla_aux= [int(item[0]),int(item[1]),int(tipo_a.tipo_alquiler_id),str(item[4]),str(tipo_a.nombre),0]
+				#print "AUX->",tupla_aux
+				tuples_resultado.append(tupla_aux)
+
+		if item[6] is not None:
+			total_horas_posibles+=time_to_int(item[6])
+		else:
+			total_horas_posibles+=float(item[7])
+
+	for item in qs:
+		#print "\n -->",item
+		for tupla in tuples_resultado:
+			#print tupla
+			if item[2] is not None:
+				if int(item[0])==int(tupla[0]) and int(item[1])==int(tupla[1]) and int(item[2])==int(tupla[2]):
+					#print "\n -->",time_to_int(item[5])
+					tupla[5]+=time_to_int(item[5])
+					total_horas_usadas+=time_to_int(item[5])
+
+	lista_resultado=[]				
+	for item in tuples_resultado:
+		item.append(total_horas_posibles)
+		item.append(total_horas_usadas)
+		#print "\n",item
+		lista_resultado.append(tuple(item))
+	return lista_resultado
+
+	#print "\n TOTAL HORAS POSIBLES --> ", total_horas_posibles
+	#print "\n TOTAL HORAS USADAS -->",total_horas_usadas
+
+def ReporteHorasCanchaData(request):
+	fetch=convert_fetchall(ReporteHorasCancha(request))
+
+	return HttpResponse(json.dumps(fetch), content_type='application/json')
+
+def time_to_int(tiempo):
+	arr_tiempo= tiempo.split(':')
+	cont=0
+	cont+=float(arr_tiempo[0])
+	if int(arr_tiempo[1]) == 30:
+		cont+=0.5
+	return cont
+
+#Retorna true si no existe en la tupla
+def verificar_existencia(item,tuplas):
+	for tupla in tuplas:
+		if int(item[0]) == int(tupla[0]) and int(item[1]) == int(tupla[1]):
+			return False
+	return True

@@ -114,3 +114,20 @@ end as id_registro, nombre_evento,
 to_char(fecha_ingreso, 'YYYY-MM-DD') AS fecha_reserva
 FROM modulo_1_reserva
 order by fecha_ingreso desc;
+
+
+CREATE OR REPLACE VIEW dt_repo_horas AS
+SELECT c.cancha_id, c.complejo_id,  res.tipo_alquiler_id, 
+to_char(res.fecha_ingreso, 'YYYY-MM-DD') AS fecha_ingreso,
+c.nombre as nombre_cancha, 
+COALESCE(to_char(SUM(rxc.hora_fin - rxc.hora_inicio), 'HH24:MI:SS'),'00:00:00') as Horas_ocupadas,
+to_char(SUM(pxc.hora_cierre-pxc.hora_apertura), 'HH24:MI:SS') AS horas_posibles,
+c.horas_posibles as horas_posibles_2
+FROM modulo_1_cancha c 
+LEFT JOIN modulo_1_reservacancha rxc ON c.cancha_id=rxc.cancha_id 
+LEFT JOIN modulo_1_precioxcancha pxc ON c.cancha_id=pxc.cancha_id
+LEFT JOIN modulo_1_reserva res ON res.reserva_id=rxc.reserva_id
+LEFT JOIN modulo_1_tipoalquiler ta ON res.tipo_alquiler_id = ta.tipo_alquiler_id
+GROUP BY c.cancha_id, res.tipo_alquiler_id, res.fecha_ingreso,ta.nombre
+ORDER BY c.cancha_id
+

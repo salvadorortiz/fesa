@@ -308,8 +308,143 @@
                 </div>
             </div>
 <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->            
-            <div class="tab-pane" id="tab4">
-              4
+                <div class="tab-pane" id="tab4">
+                    <div class="row">
+                       <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Filtrar por...</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-2">
+                                            <strong>Fecha de reserva</strong>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-1">Desde: </div>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="hor_fecha_desde">
+                                        </div>
+                                        <div class="col-sm-1">Hasta: </div>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="hor_fecha_hasta">
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-sm-1"></div>
+                                        <div class="col-sm-2">
+                                            <strong>Seleccione un complejo</strong>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" id="hor_cmb_complejo">
+                                                {{cmb_complejo|safe}}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <center>
+                                                <button type="button" id="filtrar_repo_hora" class="btn btn-success"><i class="fa fa-search"></i>&nbsp;&nbsp; Filtrar</button>
+                                            </center>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                  <div class="row">
+                            <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                                <label data-toggle="collapse" href="#horas_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-clock"></i> &nbsp;Horas Cancha</label>
+                                <a href="#" onclick="$('#dt_repo_horas').DataTable().ajax.reload(); refrescar_global();"style="float:right; color:white;">
+                                    <i class="fa fa-refresh"></i>
+                                </a>
+                            </div>
+                    </div>
+                        <hr>
+                    <div class="row">
+                         <div id="horas_toggle" class="collapse in col-sm-12">
+                                <table style="width:100%" id="dt_repo_horas" class="table table-bordered table-hover table-striped">
+                                    <thead>
+                                        <th>Cancha id</th>
+                                        <th>Complejo id</th>
+                                        <th>Tipo Alquiler id</th>
+                                        <th>Nombre de cancha</th>
+                                        <th>Tipo de alquiler</th>
+                                        <th>Horas usadas</th>
+                                        <th>Total horas posibles</th>
+                                        <th>Total horas usadas</th>
+                                    </thead>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                        </div>
+                    </div>
+                     <hr>
+                     <div class="row">
+                        <div class="col-sm-4"></div>
+                             <div class="col-lg-4 col-md-4">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <div class="row">
+                                            <div class="col-xs-3">
+                                                <i class="fa fa-tasks  fa-2x"></i>
+                                            </div>
+                                            <div class="col-xs-9 text-right">
+                                                <div class="huge"></div>
+                                                <div>Resultados globales:</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="#">
+                                        <div class="panel-footer">
+                                             <table style="width:100%" id="dt_res_globales" class="table table-bordered table-hover table-striped">
+                                                <thead>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="success">
+                                                        <td>
+                                                            <strong>Horas Posibles</strong>
+                                                        </td>
+                                                        <td id="total_horas_posibles">
+                                                            
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="success">
+                                                        <td>
+                                                            <strong>Horas Usadas</strong>
+                                                        </td>
+                                                        <td id="total_horas_usadas">
+                                                            
+                                                        </td>
+                                                    </tr>
+                                                    <tr class="warning">
+                                                        <td>
+                                                            <strong>Porcentaje Global de uso</strong>
+                                                        </td>
+                                                        <td id="porcentaje_global">
+                                                            
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>     
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        <div class="col-sm-4"></div>
+                    </div>
+
+
             </div>
 <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
         </div>  
@@ -329,14 +464,17 @@
             //altFormat: "dd-mm-yyyy"
         });
 
-       $("#panel_remesa").find( "#rem_fecha_desde" ).datepicker({
+        $("#panel_remesa").find( "#rem_fecha_desde" ).datepicker({
            // 'minDate': 0
           // altFormat: "dd-mm-yyyy"
         });
         $("#panel_remesa").find( "#rem_fecha_hasta" ).datepicker({
             //altFormat: "dd-mm-yyyy"
         });
-
+        $( "#hor_fecha_desde" ).datepicker({
+        });
+       $( "#hor_fecha_hasta" ).datepicker({
+        });
        //----Reporte de reserva
            var dt_repo_reserva = $('#dt_repo_reserva').DataTable( {
                 "ajax": {
@@ -550,6 +688,87 @@
                         "sPrevious": "Anterior"
                     },
                 }
+            });
+
+            //---- Reporte de horas cancha
+            var dt_repo_horas = $('#dt_repo_horas').DataTable( {
+                "ajax": {
+                    "url": "{%url 'repo_horas_cancha' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                        d.fecha_desde= $("#hor_fecha_desde").val(),
+                        d.fecha_hasta=$("#hor_fecha_hasta").val(),
+                        d.complejo_id=$("#hor_cmb_complejo").val()
+                    },
+                },
+               // "pageLength": 100,
+                "ordering": false,
+                "lengthChange": false,
+                "searching": false,
+                "paging": false,
+                "columnDefs":[
+                    {"targets":[0,1,2,6,7,3],"visible":false,"searchable":false},
+                    {"targets":[4], "width":"40%"},
+                    {"targets":[5], "width":"20%"},
+                ],
+                 "drawCallback": function ( settings ) {
+                    var api = this.api();
+                    var rows = api.rows( {page:'current'} ).nodes();
+                    var last=null;
+         
+                    api.column(3, {page:'current'} ).data().each( function ( group, i ) {
+                        if ( last !== group ) {
+                            $(rows).eq( i ).before(
+                                '<tr class="group success"><td colspan="5">'+group+'</td></tr>'
+                            );
+         
+                            last = group;
+                        }
+                    } );
+                },
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "",
+                    "infoEmpty": "Mostrando página 0 de 0",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
+            });
+
+            function refrescar_global(){
+                //alert( 'Table redraw' );
+                var tam= $("#dt_repo_horas").find("tbody").find("tr").length;
+                if(tam > 0){
+                    $("#dt_repo_horas").find("tbody").find("tr").each(function(){
+                        var data= $('#dt_repo_horas').DataTable().row($(this)).data();
+                        if(data!=undefined){
+                            console.log(data);
+                            $("#total_horas_posibles").html(data[6]);
+                            $("#total_horas_usadas").html(data[7]);
+                            var porcentaje_global= data[7]/data[6];
+                            porcentaje_global=porcentaje_global*100;
+                           // console.log(Number((porcentaje_global).toFixed(1)));
+                            $("#porcentaje_global").html(Math.round(porcentaje_global).toString() + " %");
+                            return ( false );   
+                        }
+                    });
+                }
+               // console.log()
+            }
+            
+            $("#dt_repo_horas").on('draw.dt',function(){
+                refrescar_global();
+            });
+
+            $("#filtrar_repo_hora").on('click',function(){
+                $("#dt_repo_horas").DataTable().ajax.reload();
+                setTimeout(function(){ refrescar_global(); }, 10);
+                
             });
     });
 
