@@ -9,4 +9,5 @@ urlpatterns = [
 	url(r'^clientes/', 'modulo_1.reportes_views.ReporteClientesData',name='repo_clientes'),
 	url(r'^remesas/', 'modulo_1.reportes_views.ReporteRemesasData',name='repo_remesas'),
 	url(r'^total/', 'modulo_1.reportes_views.ReporteRemesasTotalData',name='repo_total'),
+	url(r'^cliente_eventos/', 'modulo_1.reportes_views.EventosClientesData',name='repo_evento_cliente'),
 ]

@@ -50,6 +50,7 @@
         </div>
         <form id="empresa_form">
             <input type="hidden" value="" name="id_empresa" />
+            <input type="hidden" value="" id="count_aux"/>
             {{empresa_form.ingresado_por}}
         <div class="col-sm-12">
             <br>
@@ -59,7 +60,7 @@
             <div class="col-sm-3">
                  <div class="form-group input-group">
                         <span class="input-group-addon"><i class="fa fa-eye"></i></span>
-                        {% render_field empresa_form.codigo class+="form-control" placeholder="Código" %}
+                        {% render_field empresa_form.codigo class+="form-control" placeholder="Código"%}
                 </div>
             </div>
             <div class="col-sm-1">
@@ -156,6 +157,7 @@
 {% block addExtraScript %} 
 <script type="text/javascript">
    $(window).load(function() {
+        $("#id_codigo").attr('readonly',true);
         var dt_empresa = $('#dt_empresas').DataTable( {
            "ajax": {
                 "url": "{%url 'dt_empresas' %}",
@@ -246,6 +248,7 @@
                             create_alert("<li>Empresa ingresada con éxito </li>","EXITO","notificaciones",true,5000);
                             $("#dt_empresas").DataTable().ajax.reload();
                             $("#cancelar_empresa").click();
+                            $("#id_codigo").val(json['codigo']);
                         }else{
                             show_errors(json, 'div_errores');
                             //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);
@@ -256,9 +259,17 @@
 
 
         $("#cancelar_empresa").on('click',function(){
-               $("#empresa_form").find("[id^='id_']").val('');
+               $("#empresa_form").find("#id_nombre").val('');
+               $("#empresa_form").find("#id_empresa").val('');
+               $("#empresa_form").find("#id_nit").val('');
+               $("#empresa_form").find("#id_contacto").val('');
+               $("#empresa_form").find("#id_telefono").val('');
+               $("#empresa_form").find("#id_registro_iva").val('');
+               $("#empresa_form").find("#id_telefono_contacto").val('');
+               $("#empresa_form").find("#id_correo_contacto").val('');
                $('#dt_empresas').DataTable().$('tr.selected').removeClass('selected');
                $("#guardar_cambios_empresa").hide();
+               $("#id_codigo").val($("#count_aux").val());
                $("#cancelar_empresa").hide();
                $("#guardar_empresa").show();
          });
@@ -273,6 +284,7 @@
                 processData: false,
                 data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_empresa="+data[0][0].toString(),
                 success: function(json){
+                    $("#count_aux").val($("#id_codigo").val());
                     $("[name=id_empresa]").val(json['cliente'][0]);
                     $("#id_codigo").val(json['cliente'][1]);
                     $("#id_nombre").val(json['cliente'][2]);
@@ -303,6 +315,7 @@
                             create_alert("<li>Empresa actualizada con éxito </li>","EXITO","notificaciones",true,5000);
                             $("#dt_empresas").DataTable().ajax.reload();
                             $("#cancelar_empresa").click();
+                            $("#id_codigo").val(json['codigo']);
                         }else{
                             show_errors(json, 'div_errores');
                             //create_alert("<li>Usuario o Contraseña inválidos</li>","ERROR","notificaciones",true,5000);

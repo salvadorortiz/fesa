@@ -61,7 +61,8 @@ def GuardarCambiosCliente(request):
 		return HttpResponse(json.dumps({'errors': form_cliente.errors}), content_type='application/json')
 
 def RegistroEmpresaView(request):
-	data={'empresa_form': EmpresaForm(initial={'ingresado_por': request.session['user_log']})}
+	codigo_empresa= Empresa.objects.count()+1
+	data={'empresa_form': EmpresaForm(initial={'codigo':codigo_empresa,'ingresado_por': request.session['user_log']})}
 	return render(request,'registroempresa.html',data)
 
 def dt_empresas(request):
@@ -76,7 +77,8 @@ def GuardarEmpresa(request):
 	form_empresa=EmpresaForm(request.POST or None)
 	if form_empresa.is_valid():
 		form_empresa.save()
-		return HttpResponse(json.dumps({}), content_type='application/json')
+		codigo_empresa= Empresa.objects.count()+1
+		return HttpResponse(json.dumps({'codigo': codigo_empresa}), content_type='application/json')
 	else:
 		return HttpResponse(json.dumps({'errors': form_empresa.errors}), content_type='application/json')
 
@@ -101,6 +103,7 @@ def GuardarCambiosEmpresa(request):
 		obj_empresa.telefono_contacto= str(request.POST['telefono_contacto'])
 		obj_empresa.correo_contacto = str(request.POST['correo_contacto'])
 		obj_empresa.save(force_update=True)
-		return HttpResponse(json.dumps({}), content_type='application/json')
+		codigo_empresa= Empresa.objects.count()+1
+		return HttpResponse(json.dumps({'codigo': codigo_empresa}), content_type='application/json')
 	else:
 		return HttpResponse(json.dumps({'errors': form_empresa.errors}), content_type='application/json')

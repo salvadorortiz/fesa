@@ -32,40 +32,85 @@ LEFT JOIN modulo_1_empresa e ON e.empresa_id=res.empresa_id
 ORDER BY recan.fecha DESC
 
 
-CREATE VIEW dt_repo_clientes AS 
-SELECT '<i class="fa fa-child"></i>' AS tipo, c.nombre As nombre_cliente, c.ingresado_por,
-(SELECT nombre_evento from modulo_1_reserva where cliente_id=c.cliente_id
-order by fecha_ingreso asc limit 1) AS primer_evento,
-(SELECT nombre_evento from modulo_1_reserva where cliente_id=c.cliente_id
-order by fecha_ingreso desc limit 1) AS ultimo_evento
-FROM modulo_1_cliente c
+CREATE OR REPLACE VIEW dt_repo_clientes AS 
+ SELECT '<i class="fa fa-child"></i>'::text AS tipo,
+    c.nombre AS nombre_cliente,
+    c.ingresado_por,
+    ( SELECT modulo_1_reserva.nombre_evento || ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+           FROM modulo_1_reserva
+          WHERE modulo_1_reserva.cliente_id = c.cliente_id
+          ORDER BY modulo_1_reserva.fecha_ingreso
+         LIMIT 1) AS primer_evento,
+    ( SELECT modulo_1_reserva.nombre_evento|| ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+           FROM modulo_1_reserva
+          WHERE modulo_1_reserva.cliente_id = c.cliente_id
+          ORDER BY modulo_1_reserva.fecha_ingreso DESC
+         LIMIT 1) AS ultimo_evento,
+    1 as tipo_tabla,
+    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>' as boton,
+    cliente_id as id
+   FROM modulo_1_cliente c
 UNION
-SELECT '<i class="fa fa-building"></i>' AS tipo, c.nombre As nombre_cliente, c.ingresado_por,
-(SELECT nombre_evento from modulo_1_reserva where empresa_id=c.empresa_id
-order by fecha_ingreso asc limit 1) AS primer_evento,
-(SELECT nombre_evento from modulo_1_reserva where empresa_id=c.empresa_id
-order by fecha_ingreso desc limit 1) AS ultimo_evento
-FROM modulo_1_empresa c
+ SELECT '<i class="fa fa-building"></i>'::text AS tipo,
+    c.nombre AS nombre_cliente,
+    c.ingresado_por,
+    ( SELECT modulo_1_reserva.nombre_evento || ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+           FROM modulo_1_reserva
+          WHERE modulo_1_reserva.empresa_id = c.empresa_id
+          ORDER BY modulo_1_reserva.fecha_ingreso
+         LIMIT 1) AS primer_evento,
+    ( SELECT modulo_1_reserva.nombre_evento || ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+           FROM modulo_1_reserva
+          WHERE modulo_1_reserva.empresa_id = c.empresa_id
+          ORDER BY modulo_1_reserva.fecha_ingreso DESC
+         LIMIT 1) AS ultimo_evento,
+    2 as tipo_tabla,
+    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>' as boton,
+    empresa_id as id
+   FROM modulo_1_empresa c;
 
 
-Create or replace view dt_repo_remesa as
-SELECT res.reserva_id,
- to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) as fecha_ingreso,
-res.nombre_evento, 
-Case
-	WHEN c.cliente_id is null then e.nombre
-	ELSE c.nombre
-end as nombre_cliente, 
-u.nombre as nombre_usuario,
-'$'|| COALESCE(to_char(res.precio,'9G999.99'),to_char(0,'9G999.99')) as precio,
-'$'|| COALESCE(to_char(res.costo,'9G999.99'),to_char(0,'9G999.99')) as costo, 
-'$'|| COALESCE(to_char(res.precio - res.costo,'9G999.99'),to_char(0,'9G999.99')) as utilidad,
-'$'|| COALESCE(to_char((select sum(monto) from modulo_1_remesaxreserva where reserva_id=res.reserva_id),'9G999.99'),to_char(0,'9G999.99')) as remesado,
-'$'|| COALESCE(to_char(res.precio - (select sum(monto) from modulo_1_remesaxreserva where reserva_id=res.reserva_id),'9G999.99'),to_char(0,'9G999.99')) as remanente
-, res.usuario_id as usuario
-FROM modulo_1_remesaxreserva rr 
-inner join modulo_1_reserva res on res.reserva_id = rr.reserva_id
-inner join modulo_1_usuario u on u.usuario_id=res.usuario_id
-left join modulo_1_cliente c on res.cliente_id=c.cliente_id
-left join modulo_1_empresa e on res.empresa_id=e.empresa_id 
-group by res.reserva_id,c.cliente_id,e.nombre,res.nombre_evento,res.usuario_id,u.nombre
+
+
+CREATE OR REPLACE VIEW dt_repo_remesa AS 
+ SELECT res.reserva_id,
+    to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
+    res.nombre_evento,
+        CASE
+            WHEN c.cliente_id IS NULL THEN e.nombre
+            ELSE c.nombre
+        END AS nombre_cliente,
+    u.nombre AS nombre_usuario,
+    '$'::text || COALESCE(to_char(res.precio, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS precio,
+    '$'::text || COALESCE(to_char(res.costo, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS costo,
+    '$'::text || COALESCE(to_char(res.precio - res.costo, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS utilidad,
+    '$'::text || COALESCE(to_char(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+           FROM modulo_1_remesaxreserva
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remesado,
+    '$'::text || COALESCE(to_char(res.precio - (( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+           FROM modulo_1_remesaxreserva
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id)), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente,
+    res.usuario_id AS usuario
+--SELECT *
+   FROM modulo_1_remesaxreserva rr
+     RIGHT JOIN modulo_1_reserva res ON  rr.reserva_id=res.reserva_id
+     INNER JOIN modulo_1_usuario u ON res.usuario_id=u.usuario_id 
+     LEFT JOIN modulo_1_cliente c ON res.cliente_id = c.cliente_id
+     LEFT JOIN modulo_1_empresa e ON res.empresa_id = e.empresa_id
+  GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.nombre;
+  
+  
+Create or replace view dt_repo_cliente_eventos as
+SELECT 
+case 
+	when cliente_id is null then 2
+	else 1
+end as tipo_registro,
+case
+	when cliente_id is null then empresa_id
+	else cliente_id
+end as id_registro, nombre_evento,
+'$' || COALESCE(to_char(precio, '9G999.99'), to_char(0, '9G999.99')) as precio,
+to_char(fecha_ingreso, 'YYYY-MM-DD') AS fecha_reserva
+FROM modulo_1_reserva
+order by fecha_ingreso desc;

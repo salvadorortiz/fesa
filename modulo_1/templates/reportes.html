@@ -15,6 +15,15 @@
 
 {% block pagetitle %}Reportes{% endblock %} 
 
+{% block addExtraStyle %}
+ <style type="text/css">
+
+    .selected{
+        background-color: #cdfcff;
+    }
+        
+    </style>
+{%endblock%}
 {% block content %}
     {% load staticfiles %}
     {% csrf_token %}
@@ -130,11 +139,11 @@
                                             <div class="col-sm-1"></div>
                                             <div class="col-sm-1">Desde: </div>
                                             <div class="col-sm-3">
-                                                <input type="text" id="fecha_desde">
+                                                <input type="text" id="rem_fecha_desde">
                                             </div>
                                             <div class="col-sm-1">Hasta: </div>
                                             <div class="col-sm-3">
-                                                <input type="text" id="fecha_hasta">
+                                                <input type="text" id="rem_fecha_hasta">
                                             </div>
                                         </div>
                                         <br>
@@ -233,13 +242,16 @@
             </div>
  <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->           
             <div class="tab-pane" id="tab3">
+                <div class="row">
                 <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
                         <label data-toggle="collapse" href="#cliente_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-flag"></i> &nbsp;Reporte de clientes</label>
                         <a href="#" onclick="$('#dt_repo_clientes').DataTable().ajax.reload();"style="float:right; color:white;">
                             <i class="fa fa-refresh"></i>
                         </a>
                     </div>
+                </div>
                     <hr>
+                <div class="row">
                      <div id="cliente_toggle" class="collapse in col-sm-12">
                             <table style="width:100%" id="dt_repo_clientes" class="stripe">
                                 <thead>
@@ -248,12 +260,52 @@
                                     <th>Ingresado por </th>
                                     <th>Primer evento</th>
                                     <th>Último evento</th>
+                                    <th>Tipo</th>
+                                    <th></th>
+                                    <th></th>
                                 </thead>
                                 <tbody>
                                     
                                 </tbody>
                             </table>
                     </div>
+                </div>
+                <hr>
+                 <div class="row">
+                    <div class="col-sm-2"></div>
+                         <div class="col-lg-8 col-md-6">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <div class="row">
+                                        <div class="col-xs-3">
+                                            <i class="fa fa-flag fa-2x"></i>
+                                        </div>
+                                        <div class="col-xs-9 text-right">
+                                            <div class="huge"></div>
+                                            <div>Eventos asociados:</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="#">
+                                    <div class="panel-footer">
+                                         <table style="width:100%" id="dt_repo_eventos" class="stripe">
+                                            <thead>
+                                                <th>Tipo registro</th>
+                                                <th>Id registro</th>
+                                                <th>Nombre del evento</th>
+                                                <th>Precio</th>
+                                                <th>Fecha de reserva</th>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>     
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    <div class="col-sm-2"></div>
+                </div>
             </div>
 <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->            
             <div class="tab-pane" id="tab4">
@@ -274,6 +326,14 @@
           // altFormat: "dd-mm-yyyy"
         });
        $( "#fecha_hasta" ).datepicker({
+            //altFormat: "dd-mm-yyyy"
+        });
+
+       $("#panel_remesa").find( "#rem_fecha_desde" ).datepicker({
+           // 'minDate': 0
+          // altFormat: "dd-mm-yyyy"
+        });
+        $("#panel_remesa").find( "#rem_fecha_hasta" ).datepicker({
             //altFormat: "dd-mm-yyyy"
         });
 
@@ -336,12 +396,13 @@
                 "searching": true,
                 "paging": true,
                 "columnDefs":[
-                    //{"targets":[0,1,2,3,4],"visible":false,"searchable":false},
+                    {"targets":[5,7],"visible":false,"searchable":false},
                     {"targets":0, "width":"5%"},
                     {"targets":1, "width":"25%"},
-                    {"targets":2, "width":"20%"},
+                    {"targets":2, "width":"15%"},
                     {"targets":3, "width":"25%"},
                     {"targets":4, "width":"25%"},
+                    {"targets":6, "width":"5%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -356,6 +417,65 @@
                 }
             });
 
+            var tipo_registro='0';
+            var id_registro='0';
+            $("#dt_repo_clientes").on('click','[name=ver_eventos]',function(){
+                //console.log("entro");
+                var row= $(this).parent().parent(); 
+                if(row.hasClass("selected")){
+                    row.removeClass('selected');
+                    tipo_registro='0';
+                    id_registro='0';
+                }else{
+                    $('#dt_repo_clientes').DataTable().$('tr.selected').removeClass('selected');
+                    row.addClass('selected');
+                    var data = $('#dt_repo_clientes').DataTable().rows('.selected').data();
+                    //console.log(data[0]);
+                    //console.log("Tipo ->");
+                    //console.log(data[0][5]);
+                    tipo_registro=data[0][5];
+                    //console.log("Id->");
+                    //console.log(data[0][7]); 
+                    id_registro= data[0][7];
+                }   
+                $("#dt_repo_eventos").DataTable().ajax.reload();
+                
+            });
+
+            var dt_repo_eventos = $('#dt_repo_eventos').DataTable( {
+                "ajax": {
+                    "url": "{%url 'repo_evento_cliente' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                        d.tipo_registro= tipo_registro,
+                        d.id_registro= id_registro
+                    },
+                },
+                "pageLength": 15,
+                "ordering": false,
+                "lengthChange": true,
+                "searching": true,
+                "paging": true,
+                "columnDefs":[
+                    {"targets":[0,1],"visible":false,"searchable":false},
+                    {"targets":2, "width":"40%"},
+                    {"targets":[3,4], "width":"30%"},
+                ],
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "Mostrando página 0 de 0",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
+            });
+
+
         // --- Repo de remesas
             var dt_repo_remesa = $('#dt_repo_remesa').DataTable( {
                 "ajax": {
@@ -363,8 +483,8 @@
                     "type": "POST",
                     "data":  function( d ) {
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
-                        d.fecha_desde= $("#panel_remesa").find("#fecha_desde").val(),
-                        d.fecha_hasta=$("#panel_remesa").find("#fecha_hasta").val(),
+                        d.fecha_desde= $("#panel_remesa").find("#rem_fecha_desde").val(),
+                        d.fecha_hasta=$("#panel_remesa").find("#rem_fecha_hasta").val(),
                         d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val()
                     },
                 },
@@ -403,8 +523,8 @@
                     "type": "POST",
                     "data":  function( d ) {
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
-                        d.fecha_desde= $("#panel_remesa").find("#fecha_desde").val(),
-                        d.fecha_hasta=$("#panel_remesa").find("#fecha_hasta").val(),
+                        d.fecha_desde= $("#panel_remesa").find("#rem_fecha_desde").val(),
+                        d.fecha_hasta=$("#panel_remesa").find("#rem_fecha_hasta").val(),
                         d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val()
                     },
                 },

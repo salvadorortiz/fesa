@@ -50,6 +50,7 @@
         <form id="cliente_form">
             <input type="hidden" value="" name="id_cliente" />
             {{cliente_form.ingresado_por}}
+            <input type="hidden" value="" name="count_aux"/>
         <div class="col-sm-12">
             <br>
              <div class="col-sm-1">
@@ -192,6 +193,7 @@
                 processData: false,
                 data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cliente="+data[0][0].toString(),
                 success: function(json){
+                    $("#count_aux").val($("#id_codigo").val());
                     $("[name=id_cliente]").val(json['cliente'][0]);
                     $("#id_codigo").val(json['cliente'][1]);
                     $("#id_nombre").val(json['cliente'][2]);
@@ -224,6 +226,7 @@
                $("#guardar_cambios_cliente").hide();
                $("#cancelar_cliente").hide();
                $("#guardar_cliente").show();
+               $("#id_codigo").val($("#count_aux").val());
          });
 
     //------------------------------------------------------------------------------
