@@ -719,6 +719,7 @@
          
                     api.column(3, {page:'current'} ).data().each( function ( group, i ) {
                         if ( last !== group ) {
+                            
                             $(rows).eq( i ).before(
                                 '<tr class="group success"><td colspan="5">'+group+'</td></tr>'
                             );
