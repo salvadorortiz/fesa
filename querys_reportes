@@ -121,17 +121,22 @@ CREATE OR REPLACE VIEW dt_repo_horas AS
     c.complejo_id,
     res.tipo_alquiler_id,
     to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
-    '<div class="row"><div class="col-sm-12"><div class="col-sm-4"></div><div class="col-sm-4 text-capitalize text-center"><h4 style="color:#074515">'|| c.nombre
-    ||'</h4></div><div class="col-sm-4 text-right"><h6><span class="label label-default">'||com.nombre||'</span></h6></div></div></div>'  AS nombre_cancha,
-    COALESCE(to_char(sum(rxc.hora_fin - rxc.hora_inicio), 'HH24:MI:SS'::text), '00:00:00'::text) AS horas_ocupadas,
-    to_char(sum(pxc.hora_cierre - pxc.hora_apertura), 'HH24:MI:SS'::text) AS horas_posibles,
+    ((('<div class="row"><div class="col-sm-12"><div class="col-sm-4"></div><div class="col-sm-4 text-capitalize text-center"><h4 style="color:#074515">'::text || c.nombre::text) || '</h4></div><div class="col-sm-4 text-right"><h6><span class="label label-default">'::text) || com.nombre::text) || '</span></h6></div></div></div>'::text AS nombre_cancha,
+   COALESCE(
+   to_char((select SUM(rxcan.hora_fin-rxcan.hora_inicio)
+   FROM modulo_1_cancha can
+     LEFT JOIN modulo_1_reservacancha rxcan ON can.cancha_id = rxcan.cancha_id
+     LEFT JOIN modulo_1_reserva reser ON reser.reserva_id = rxcan.reserva_id
+     WHERE can.cancha_id=c.cancha_id and reser.tipo_alquiler_id= res.tipo_alquiler_id 
+     GROUP BY can.cancha_id,reser.tipo_alquiler_id),'HH24:MI:SS'::text),'00:00:00') AS horas_ocupadas,    
+    to_char(sum(pxc.hora_cierre - pxc.hora_apertura), 'HH24:MI:SS'::text) AS horas_posibles,  
     c.horas_posibles AS horas_posibles_2
    FROM modulo_1_cancha c
-     INNER JOIN modulo_1_complejo com ON com.complejo_id=c.complejo_id
+     JOIN modulo_1_complejo com ON com.complejo_id = c.complejo_id
      LEFT JOIN modulo_1_reservacancha rxc ON c.cancha_id = rxc.cancha_id
      LEFT JOIN modulo_1_precioxcancha pxc ON c.cancha_id = pxc.cancha_id
      LEFT JOIN modulo_1_reserva res ON res.reserva_id = rxc.reserva_id
      LEFT JOIN modulo_1_tipoalquiler ta ON res.tipo_alquiler_id = ta.tipo_alquiler_id
-  GROUP BY c.cancha_id, res.tipo_alquiler_id, res.fecha_ingreso, ta.nombre,com.nombre
+  GROUP BY c.cancha_id, res.tipo_alquiler_id, res.fecha_ingreso, ta.nombre, com.nombre
   ORDER BY c.cancha_id;
 
