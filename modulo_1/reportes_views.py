@@ -141,10 +141,10 @@ def ReporteHorasCancha(request):
 	filtro=" WHERE 1=1"
 
 	if str(request.POST['fecha_desde'])!= '':
-		filtro+=" AND fecha_reserva >= '" + str(request.POST['fecha_desde']) + "'" 
+		filtro+=" AND fecha_ingreso >= '" + str(request.POST['fecha_desde']) + "'" 
 
 	if str(request.POST['fecha_hasta'])!='':
-		filtro+=" AND fecha_reserva <= '" + str(request.POST['fecha_hasta']) + "'"
+		filtro+=" AND fecha_ingreso <= '" + str(request.POST['fecha_hasta']) + "'"
 
 	if str(request.POST['complejo_id'])!='':
 		filtro+=" AND complejo_id = " + str(request.POST['complejo_id'])
