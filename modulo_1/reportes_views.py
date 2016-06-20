@@ -104,7 +104,7 @@ def ReporteRemesasTotalData(request):
 				 COALESCE(res.precio,0) as precio_total,\
 				COALESCE(res.costo,0) as costo_total,\
 				COALESCE(res.precio - res.costo,0) as utilidad_total,\
-				COALESCE(SUM(rr.monto),0) as remanente_total\
+				COALESCE(res.precio,0)-COALESCE(SUM(rr.monto),0) as remanente_total\
 				FROM modulo_1_remesaxreserva rr \
 				right join modulo_1_reserva res on rr.reserva_id=res.reserva_id\
 				" +filtro +" group by res.reserva_id"

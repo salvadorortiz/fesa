@@ -87,14 +87,14 @@ CREATE OR REPLACE VIEW dt_repo_remesa AS
     '$'::text || COALESCE(to_char(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
            FROM modulo_1_remesaxreserva
           WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remesado,
-    '$'::text || COALESCE(to_char(res.precio - (( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+    '$'::text || COALESCE(to_char(res.precio - COALESCE((( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
            FROM modulo_1_remesaxreserva
-          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id)), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente,
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id)),0), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente,
     res.usuario_id AS usuario
---SELECT *
+ --SELECT * 
    FROM modulo_1_remesaxreserva rr
-     RIGHT JOIN modulo_1_reserva res ON  rr.reserva_id=res.reserva_id
-     INNER JOIN modulo_1_usuario u ON res.usuario_id=u.usuario_id 
+     RIGHT JOIN modulo_1_reserva res ON rr.reserva_id = res.reserva_id
+     JOIN modulo_1_usuario u ON res.usuario_id = u.usuario_id
      LEFT JOIN modulo_1_cliente c ON res.cliente_id = c.cliente_id
      LEFT JOIN modulo_1_empresa e ON res.empresa_id = e.empresa_id
   GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.nombre;
