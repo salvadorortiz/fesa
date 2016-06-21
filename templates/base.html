@@ -129,7 +129,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{%url 'home'%}" style="padding-top:0px;padding-left:40px;"><img src="{% static 'img/logo.jpg' %}" alt="logo" width="150" height="49"></a>
+                <a class="navbar-brand" href="{%url 'reservas'%}" style="padding-top:0px;padding-left:40px;"><img src="{% static 'img/logo.jpg' %}" alt="logo" width="150" height="49"></a>
             </div>
             <!-- /.navbar-header -->
 
@@ -169,6 +169,7 @@
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
+                    <!--
                         <li class="sidebar-search">
                             <div class="input-group custom-search-form">
                                 <input type="text" class="form-control" placeholder="Buscar...">
@@ -178,7 +179,7 @@
                                 </button>
                             </span>
                             </div>
-                            <!-- /input-group -->
+                             /input-group -->
                         </li>
                         {%if request.session.type_user == 'R'%}
                         <li >

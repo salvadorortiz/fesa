@@ -297,11 +297,12 @@
     var tipo_usuario = "{{request.session.type_user}}";
     var evento_seleccionado = -1;
     var reserva_seleccionada = -1;
+    var desactivar = false;
 
     $(window).load(function() {
         cargar_combos();
         $( "#txt_fecha" ).datepicker({
-            //'minDate': 0
+            'minDate': 0
         });
 
         $('#txt_hora_inicio').timepicker({
@@ -464,18 +465,27 @@
                     $("#dt_reservas").DataTable().ajax.reload();
 
                     if(data[0][5] != usuario_log && tipo_usuario != "R"){ //SOLO PUEDE VISUALIZAR MÁS NO MODIFICAR
-                        $(document).find("[id^='txt_']").prop('disabled', true);
-                        $(document).find("[id^='cmb_']").prop('disabled', true);
+                        //$(document).find("[id^='txt_']").prop('disabled', true);
+                        //$(document).find("[id^='cmb_']").prop('disabled', true);
                         $("#btn_cancelar").show();
+                        $("#btn_cancelar_reserva").show();
                         $("#btn_guardar").hide();
                         $("#btn_guardar_cambios").hide();
                         $("#btn_guardar_reserva").hide();
                         $("#btn_guardar_precio").hide();
                     }else if(data[0][5] == usuario_log || tipo_usuario == "R"){ // ES SU EVENTO Y PUEDE MODIFICAR
                         $("#btn_cancelar").show();
-                        $("#btn_guardar_cambios").show();
+                        if(!json['desactivar']){ // NO HAN PASADO TODAS LAS FECHAS - NO DESACTIVAR
+                            $("#btn_guardar_cambios").show();
+                            $("#btn_guardar_reserva").show();
+                            $('#txt_precio_evento').prop('disabled',false);
+                            desactivar = json['desactivar'];
+                        }else{ // YA PASARON TODAS LAS FECHAS - DESACTIVAR
+                            $("#btn_guardar_reserva").hide();
+                            $('#txt_precio_evento').prop('disabled',true);
+                            desactivar = json['desactivar'];
+                        }
                         $("#btn_guardar").hide();
-                        $("#btn_guardar_reserva").show();
                         $("#btn_guardar_precio").show();
                     }
                 }
@@ -486,8 +496,8 @@
             $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
             $(document).find("[id^='txt_']").val('');
             $(document).find("[id^='cmb_']").val('-1');
-            $(document).find("[id^='txt_']").prop('disabled', false);
-            $(document).find("[id^='cmb_']").prop('disabled', false);
+            /*$(document).find("[id^='txt_']").prop('disabled', false);
+            $(document).find("[id^='cmb_']").prop('disabled', false);*/
             $('#id_cliente').val('-1');
             $("#btn_guardar_cambios").hide();
             $("#btn_cancelar").hide();
@@ -496,10 +506,11 @@
             $("#btn_guardar_cambios_reserva").hide();
             $("#btn_cancelar_reserva").hide();
             $("#btn_guardar_precio").show();
+            $('#txt_precio_evento').prop('disabled',false);
             evento_seleccionado = -1;
             reserva_seleccionada = -1;
-            $("#txt_precio_sugerido").prop('disabled', true);
-            $("#txt_saldo_evento").prop('disabled', true);
+            /*$("#txt_precio_sugerido").prop('disabled', true);
+            $("#txt_saldo_evento").prop('disabled', true);*/
             dt_reservas.ajax.reload();
         });
 
@@ -564,9 +575,10 @@
                             create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
                             $("#div_errores").html('');
                             $("#dt_eventos").DataTable().ajax.reload();
-                            $("#btn_guardar_cambios").show();
+                            $("#btn_cancelar").click();
+                            /*$("#btn_guardar_cambios").show();
                             $("#btn_cancelar").show();
-                            $("#btn_guardar").hide();
+                            $("#btn_guardar").hide();*/
                         }
                     }
                 });
@@ -587,7 +599,7 @@
                             create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
                         }else{
                             create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
-                            /*$("#div_errores").html('');
+                            $("#div_errores").html('');
                             $("#dt_reservas").DataTable().ajax.reload();
                             $('#cmb_complejo').val("-1");
                             $('#cmb_cancha').val("-1");
@@ -595,7 +607,7 @@
                             $('#txt_hora_inicio').val("");
                             $('#txt_hora_fin').val("");
                             $('#txt_notas_reserva').val("");
-                            $('#txt_precio_sugerido').val("");*/
+                            $('#txt_precio_sugerido').val("");
                         }
                     },
                     error:function(json){
@@ -642,6 +654,9 @@
                             $('#cmb_cancha').val(cancha);
                         }
                     });
+                    if(validarFechaMenorActual(json['fecha'])){
+                       $("#btn_guardar_cambios_reserva").hide();
+                    }
                 }
             });
         });
@@ -684,7 +699,9 @@
             $("#btn_cancelar_reserva").hide();
             var data = $('#dt_eventos').DataTable().rows('.selected').data();
             if(data[0][5] == usuario_log || tipo_usuario == "R"){
-                $("#btn_guardar_reserva").show();
+                if(!desactivar){
+                    $("#btn_guardar_reserva").show();
+                }
             }
             reserva_seleccionada = -1;
         });
@@ -727,6 +744,17 @@
                 }
             });
         }
+    }
+
+    function validarFechaMenorActual(date){
+      var x=new Date();
+      var fecha = date.split("-");
+      x.setFullYear(fecha[0],fecha[1]-1,fecha[2]);
+      var today = new Date();
+      if (x >= today)
+        return false;
+      else
+        return true;
     }
 </script>
 {% endblock %}

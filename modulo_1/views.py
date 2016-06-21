@@ -4,6 +4,7 @@ from django.shortcuts import render
 from funciones_generales import convert_fetchall
 from django.db import connection
 from django.http import HttpResponse
+from django.db.models import Max
 from .models import Cancha,Usuario,FormaPago,FormaFacturacion,TipoAlquiler,PrecioXCancha,Reserva,Cliente,Empresa,Complejo,ReservaCancha,RemesaXReserva
 from modulo_1.forms import UsuarioForm
 from datetime import datetime, date, timedelta
@@ -245,6 +246,7 @@ def CargarCombos(request):
 	return HttpResponse(json.dumps(data), content_type='application/json')
 
 def InformacionEvento(request):
+	desactivar = VerificarReservasRealizadas(request.POST['id_evento'])
 	reserva = Reserva.objects.get(reserva_id = request.POST['id_evento'])
 	cliente = ""
 	cliente_id = ""
@@ -267,10 +269,25 @@ def InformacionEvento(request):
 			'pago':reserva.forma_pago_id,
 			'alquiler':reserva.tipo_alquiler_id,
 			'cliente':cliente,
-			'cliente_id':cliente_id
+			'cliente_id':cliente_id,
+			'desactivar':desactivar
 			}
 
 	return HttpResponse(json.dumps(evento), content_type='application/json')
+
+def VerificarReservasRealizadas(reserva_id):
+	reservas = ReservaCancha.objects.filter(reserva_id=reserva_id).aggregate(Max('fecha'))
+	if reservas['fecha__max'] != None:
+		if reservas['fecha__max'] < date.today():
+			if Reserva.objects.get(reserva_id=reserva_id).estado == 'C':
+				Reserva.objects.filter(reserva_id=reserva_id).update(estado='R')
+			elif Reserva.objects.get(reserva_id=reserva_id).estado == 'T':
+				Reserva.objects.filter(reserva_id=reserva_id).update(estado='N')
+			return True
+		else:
+			return False
+	else:
+		return False
 
 def ClientesAutocomplete(request):
 	clientes = Cliente.objects.filter(nombre__icontains=request.GET['term'])
@@ -443,6 +460,22 @@ def CalcularPrecio(request):
 	return HttpResponse(json.dumps({'precio_sugerido':str(acumulador)}), content_type='application/json')
 
 def GuardarCambiosReserva(request):
+	reservas = 	ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],hora_inicio__gte=request.POST['inicio'],
+		hora_inicio__lt=request.POST['fin']) | ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],
+		hora_fin__gt=request.POST['inicio'],hora_fin__lte=request.POST['fin'])
+	mensaje = ""
+	tab = "&nbsp;"*5	
+	if len(reservas) > 0:
+		for reserva in reservas:
+			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
+			mensaje += "<b>Igresado por:</b> "+reserva.usuario.nombre+"<br>"
+			mensaje += "<b>Conflicto con la reserva:</b><br>"
+			mensaje += tab+"<b>Complejo:</b> "+reserva.cancha.complejo.nombre+"<br>"
+			mensaje += tab+"<b>Cancha:</b> "+reserva.cancha.nombre+"<br>"
+			mensaje += tab+"<b>Fecha:</b> "+str(reserva.fecha)+"<br>"
+			mensaje += tab+"<b>Hora: </b>"+reserva.hora_inicio.strftime("%H:%M")+" - "+reserva.hora_fin.strftime("%H:%M")+"</li><br><br>"
+		return HttpResponse(json.dumps({'error':True,'mensaje':mensaje}), content_type='application/json')
+
 	ReservaCancha.objects.filter(reserva_cancha_id=request.POST['reserva']).update(cancha_id=request.POST['cancha'],
 				fecha=request.POST['fecha'],hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],
 				notas=request.POST['notas'],precio_sugerido=request.POST['precio_sugerido'])
