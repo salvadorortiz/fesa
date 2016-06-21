@@ -475,6 +475,8 @@
         });
        $( "#hor_fecha_hasta" ).datepicker({
         });
+       $("#hor_fecha_desde").datepicker().datepicker("setDate", new Date());
+       $("#hor_fecha_hasta").datepicker().datepicker("setDate", new Date());
        //----Reporte de reserva
            var dt_repo_reserva = $('#dt_repo_reserva').DataTable( {
                 "ajax": {
@@ -745,16 +747,31 @@
                 //alert( 'Table redraw' );
                 var tam= $("#dt_repo_horas").find("tbody").find("tr").length;
                 if(tam > 0){
+
                     $("#dt_repo_horas").find("tbody").find("tr").each(function(){
                         var data= $('#dt_repo_horas').DataTable().row($(this)).data();
                         if(data!=undefined){
                             console.log(data);
-                            $("#total_horas_posibles").html(data[6]);
-                            $("#total_horas_usadas").html(data[7]);
-                            var porcentaje_global= data[7]/data[6];
-                            porcentaje_global=porcentaje_global*100;
-                           // console.log(Number((porcentaje_global).toFixed(1)));
-                            $("#porcentaje_global").html(Math.round(porcentaje_global).toString() + " %");
+                            jQuery.ajax({
+                                url: "{%url 'calcular_horas_posibles'%}",
+                                type: "POST",
+                                processData: false,
+                                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&horas_posibles="+data[6]+"&fecha_desde="+$("#hor_fecha_desde").val()+"&fecha_hasta="+$("#hor_fecha_hasta").val(),
+                                success: function(json){
+                                    if(json['errors']==null){
+                                        $("#total_horas_posibles").html(Number((json['resultado']).toFixed(2)));
+                                        $("#total_horas_usadas").html(data[7]);
+                                        var porcentaje_global= data[7]/json['resultado'];
+                                        porcentaje_global=porcentaje_global*100;
+                                         console.log(Number((json['resultado']).toFixed(2)));
+                                        $("#porcentaje_global").html(Number((porcentaje_global).toFixed(3)) + " %");
+                                    }else{
+                                        $("#total_horas_posibles").html('');
+                                        $("#total_horas_usadas").html('');
+                                        $("#porcentaje_global").html("");
+                                    }
+                                }
+                            });
                             return ( false );   
                         }
                     });
@@ -762,13 +779,20 @@
                // console.log()
             }
             
-            $("#dt_repo_horas").on('draw.dt',function(){
+            $("#dt_repo_horas").on('init.dt',function(){
                 refrescar_global();
             });
 
             $("#filtrar_repo_hora").on('click',function(){
-                $("#dt_repo_horas").DataTable().ajax.reload();
-                setTimeout(function(){ refrescar_global(); }, 10);
+                if($("#hor_fecha_hasta").val()!='' && $("#hor_fecha_desde").val()!=''){
+                   $("#dt_repo_horas").DataTable().ajax.reload();
+                    setTimeout(function(){ refrescar_global(); }, 10);  
+                }else if($("#hor_fecha_hasta").val()=='' && $("#hor_fecha_desde").val()=='' && $("#hor_cmb_complejo").val()!=''){
+                    $("#dt_repo_horas").DataTable().ajax.reload();
+                    setTimeout(function(){ refrescar_global(); }, 10);
+                }else{
+                    create_alert("<li>Debe ingresar un rango de fechas válido</li>","ERROR","notificaciones",true,5000);
+                }
                 
             });
     });

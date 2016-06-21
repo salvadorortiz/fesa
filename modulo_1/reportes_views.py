@@ -8,6 +8,7 @@ from modulo_1.models import Cliente, Empresa,Complejo,Usuario,TipoAlquiler
 import json
 import hashlib
 import sys
+from datetime import date,datetime
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -158,7 +159,7 @@ def ReporteHorasCancha(request):
 	#print qs_alquiler
 	tuples_resultado=[]
 	for item in qs:
-	#	print "\n -->",item
+		print "\n -->",item
 		#verifica que no exista alguna tupla con sus datos 
 		if verificar_existencia(item,tuples_resultado):
 			for tipo_a in qs_alquiler:
@@ -166,10 +167,12 @@ def ReporteHorasCancha(request):
 				#print "AUX->",tupla_aux
 				tuples_resultado.append(tupla_aux)
 
-		if item[6] is not None:
-			total_horas_posibles+=time_to_int(item[6])
-		else:
-			total_horas_posibles+=float(item[7])
+			if item[6] is not None:
+				total_horas_posibles+=(time_to_int(item[6])/7)
+			else:
+				total_horas_posibles+=(float(item[7])/7)
+		
+			print "HPPP-->",total_horas_posibles
 
 	for item in qs:
 		#print "\n -->",item
@@ -211,3 +214,26 @@ def verificar_existencia(item,tuplas):
 		if int(item[0]) == int(tupla[0]) and int(item[1]) == int(tupla[1]):
 			return False
 	return True
+
+def calcular_horas_posibles(request):
+	arr_hasta= request.POST['fecha_hasta'].split('-')
+	print arr_hasta
+	arr_desde= request.POST['fecha_desde'].split('-')
+	#d0 = date(int(arr_desde[0]), int(arr_desde[1]), int(arr_desde[2]))
+	#print d0
+	#d1 = date(int(arr_hasta[0]), int(arr_hasta[1]), int(arr_desde[2]))
+	d0=datetime.strptime(str(request.POST['fecha_desde']), "%Y-%m-%d").date()
+	d1=datetime.strptime(str(request.POST['fecha_hasta']), "%Y-%m-%d").date()
+	delta = d0 - d1
+	cantidad_dias= delta.days
+	print "Cantidad de dias-->",cantidad_dias
+	if cantidad_dias < 0: #esta bien :3
+		resultado= float(request.POST['horas_posibles'])*(-1*cantidad_dias)
+		print resultado
+		fetch={'resultado':resultado}
+	elif cantidad_dias==0:	#tambien esta bien
+		resultado= float(request.POST['horas_posibles'])
+		fetch={'resultado':resultado}
+	else: #no esta bien :c
+		fetch={'errors':1}
+	return HttpResponse(json.dumps(fetch), content_type='application/json')

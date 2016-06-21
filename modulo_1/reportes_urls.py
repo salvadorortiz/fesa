@@ -11,5 +11,5 @@ urlpatterns = [
 	url(r'^total/', 'modulo_1.reportes_views.ReporteRemesasTotalData',name='repo_total'),
 	url(r'^cliente_eventos/', 'modulo_1.reportes_views.EventosClientesData',name='repo_evento_cliente'),
 	url(r'^horas_cancha/', 'modulo_1.reportes_views.ReporteHorasCanchaData',name='repo_horas_cancha'),
-
+	url(r'^calcular_horas_posibles/', 'modulo_1.reportes_views.calcular_horas_posibles',name='calcular_horas_posibles'),
 ]
