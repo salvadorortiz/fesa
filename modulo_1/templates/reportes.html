@@ -32,9 +32,10 @@
         <div id="rootwizard">
         <ul class="nav nav-pills">
             <li class="active"><a href="#tab1" data-toggle="tab">Resumen complejo</a></li>
-            <li><a href="#tab2" data-toggle="tab">Reporte utilidad</a></li>
+            <li><a href="#tab2" data-toggle="tab">Utilidad</a></li>
             <li><a href="#tab3" data-toggle="tab">Clientes</a></li>
             <li><a href="#tab4" data-toggle="tab">Ocupación de canchas</a></li>
+            <li><a href="#tab5" data-toggle="tab">Ranking Clientes</a></li>
         </ul>
         <hr>
         <div class="tab-content">
@@ -364,7 +365,7 @@
 
                   <div class="row">
                             <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
-                                <label data-toggle="collapse" href="#horas_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-clock"></i> &nbsp;Horas Cancha</label>
+                                <label data-toggle="collapse" href="#horas_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-clock"></i> &nbsp;Ocupación de Canchas</label>
                                 <a href="#" onclick="$('#dt_repo_horas').DataTable().ajax.reload(); refrescar_global();"style="float:right; color:white;">
                                     <i class="fa fa-refresh"></i>
                                 </a>
@@ -446,6 +447,89 @@
                     </div>
 
 
+            </div>
+<!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->          
+            <div class="tab-pane" id="tab5">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Filtrar por...</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-sm-2"></div>
+                                    <div class="col-sm-1">Desde: </div>
+                                    <div class="col-sm-3">
+                                        <input type="text" id="txt_desde_ranking">
+                                    </div>
+                                    <div class="col-sm-1">Hasta: </div>
+                                    <div class="col-sm-3">
+                                        <input type="text" id="txt_hasta_ranking">
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <center>
+                                            <button type="button" id="btn_filtrar_cliente" class="btn btn-success"><i class="fa fa-search"></i>&nbsp;&nbsp; Filtrar</button>
+                                        </center>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                        <label data-toggle="collapse" href="#ranking_cliente_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-flag"></i> &nbsp;Ranking de clientes</label>
+                        <a href="#" onclick="$('#dt_ranking_clientes').DataTable().ajax.reload();"style="float:right; color:white;">
+                            <i class="fa fa-refresh"></i>
+                        </a>
+                    </div>
+                </div>
+                    <hr>
+                <div class="row">
+                     <div id="ranking_cliente_toggle" class="collapse in col-sm-12">
+                            <table style="width:100%" id="dt_ranking_clientes" class="stripe">
+                                <thead>
+                                    <th>Cliente</th>
+                                    <th>Teléfono</th>
+                                    <th>Correo</th>
+                                    <th>Horas</th>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
+                        <label data-toggle="collapse" href="#ranking_empresa_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-flag"></i> &nbsp;Ranking de empresas</label>
+                        <a href="#" onclick="$('#dt_ranking_empresas').DataTable().ajax.reload();"style="float:right; color:white;">
+                            <i class="fa fa-refresh"></i>
+                        </a>
+                    </div>
+                </div>
+                    <hr>
+                <div class="row">
+                     <div id="ranking_empresa_toggle" class="collapse in col-sm-12">
+                            <table style="width:100%" id="dt_ranking_empresas" class="stripe">
+                                <thead>
+                                    <th>Empresa</th>
+                                    <th>Contacto</th>
+                                    <th>Teléfono</th>
+                                    <th>Horas</th>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+                
             </div>
 <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->
         </div>  
@@ -826,6 +910,80 @@
                     create_alert("<li>Debe ingresar un rango de fechas válido</li>","ERROR","notificaciones",true,5000);
                 }
                 
+            });
+
+            $( "#txt_desde_ranking" ).datepicker({
+               // 'minDate': 0
+              // altFormat: "dd-mm-yyyy"
+            });
+
+            $( "#txt_hasta_ranking" ).datepicker({
+               // 'minDate': 0
+              // altFormat: "dd-mm-yyyy"
+            });
+
+            var dt_ranking_clientes = $('#dt_ranking_clientes').DataTable( {
+                /*"ajax": {
+                    "url": "{%url 'repo_clientes' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                    },
+                },*/
+                "pageLength": 5,
+                "ordering": false,
+                "lengthChange": true,
+                "searching": false,
+                "paging": false,
+                "columnDefs":[
+                    {"targets":0, "width":"40%"},
+                    {"targets":1, "width":"20%"},
+                    {"targets":2, "width":"25%"},
+                    {"targets":3, "width":"15%","searchable":false},
+                ],
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
+            });
+
+            var dt_ranking_empresas = $('#dt_ranking_empresas').DataTable( {
+                /*"ajax": {
+                    "url": "{%url 'repo_clientes' %}",
+                    "type": "POST",
+                    "data":  function( d ) {
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                    },
+                },*/
+                "pageLength": 5,
+                "ordering": false,
+                "lengthChange": true,
+                "searching": false,
+                "paging": false,
+                "columnDefs":[
+                    {"targets":0, "width":"35%"},
+                    {"targets":1, "width":"35%"},
+                    {"targets":2, "width":"15%"},
+                    {"targets":3, "width":"15%","searchable":false},
+                ],
+                "language": {
+                    "lengthMenu": "Mostrando _MENU_ filas por página",
+                    "zeroRecords": "No se encontraron resultados",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "",
+                    "infoFiltered": "(filtered from _MAX_ total records)",
+                    "oPaginate": {
+                        "sNext":     "Siguiente",
+                        "sPrevious": "Anterior"
+                    },
+                }
             });
     });
 
