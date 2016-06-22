@@ -744,12 +744,13 @@
             });
 
             function refrescar_global(){
-                //alert( 'Table redraw' );
+                console.log("ref");
                 var tam= $("#dt_repo_horas").find("tbody").find("tr").length;
                 if(tam > 0){
-
+                    console.log("entra a if");
                     $("#dt_repo_horas").find("tbody").find("tr").each(function(){
                         var data= $('#dt_repo_horas').DataTable().row($(this)).data();
+                        console.log(data);
                         if(data!=undefined){
                             console.log(data);
                             jQuery.ajax({
@@ -783,13 +784,24 @@
                 refrescar_global();
             });
 
+            function limpiar_resultados(){
+                $("#total_horas_posibles").html('procesando...');
+                $("#total_horas_usadas").html('procesando...');
+                $("#porcentaje_global").html('procesando...');
+            }
+
             $("#filtrar_repo_hora").on('click',function(){
                 if($("#hor_fecha_hasta").val()!='' && $("#hor_fecha_desde").val()!=''){
+                    console.log("1");
+                    limpiar_resultados();
                    $("#dt_repo_horas").DataTable().ajax.reload();
-                    setTimeout(function(){ refrescar_global(); }, 10);  
+                    setTimeout(function(){ refrescar_global();  }, 1500);
+
                 }else if($("#hor_fecha_hasta").val()=='' && $("#hor_fecha_desde").val()=='' && $("#hor_cmb_complejo").val()!=''){
+                    console.log("2");
+                    limpiar_resultados();
                     $("#dt_repo_horas").DataTable().ajax.reload();
-                    setTimeout(function(){ refrescar_global(); }, 10);
+                     setTimeout(function(){ refrescar_global();  }, 1500);
                 }else{
                     create_alert("<li>Debe ingresar un rango de fechas válido</li>","ERROR","notificaciones",true,5000);
                 }
