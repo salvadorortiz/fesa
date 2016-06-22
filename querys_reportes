@@ -120,17 +120,14 @@ CREATE OR REPLACE VIEW dt_repo_horas AS
  SELECT c.cancha_id,
     c.complejo_id,
     res.tipo_alquiler_id,
-    to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
+    to_char(rxc.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
     ((('<div class="row"><div class="col-sm-12"><div class="col-sm-4"></div><div class="col-sm-4 text-capitalize text-center"><h4 style="color:#074515">'::text || c.nombre::text) || '</h4></div><div class="col-sm-4 text-right"><h6><span class="label label-default">'::text) || com.nombre::text) || '</span></h6></div></div></div>'::text AS nombre_cancha,
-
     COALESCE(to_char(( SELECT sum(rxcan.hora_fin - rxcan.hora_inicio) AS sum
            FROM modulo_1_cancha can
-             inner JOIN modulo_1_reservacancha rxcan ON can.cancha_id = rxcan.cancha_id
-             inner JOIN modulo_1_reserva reser ON reser.reserva_id = rxcan.reserva_id
+             JOIN modulo_1_reservacancha rxcan ON can.cancha_id = rxcan.cancha_id
+             JOIN modulo_1_reserva reser ON reser.reserva_id = rxcan.reserva_id
           WHERE can.cancha_id = c.cancha_id AND reser.tipo_alquiler_id = res.tipo_alquiler_id AND reser.reserva_id = res.reserva_id
           GROUP BY can.cancha_id, reser.reserva_id, reser.tipo_alquiler_id), 'HH24:MI:SS'::text), '00:00:00'::text) AS horas_ocupadas,
-
-
     ''::text || (( SELECT (( SELECT 5::double precision * sum(modulo_1_precioxcancha_1.hora_cierre - modulo_1_precioxcancha_1.hora_apertura)
                    FROM modulo_1_precioxcancha modulo_1_precioxcancha_1
                   WHERE modulo_1_precioxcancha_1.cancha_id = c.cancha_id AND modulo_1_precioxcancha_1.dia::text = 'X'::text
@@ -145,7 +142,7 @@ CREATE OR REPLACE VIEW dt_repo_horas AS
      LEFT JOIN modulo_1_precioxcancha pxc ON c.cancha_id = pxc.cancha_id
      LEFT JOIN modulo_1_reserva res ON res.reserva_id = rxc.reserva_id
      LEFT JOIN modulo_1_tipoalquiler ta ON res.tipo_alquiler_id = ta.tipo_alquiler_id
-  GROUP BY c.cancha_id, c.complejo_id,res.tipo_alquiler_id,res.reserva_id ,res.fecha_ingreso, ta.nombre, com.nombre
+  GROUP BY c.cancha_id, c.complejo_id, res.tipo_alquiler_id, res.reserva_id, rxc.fecha, ta.nombre, com.nombre
   ORDER BY c.cancha_id;
 
 
