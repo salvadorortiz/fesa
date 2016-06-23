@@ -146,3 +146,20 @@ CREATE OR REPLACE VIEW dt_repo_horas AS
   ORDER BY c.cancha_id;
 
 
+
+
+CREATE OR REPLACE VIEW dt_repo_horasposibles AS
+SELECT   
+         c.cancha_id,c.complejo_id,
+         COALESCE(''||((( SELECT 5 * sum(modulo_1_precioxcancha_1.hora_cierre - modulo_1_precioxcancha_1.hora_apertura)
+                   FROM modulo_1_precioxcancha modulo_1_precioxcancha_1 
+                   WHERE modulo_1_precioxcancha_1.cancha_id=c.cancha_id AND modulo_1_precioxcancha_1.dia::text = 'X'
+                  GROUP BY modulo_1_precioxcancha_1.cancha_id)) 
+         + 
+         sum(pxc.hora_cierre - pxc.hora_apertura)),c.horas_posibles||':00:00')
+--SELECT *
+FROM modulo_1_cancha c 
+LEFT JOIN modulo_1_precioxcancha pxc 
+ON c.cancha_id=pxc.cancha_id
+WHERE (pxc.dia::text <> 'X' or pxc.dia is null)
+GROUP BY c.cancha_id

@@ -170,10 +170,10 @@ def ReporteHorasCancha(request):
 				##print  "AUX->",tupla_aux
 				tuples_resultado.append(tupla_aux)
 
-			if item[6] is not None:
-				total_horas_posibles+=(time_to_int(item[6])/7)
-			else:
-				total_horas_posibles+=(float(item[7])/7)
+			#if item[6] is not None:
+			#	total_horas_posibles+=(time_to_int(item[6])/7)
+			#else:
+			#	total_horas_posibles+=(float(item[7])/7)
 		
 			#print  "HPPP-->",total_horas_posibles
 
@@ -188,6 +188,19 @@ def ReporteHorasCancha(request):
 					total_horas_usadas+=time_to_int(item[5])
 
 	lista_resultado=[]				
+#-------------------------------------------------------------------------------------------
+	filtro_horas=" WHERE 1=1"
+	if str(request.POST['complejo_id'])!='':
+		filtro_horas+=" AND complejo_id = " + str(request.POST['complejo_id'])
+
+	str_query = "SELECT * FROM dt_repo_horasposibles" + filtro_horas
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	repo_horas = cursor.fetchall()
+	for hora in repo_horas:
+		print "\n",hora
+		total_horas_posibles+=time_to_int(hora[2])/7
+#--------------------------------------------------------------------------------------------
 	for item in tuples_resultado:
 		item.append(total_horas_posibles)
 		item.append(total_horas_usadas)
@@ -229,8 +242,8 @@ def calcular_horas_posibles(request):
 		d0=datetime.strptime(str(request.POST['fecha_desde']), "%Y-%m-%d").date()
 		d1=datetime.strptime(str(request.POST['fecha_hasta']), "%Y-%m-%d").date()
 		delta = d0 - d1
-		cantidad_dias= delta.days
-		##print  "Cantidad de dias-->",cantidad_dias
+		cantidad_dias= delta.days-1
+		print  "Cantidad de dias-->",cantidad_dias
 		if cantidad_dias < 0: #esta bien :3
 			resultado= float(request.POST['horas_posibles'])*(-1*cantidad_dias)
 			##print  resultado
