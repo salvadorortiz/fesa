@@ -1,35 +1,42 @@
-CREATE OR REPLACE VIEW dt_repo_reserva AS
-SELECT com.complejo_id, can.cancha_id, recan.reserva_cancha_id, res.reserva_id, fpag.forma_pago_id, 
- 	to_char(recan.fecha, 'YYYY-MM-DD') as fecha_reserva, 
-CASE
-	WHEN c.cliente_id IS NOT NULL THEN COALESCE( c.nombre, '' )
-	ELSE COALESCE( e.nombre, '' )
-END AS info_cliente,
-res.nombre_evento,
-CASE 
-	WHEN res.estado = 'C' THEN '<span class="label label-primary">Confirmado</span>'
-	WHEN res.estado = 'T' THEN '<span class="label label-default">Tentativo</span>'
-	WHEN res.estado = 'R' THEN '<span class="label label-success">Realizado</span>'
-	WHEN res.estado = 'N' THEN '<span class="label label-danger">No realizado</span>'
-END AS estado_reserva,
-fpag.nombre AS nombre_formapago,
-ta.nombre AS nombre_tipoalquiler,
-ff.nombre AS nombre_formafacturacion,
-CASE 
-	WHEN res.forma_pago_id = 1 THEN '$'||to_char(res.precio, '9G999.99')
-	ELSE ''
-END AS precio_reserva
---SELECT * 
-FROM modulo_1_complejo com
-INNER JOIN modulo_1_cancha can ON can.complejo_id = com.complejo_id
-INNER JOIN modulo_1_reservacancha recan ON recan.cancha_id=can.cancha_id
-INNER JOIN modulo_1_reserva res ON res.reserva_id=recan.reserva_id
-INNER JOIN modulo_1_formapago fpag ON fpag.forma_pago_id=res.forma_pago_id
-INNER JOIN modulo_1_formafacturacion ff ON ff.forma_facturacion_id = res.forma_facturacion_id
-INNER JOIN modulo_1_tipoalquiler ta ON ta.tipo_alquiler_id = res.tipo_alquiler_id
-LEFT JOIN modulo_1_cliente c ON c.cliente_id=res.cliente_id
-LEFT JOIN modulo_1_empresa e ON e.empresa_id=res.empresa_id
-ORDER BY recan.fecha DESC
+--DROP VIEW dt_repo_reserva;
+
+CREATE OR REPLACE VIEW dt_repo_reserva AS 
+ SELECT com.complejo_id,
+    can.cancha_id,
+    recan.reserva_cancha_id,
+    res.reserva_id,
+    fpag.forma_pago_id, 
+    to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva,
+    u.usuario,
+        CASE
+            WHEN c.cliente_id IS NOT NULL THEN COALESCE(c.nombre, ''::character varying)
+            ELSE COALESCE(e.nombre, ''::character varying)
+        END AS info_cliente,
+    res.nombre_evento,
+        CASE
+            WHEN res.estado::text = 'C'::text THEN '<span class="label label-primary">Confirmado</span>'::text
+            WHEN res.estado::text = 'T'::text THEN '<span class="label label-default">Tentativo</span>'::text
+            WHEN res.estado::text = 'R'::text THEN '<span class="label label-success">Realizado</span>'::text
+            WHEN res.estado::text = 'N'::text THEN '<span class="label label-danger">No realizado</span>'::text
+            ELSE NULL::text
+        END AS estado_reserva,
+    fpag.nombre AS nombre_formapago,
+        CASE
+            WHEN res.forma_pago_id = 1 THEN '$'::text || to_char(res.precio, '9G999.99'::text)
+            ELSE ''::text
+        END AS precio_reserva
+--SELECT *
+   FROM modulo_1_complejo com
+     JOIN modulo_1_cancha can ON can.complejo_id = com.complejo_id
+     JOIN modulo_1_reservacancha recan ON recan.cancha_id = can.cancha_id
+     JOIN modulo_1_reserva res ON res.reserva_id = recan.reserva_id
+     JOIN modulo_1_formapago fpag ON fpag.forma_pago_id = res.forma_pago_id
+     JOIN modulo_1_formafacturacion ff ON ff.forma_facturacion_id = res.forma_facturacion_id
+     JOIN modulo_1_tipoalquiler ta ON ta.tipo_alquiler_id = res.tipo_alquiler_id
+     JOIN modulo_1_usuario u ON u.usuario_id= res.usuario_id
+     LEFT JOIN modulo_1_cliente c ON c.cliente_id = res.cliente_id
+     LEFT JOIN modulo_1_empresa e ON e.empresa_id = res.empresa_id
+  ORDER BY recan.fecha DESC;
 
 
 CREATE OR REPLACE VIEW dt_repo_clientes AS 

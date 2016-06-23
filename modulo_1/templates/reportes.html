@@ -104,12 +104,11 @@
                                     <th>Id reserva</th>
                                     <th>Id de forma de pago</th>
                                     <th>Fecha de reserva</th>
+                                    <th>Usuario</th>
                                     <th>Cliente</th>
                                     <th>Nombre del evento</th>
                                     <th>Estado de la reserva</th>
                                     <th>Forma de pago</th>
-                                    <th>Tipo de alquiler</th>
-                                    <th>Forma de facturación</th>
                                     <th>Precio</th>
                                 </thead>
                                 <tbody>
@@ -495,15 +494,14 @@
                 "searching": true,
                 "paging": true,
                 "columnDefs":[
-                    {"targets":[0,1,2,3,4],"visible":false,"searchable":false},
-                    {"targets":5, "width":"10%"},
-                    {"targets":6, "width":"20%"},
+                    {"targets":[0,1,2,3,4,9],"visible":false,"searchable":false},
+                    {"targets":5, "width":"15%"},
+                    {"targets":6, "width":"15%"},
                     {"targets":7, "width":"20%"},
-                    {"targets":8, "width":"10%"},
-                    {"targets":9, "width":"10%"},
-                    {"targets":10, "width":"10%"},
-                    {"targets":11, "width":"10%"},
-                    {"targets":12, "width":"10%"},
+                    {"targets":8, "width":"20%"},
+                   // {"targets":9, "width":"10%"},
+                    {"targets":10, "width":"15%"},
+                    {"targets":11, "width":"15%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -518,6 +516,19 @@
                 }
             });
 
+           /*                       0<th>Id complejo</th>
+                                    1<th>Id cancha</th>
+                                    2<th>Id reserva de cancha </th>
+                                    3<th>Id reserva</th>
+                                    4<th>Id de forma de pago</th>
+                                    5<th>Fecha de reserva</th>
+                                    6<th>Usuario</th>
+                                    7<th>Cliente</th>
+                                    8<th>Nombre del evento</th>
+                                    9<th>Estado de la reserva</th>
+                                    10<th>Forma de pago</th>
+                                    11<th>Precio</th>
+                                    */
            $("#filtrar_repo_reserva").on('click',function(){
                 $("#dt_repo_reserva").DataTable().ajax.reload();
            });
@@ -540,8 +551,8 @@
                     {"targets":0, "width":"5%"},
                     {"targets":1, "width":"25%"},
                     {"targets":2, "width":"15%"},
-                    {"targets":3, "width":"25%"},
-                    {"targets":4, "width":"25%"},
+                    {"targets":[3,4], "width":"25%","searchable":false},
+                    //{"targets":4, "width":"25%"},
                     {"targets":6, "width":"5%"},
                 ],
                 "language": {
@@ -634,10 +645,10 @@
                 "searching": true,
                 "paging": true,
                 "columnDefs":[
-                    {"targets":[0,10],"visible":false,"searchable":false},
+                    {"targets":[0,10,4],"visible":false,"searchable":false},
                     {"targets":1, "width":"10%"},
-                    {"targets":[2,3], "width":"15%"},
-                    {"targets":[4,5,6,7,8,9], "width":"10%"},
+                    {"targets":[2,3], "width":"20%"},
+                    {"targets":[5,6,7,8,9], "width":"10%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
