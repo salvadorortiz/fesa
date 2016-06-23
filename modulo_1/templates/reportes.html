@@ -107,6 +107,8 @@
                                     <th>Usuario</th>
                                     <th>Cliente</th>
                                     <th>Nombre del evento</th>
+                                    <th>Nombre de cancha </th>
+                                    <th>Horario</th>
                                     <th>Estado de la reserva</th>
                                     <th>Forma de pago</th>
                                     <th>Precio</th>
@@ -494,14 +496,14 @@
                 "searching": true,
                 "paging": true,
                 "columnDefs":[
-                    {"targets":[0,1,2,3,4,9],"visible":false,"searchable":false},
-                    {"targets":5, "width":"15%"},
-                    {"targets":6, "width":"15%"},
-                    {"targets":7, "width":"20%"},
+                    {"targets":[0,1,2,3,4,11],"visible":false,"searchable":false},
+                    {"targets":5, "width":"10%"},
+                    {"targets":6, "width":"10%"},
+                    {"targets":7, "width":"15%"},
                     {"targets":8, "width":"20%"},
-                   // {"targets":9, "width":"10%"},
+                    {"targets":9, "width":"20%"},
                     {"targets":10, "width":"15%"},
-                    {"targets":11, "width":"15%"},
+                    {"targets":[11,12,13], "width":"10%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -524,10 +526,12 @@
                                     5<th>Fecha de reserva</th>
                                     6<th>Usuario</th>
                                     7<th>Cliente</th>
-                                    8<th>Nombre del evento</th>
-                                    9<th>Estado de la reserva</th>
-                                    10<th>Forma de pago</th>
-                                    11<th>Precio</th>
+                                    8<th>Nombre del evento</th> 
+                                    9<th>Nombre de cancha </th>
+                                    10<th>Horario</th>
+                                    11<th>Estado de la reserva</th>
+                                    12<th>Forma de pago</th>
+                                    13<th>Precio</th>
                                     */
            $("#filtrar_repo_reserva").on('click',function(){
                 $("#dt_repo_reserva").DataTable().ajax.reload();

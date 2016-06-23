@@ -6,13 +6,15 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
     recan.reserva_cancha_id,
     res.reserva_id,
     fpag.forma_pago_id, 
-    to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva,
+    to_char(recan.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva,
     u.usuario,
         CASE
             WHEN c.cliente_id IS NOT NULL THEN COALESCE(c.nombre, ''::character varying)
             ELSE COALESCE(e.nombre, ''::character varying)
         END AS info_cliente,
     res.nombre_evento,
+     can.nombre,
+    to_char(recan.hora_inicio,'HH24:MM') || ' - ' || to_char(recan.hora_fin,'HH24:MM'), 
         CASE
             WHEN res.estado::text = 'C'::text THEN '<span class="label label-primary">Confirmado</span>'::text
             WHEN res.estado::text = 'T'::text THEN '<span class="label label-default">Tentativo</span>'::text
