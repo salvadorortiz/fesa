@@ -782,16 +782,16 @@
                                          console.log(Number((json['resultado']).toFixed(2)));
                                         $("#porcentaje_global").html(Number((porcentaje_global).toFixed(3)) + " %");
                                     }else{
-                                        $("#total_horas_posibles").html('');
-                                        $("#total_horas_usadas").html('');
-                                        $("#porcentaje_global").html("");
+                                        $("#total_horas_posibles").html('-');
+                                        $("#total_horas_usadas").html('-');
+                                        $("#porcentaje_global").html("-");
                                         create_alert("<li>Para calcular el resultado global es necesario que se defina un rango de fechas válido</li>","INFO","notificaciones",true,5000);
                                     }
                                 }
                             });
                             return ( false );   
                         }else{
-                            $("#total_horas_posibles").html('0');
+                            $("#total_horas_posibles").html('-');
                             $("#total_horas_usadas").html('-');
                             $("#porcentaje_global").html("0%");
                         }
