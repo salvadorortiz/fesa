@@ -12,4 +12,7 @@ urlpatterns = [
 	url(r'^cliente_eventos/', 'modulo_1.reportes_views.EventosClientesData',name='repo_evento_cliente'),
 	url(r'^horas_cancha/', 'modulo_1.reportes_views.ReporteHorasCanchaData',name='repo_horas_cancha'),
 	url(r'^calcular_horas_posibles/', 'modulo_1.reportes_views.calcular_horas_posibles',name='calcular_horas_posibles'),
+	url(r'^top_clientes/', 'modulo_1.reportes_views.TopClientesData',name='top_clientes'),
+	url(r'^top_empresa/', 'modulo_1.reportes_views.TopEmpresaData',name='top_empresa'),
+	
 ]

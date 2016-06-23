@@ -256,3 +256,60 @@ def calcular_horas_posibles(request):
 	except:
 		fetch={'errors':1}
 	return HttpResponse(json.dumps(fetch), content_type='application/json')
+
+def TopClientesData(request):
+	filtro=""
+	if str(request.POST['fecha_desde'])!= '':
+		filtro+=" AND rxc.fecha >= '" + str(request.POST['fecha_desde']) + "'" 
+
+	if str(request.POST['fecha_hasta'])!='':
+		filtro+=" AND rxc.fecha <= '" + str(request.POST['fecha_hasta']) + "'"
+
+	str_query = "SELECT c.nombre,c.telefono,c.correo,\
+			''|| sum(rxc.hora_fin-rxc.hora_inicio) AS horas_usadas,r.cliente_id\
+			FROM modulo_1_reservacancha rxc\
+			INNER JOIN modulo_1_reserva r ON rxc.reserva_id=r.reserva_id\
+			INNER JOIN modulo_1_cliente c ON c.cliente_id=r.cliente_id\
+			WHERE r.empresa_id is null" + filtro
+	str_query+=" GROUP BY r.cliente_id,c.nombre,c.telefono,c.correo \
+				ORDER BY horas_usadas DESC\
+				LIMIT 5"
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+
+	return HttpResponse(json.dumps(convert_fetchall_top(qs)), content_type='application/json')
+
+def TopEmpresaData(request):
+	filtro=""
+	if str(request.POST['fecha_desde'])!= '':
+		filtro+=" AND rxc.fecha >= '" + str(request.POST['fecha_desde']) + "'" 
+
+	if str(request.POST['fecha_hasta'])!='':
+		filtro+=" AND rxc.fecha <= '" + str(request.POST['fecha_hasta']) + "'"
+
+	str_query = "SELECT c.nombre,c.contacto,c.telefono_contacto,\
+				''|| sum(rxc.hora_fin-rxc.hora_inicio) AS horas_usadas,r.empresa_id\
+				FROM modulo_1_reservacancha rxc\
+				INNER JOIN modulo_1_reserva r ON rxc.reserva_id=r.reserva_id\
+				INNER JOIN modulo_1_empresa c ON c.empresa_id=r.empresa_id\
+				WHERE r.cliente_id is null " + filtro
+	str_query+=" GROUP BY c.nombre,c.contacto,c.telefono_contacto,r.empresa_id \
+				ORDER BY horas_usadas DESC\
+				LIMIT 5"
+	cursor = connection.cursor()
+	cursor.execute(str_query)
+	qs = cursor.fetchall()
+	##print  convert_fetchall(qs)
+	return HttpResponse(json.dumps(convert_fetchall_top(qs)), content_type='application/json')
+
+def convert_fetchall_top(cursor):
+	dict_cursor={}
+	list_aux=[]
+	for item in cursor:
+		list_aux.append([item[0],item[1],item[2],time_to_int(item[3]),item[4]])
+	dict_cursor['recordsTotal']=len(list_aux)
+	dict_cursor['recordsFiltered']=len(list_aux)
+	dict_cursor['draw']= len(list_aux)//10
+	dict_cursor['data']=list_aux
+	return dict_cursor

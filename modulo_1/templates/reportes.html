@@ -472,7 +472,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <center>
-                                            <button type="button" id="btn_filtrar_cliente" class="btn btn-success"><i class="fa fa-search"></i>&nbsp;&nbsp; Filtrar</button>
+                                            <button type="button" id="btn_filtrar_top" class="btn btn-success"><i class="fa fa-search"></i>&nbsp;&nbsp; Filtrar</button>
                                         </center>
                                     </div>
                                 </div>
@@ -497,6 +497,7 @@
                                     <th>Teléfono</th>
                                     <th>Correo</th>
                                     <th>Horas</th>
+                                    <th>Cliente_id</th>
                                 </thead>
                                 <tbody>
                                     
@@ -522,6 +523,7 @@
                                     <th>Contacto</th>
                                     <th>Teléfono</th>
                                     <th>Horas</th>
+                                    <th>Empresa_id</th>
                                 </thead>
                                 <tbody>
                                     
@@ -560,6 +562,7 @@
         });
        $( "#hor_fecha_hasta" ).datepicker({
         });
+
        $("#hor_fecha_desde").datepicker().datepicker("setDate", new Date());
        $("#hor_fecha_hasta").datepicker().datepicker("setDate", new Date());
        //----Reporte de reserva
@@ -923,19 +926,22 @@
             });
 
             var dt_ranking_clientes = $('#dt_ranking_clientes').DataTable( {
-                /*"ajax": {
-                    "url": "{%url 'repo_clientes' %}",
+                "ajax": {
+                    "url": "{%url 'top_clientes' %}",
                     "type": "POST",
                     "data":  function( d ) {
-                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                        d.fecha_desde= $("#txt_desde_ranking").val(),
+                        d.fecha_hasta= $("#txt_hasta_ranking").val()
                     },
-                },*/
+                },
                 "pageLength": 5,
                 "ordering": false,
                 "lengthChange": true,
                 "searching": false,
                 "paging": false,
                 "columnDefs":[
+                    {"targets":4,"visible":false,"searchable":false},
                     {"targets":0, "width":"40%"},
                     {"targets":1, "width":"20%"},
                     {"targets":2, "width":"25%"},
@@ -955,19 +961,22 @@
             });
 
             var dt_ranking_empresas = $('#dt_ranking_empresas').DataTable( {
-                /*"ajax": {
-                    "url": "{%url 'repo_clientes' %}",
+                "ajax": {
+                    "url": "{%url 'top_empresa' %}",
                     "type": "POST",
                     "data":  function( d ) {
-                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val()
+                        d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
+                        d.fecha_desde= $("#txt_desde_ranking").val(),
+                        d.fecha_hasta= $("#txt_hasta_ranking").val()
                     },
-                },*/
+                },
                 "pageLength": 5,
                 "ordering": false,
                 "lengthChange": true,
                 "searching": false,
                 "paging": false,
                 "columnDefs":[
+                    {"targets":4,"visible":false,"searchable":false},
                     {"targets":0, "width":"35%"},
                     {"targets":1, "width":"35%"},
                     {"targets":2, "width":"15%"},
@@ -984,6 +993,10 @@
                         "sPrevious": "Anterior"
                     },
                 }
+            });
+
+            $("#btn_filtrar_top").on('click',function(){
+                $("#dt_ranking_clientes").DataTable().ajax.reload();
             });
     });
 
