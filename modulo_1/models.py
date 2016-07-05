@@ -161,5 +161,6 @@ class RemesaXReserva(models.Model):
 	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	numero_remesa = models.CharField('Número de remesa',max_length=100,blank=False,null=False,default='')
 	monto = models.DecimalField('Monto',max_digits=10, decimal_places=2, blank=False, default=0.0)
+	banco = models.CharField('Banco',max_length=150, blank=True, null=True, default='')
 	fecha_ingreso = models.DateField('Fecha de ingreso',auto_now_add=True)
 	fecha = models.DateField(auto_now=False,auto_now_add=False)

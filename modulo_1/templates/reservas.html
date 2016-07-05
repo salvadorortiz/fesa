@@ -45,9 +45,9 @@
             <br>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Registro de nuevos eventos</h3>
+                      <h3 class="panel-title" data-toggle="collapse" href="#registro_eventos_toggle"><i class="fa fa-clock-o fa-fw"></i> Registro de nuevos eventos</h3>
                 </div>
-                <div class="panel-body">
+                <div id="registro_eventos_toggle" class="collapse in panel-body">
                     <div class="row">
                         <div class="col-sm-12">
                             <br>
@@ -152,6 +152,7 @@
                             <th>Inicio</th>
                             <th>Fin</th>
                             <th>Precio autorizado</th>
+                            <th>Precio acordado</th>
                             <th>Acciones</th>
                         </thead>
                         <tbody>
@@ -167,9 +168,9 @@
             <br>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                      <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Registro de nuevas reservas al evento</h3>
+                      <h3 class="panel-title" data-toggle="collapse" href="#registro_reserva_toggle"><i class="fa fa-clock-o fa-fw"></i> Registro de nuevas reservas al evento</h3>
                 </div>
-                <div class="panel-body">
+                <div id="registro_reserva_toggle" class="collapse in panel-body">
                     <div class="row">
                         <div class="col-sm-12">
                             <br>
@@ -177,7 +178,7 @@
                                 <b>Complejo</b>
                             </div>
                             <div class="col-sm-3">
-                                <select id="cmb_complejo" class="form-control" onchange="calcular_precio()">
+                                <select id="cmb_complejo" class="form-control" onchange="calcular_precio_reserva()">
                                     <option value="-1">Seleccione el complejo</option>
                                     {% for complejo in data %}
                                     <option value="{{complejo.id}}">{{complejo.nombre}}</option>
@@ -189,7 +190,7 @@
                                 <strong>Cancha</strong>
                             </div>
                             <div class="col-sm-3">
-                                <select id="cmb_cancha" class="form-control" onchange="calcular_precio()">
+                                <select id="cmb_cancha" class="form-control" onchange="calcular_precio_reserva()">
                                     <option value="-1">Seleccione la cancha</option>
                                 </select>
                             </div>
@@ -209,19 +210,19 @@
                                 <b>Fecha</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_fecha" class="form-control" placeholder="AAAA-MM-DD" onchange="calcular_precio()">
+                                <input type="text" id="txt_fecha" class="form-control" placeholder="AAAA-MM-DD" onchange="calcular_precio_reserva()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Desde</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_hora_inicio" class="time start ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio()">
+                                <input type="text" id="txt_hora_inicio" class="time start ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio_reserva()">
                             </div>
                             <div class="col-sm-1">
                                 <b>Hasta</b>
                             </div>
                             <div class="col-sm-2">
-                                <input type="text" id="txt_hora_fin" class="time end ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio()">
+                                <input type="text" id="txt_hora_fin" class="time end ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio_reserva()">
                             </div>
                             
                             <div class="col-sm-1">
@@ -272,7 +273,7 @@
                     <div class="col-sm-2">
                         <div class="form-group input-group">
                             <span class="input-group-addon"><i class="fa fa-usd"></i></span>
-                            <input type="text" id="txt_precio_evento" class="form-control">
+                            <input type="text" id="txt_precio_evento" class="form-control" disabled>
                         </div>
                     </div>
                     <div class="col-sm-1">
@@ -371,7 +372,7 @@
                 {"targets":3, "width":"12.5%"},
                 {"targets":4, "width":"15%"},
                 {"targets":5, "width":"10%"},
-                {"targets":6 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"registro_remesa\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-credit-card bigger-120\"></i></button></center>" },
+                {"targets":6 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"registro_remesa\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-credit-card bigger-120\"></i></button> <button type='button' name=\"delete_evento\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button></center>" },
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -402,13 +403,14 @@
             "order":[[5,"asc"],[6,"asc"]],
             "columnDefs":[
                 {"targets":[0,1,2],"visible":false,"searchable":false},
-                {"targets":3, "width":"20%%"},
-                {"targets":4, "width":"20%"},
+                {"targets":3, "width":"17.5%%"},
+                {"targets":4, "width":"17.5%"},
                 {"targets":5, "width":"15%"},
                 {"targets":6, "width":"10%"},
                 {"targets":7, "width":"10%"},
                 {"targets":8, "width":"10%"},
-                {"targets":9 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_reserva\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> </center>" },
+                {"targets":9, "width":"10%"},
+                {"targets":10 ,"width": "10%",  "defaultContent": "<center><button name=\"edit_reserva\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"delete_reserva\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button></center>" },
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -488,7 +490,7 @@
                         if(!json['desactivar']){ // NO HAN PASADO TODAS LAS FECHAS - NO DESACTIVAR
                             $("#btn_guardar_cambios").show();
                             $("#btn_guardar_reserva").show();
-                            $('#txt_precio_evento').prop('disabled',false);
+                            //$('#txt_precio_evento').prop('disabled',false);
                             desactivar = json['desactivar'];
                         }else{ // YA PASARON TODAS LAS FECHAS - DESACTIVAR
                             $("#btn_guardar_reserva").hide();
@@ -516,10 +518,10 @@
             $("#btn_guardar_cambios_reserva").hide();
             $("#btn_cancelar_reserva").hide();
             $("#btn_guardar_precio").show();
-            $('#txt_precio_evento').prop('disabled',false);
             evento_seleccionado = -1;
             reserva_seleccionada = -1;
             /*$("#txt_precio_sugerido").prop('disabled', true);
+            $('#txt_precio_evento').prop('disabled',false);
             $("#txt_saldo_evento").prop('disabled', true);*/
             dt_reservas.ajax.reload();
         });
@@ -603,11 +605,12 @@
                     url: "{%url 'guardar_reserva'%}",
                     type: "POST",
                     processData: false,
-                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&evento="+evento_seleccionado,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&precio_acordado="+$('#txt_precio_acordado').val()+"&evento="+evento_seleccionado,
                     success: function(json){
                         if(json['error']==true){
                             create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
                         }else{
+                            calcular_precio_evento();
                             create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
                             $("#div_errores").html('');
                             $("#dt_reservas").DataTable().ajax.reload();
@@ -648,6 +651,7 @@
                     $('#txt_hora_inicio').val(json['inicio']);
                     $('#txt_hora_fin').val(json['fin']);
                     $('#txt_precio_sugerido').val(json['precio_sugerido']);
+                    $('#txt_precio_acordado').val(json['precio_acordado']);
                     $('#txt_notas_reserva').val(json['notas']);
                     $("#btn_cancelar_reserva").show();
                     $("#btn_guardar_reserva").hide();
@@ -678,11 +682,12 @@
                     url: "{%url 'guardar_cambios_reserva'%}",
                     type: "POST",
                     processData: false,
-                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&reserva="+reserva_seleccionada,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&precio_acordado="+$('#txt_precio_acordado').val()+"&reserva="+reserva_seleccionada,
                     success: function(json){
                         if(json['error']==true){
                             create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
                         }else{
+                            calcular_precio_evento();
                             create_alert(json['mensaje'],"EXITO","notificaciones",true,5000);
                             $("#div_errores").html('');
                             $("#btn_cancelar_reserva").click();
@@ -728,6 +733,15 @@
             }else{
                 $("#btn_guardar_remesa").show();
             }
+            jQuery.ajax({
+                url: "{%url 'data_saldo_evento'%}",
+                type: "POST",
+                processData: false,
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&evento="+evento_seleccionado,
+                success: function(json){
+                    $("#txt_saldo_remesa").val(json['saldo']);
+                },
+            });
             $("#dt_remesas").DataTable().ajax.reload();
             $("#modal_remesa").modal('show');
         });
@@ -739,9 +753,68 @@
             $("#btn_cancelar_remesa").hide();
             $("#btn_guardar_cambios_remesa").hide();
         });
+
+        $(document).on('click', "[name=delete_evento]",function(){
+            $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_eventos').DataTable().rows('.selected').data();
+            console.log(data);
+            if(data[0][5] == usuario_log || tipo_usuario == "R"){
+                bootbox.confirm("Se eliminará el evento seleccionado, ¿Está seguro?", function(result) {
+                    if(result){
+                        jQuery.ajax({
+                            url: "{%url 'eliminar_evento'%}",
+                            type: "POST",
+                            processData: false,
+                            data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&evento="+data[0][0],
+                            success: function(json){
+                                $("#btn_cancelar").click();
+                                $("#dt_eventos").DataTable().ajax.reload();
+                                create_alert("<li>Evento eliminado con éxito </li>","EXITO","notificaciones",true,5000);
+                            }
+                        });
+                    }else{
+                        $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+                    }
+                });
+            }else{
+                create_alert("<li>No tienes permisos para eliminar este evento </li>","ERROR","notificaciones",true,5000);
+                $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
+            }
+        });
+
+        $(document).on('click', "[name=delete_reserva]",function(){
+            $('#dt_reservas').DataTable().$('tr.selected').removeClass('selected');
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_reservas').DataTable().rows('.selected').data();
+            console.log(data);
+            if(data[0][5] == usuario_log || tipo_usuario == "R"){
+                bootbox.confirm("Se eliminará la reserva seleccionada, ¿Está seguro?", function(result) {
+                    if(result){
+                        jQuery.ajax({
+                            url: "{%url 'eliminar_reserva'%}",
+                            type: "POST",
+                            processData: false,
+                            data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&reserva="+data[0][0],
+                            success: function(json){
+                                calcular_precio_evento();
+                                $("#btn_cancelar_reserva").click();
+                                $("#dt_reservas").DataTable().ajax.reload();
+                                create_alert("<li>Reserva eliminada con éxito </li>","EXITO","notificaciones",true,5000);
+                            }
+                        });
+                    }else{
+                        $('#dt_reservas').DataTable().$('tr.selected').removeClass('selected');
+                    }
+                });
+            }else{
+                create_alert("<li>No tienes permisos para eliminar esta reserva</li>","ERROR","notificaciones",true,5000);
+                $('#dt_reservas').DataTable().$('tr.selected').removeClass('selected');
+            }
+        });
     });
 
-    function calcular_precio(){
+    function calcular_precio_reserva(){
         if(!($('#cmb_complejo').val()=="-1" || $('#cmb_cancha').val()=="-1" || $("#txt_fecha").val()=="" || $('#txt_hora_inicio').val()=="" || $('#txt_hora_fin').val()=="")){
             jQuery.ajax({
                 url: "{%url 'calcular_precio'%}",
@@ -757,6 +830,19 @@
                 }
             });
         }
+    }
+
+    function calcular_precio_evento(){
+        jQuery.ajax({
+            url: "{%url 'calcular_precio_evento'%}",
+            type: "POST",
+            processData: false,
+            data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&evento="+evento_seleccionado,
+            success: function(json){
+                $('#txt_precio_evento').val(json['precio']);
+                $('#txt_saldo_evento').val(json['saldo']);
+            }
+        });
     }
 
     function validarFechaMenorActual(date){

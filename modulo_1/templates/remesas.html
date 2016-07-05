@@ -27,6 +27,15 @@
               <br>
               <div class="row">
                   <div class="col-lg-2">
+                      <b>Banco</b>
+                  </div>
+                  <div class="col-lg-10">
+                      <input type="text" id="txt_banco" class="form-control" placeholder="Banco" maxlength="150">
+                  </div>
+              </div>
+              <br>
+              <div class="row">
+                  <div class="col-lg-2">
                       <b>Monto</b>
                   </div>
                   <div class="col-lg-4">
@@ -62,13 +71,28 @@
                              <th>Número remesa</th>
                              <th>Monto</th>
                              <th>Fecha</th>
+                             <th>Banco</th>
                              <th>Acciones</th>
                          </thead>
                          <tbody>
                          </tbody>
                      </table>
                 </div>
-            </div> 
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="col-sm-7"></div>
+                <div class="col-sm-1">
+                    <b>Saldo</b>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group input-group">
+                        <span class="input-group-addon"><i class="fa fa-usd"></i></span>
+                        <input type="text" id="txt_saldo_remesa" class="form-control" disabled>
+                    </div>
+                </div>
+              </div>
+            </div>
         </form>
       </div>
     </div><!-- /.modal-content -->
@@ -97,10 +121,11 @@ $(window).load(function() {
     "order":[[4,"asc"]],
     "columnDefs":[
         {"targets":[0,1],"visible":false,"searchable":false},
-        {"targets":2, "width":"30%"},
-        {"targets":3, "width":"25%"},
-        {"targets":4, "width":"30%"},
-        {"targets":5 ,"width": "15%",  "defaultContent": "<center><button type='button' name=\"edit_remesa\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button name=\"eliminar_remesa\" type='button' class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash bigger-120\"></i></button></center>" },
+        {"targets":2, "width":"22.5%"},
+        {"targets":3, "width":"22.5%"},
+        {"targets":4, "width":"22.5%"},
+        {"targets":5, "width":"22.5%"},
+        {"targets":6 ,"width": "10%",  "defaultContent": "<center><button type='button' name=\"edit_remesa\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button name=\"eliminar_remesa\" type='button' class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash bigger-120\"></i></button></center>" },
     ],
     "language": {
         "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -118,6 +143,7 @@ $(window).load(function() {
   $("#btn_cancelar_remesa").on('click',function(){
     $("#dt_remesas").DataTable().ajax.reload();
     $('#txt_numero_remesa').val("");
+    $('#txt_banco').val("");
     $('#txt_monto').val("");
     $('#txt_fecha_remesa').val("");
     $("#btn_guardar_cambios_remesa").hide();
@@ -135,7 +161,7 @@ $(window).load(function() {
           url: "{%url 'guardar_remesa'%}",
           type: "POST",
           processData: false,
-          data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&numero_remesa="+$('#txt_numero_remesa').val()+"&fecha="+$('#txt_fecha_remesa').val()+"&monto="+$('#txt_monto').val()+"&evento="+evento_seleccionado,
+          data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&numero_remesa="+$('#txt_numero_remesa').val()+"&fecha="+$('#txt_fecha_remesa').val()+"&monto="+$('#txt_monto').val()+"&banco="+$('#txt_banco').val()+"&evento="+evento_seleccionado,
           success: function(json){
                       $("#errores_remesa").html('');
                       create_alert(json['mensaje'],"EXITO","errores_remesa",true,5000);
@@ -143,6 +169,7 @@ $(window).load(function() {
                       $('#txt_fecha_remesa').val("");
                       $('#txt_monto').val("");
                       $('#txt_numero_remesa').val("");
+                      $('#txt_saldo_remesa').val(json['saldo']);
                     },
           error:function(json){
               create_alert("<li><b>Datos incorrectos: </b>Monto o fecha no válidos</li>","ERROR","errores_remesa",false,0);
@@ -161,6 +188,7 @@ $(window).load(function() {
     $('#txt_numero_remesa').val(data[0][2]);
     $('#txt_monto').val(data[0][3]);
     $('#txt_fecha_remesa').val(data[0][4]);
+    $('#txt_banco').val(data[0][5]);
     $("#btn_cancelar_remesa").show();
     data = $('#dt_eventos').DataTable().rows('.selected').data();
     if(data[0][5] == usuario_log || tipo_usuario == "R"){
@@ -175,15 +203,17 @@ $(window).load(function() {
           url: "{%url 'guardar_cambios_remesa'%}",
           type: "POST",
           processData: false,
-          data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&numero_remesa="+$('#txt_numero_remesa').val()+"&fecha="+$('#txt_fecha_remesa').val()+"&monto="+$('#txt_monto').val()+"&remesa="+remesa_seleccionada+"&evento="+evento_seleccionado,
+          data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&numero_remesa="+$('#txt_numero_remesa').val()+"&fecha="+$('#txt_fecha_remesa').val()+"&monto="+$('#txt_monto').val()+"&remesa="+remesa_seleccionada+"&banco="+$('#txt_banco').val()+"&evento="+evento_seleccionado,
           success: function(json){
                       $("#errores_remesa").html('');
                       create_alert(json['mensaje'],"EXITO","errores_remesa",true,5000);
                       remesa_seleccionada=-1;
                       $("#dt_remesas").DataTable().ajax.reload();
                       $('#txt_fecha_remesa').val("");
+                      $('#txt_saldo_remesa').val(json['saldo']);
                       $('#txt_monto').val("");
                       $('#txt_numero_remesa').val("");
+                      $('#txt_banco').val("");
                       $("#btn_cancelar_remesa").hide();
                       $("#btn_guardar_cambios_remesa").hide();
                       var data = $('#dt_eventos').DataTable().rows('.selected').data();
@@ -218,6 +248,7 @@ $(window).load(function() {
                       create_alert("<li>Remesa eliminado con éxito </li>","EXITO","errores_remesa",true,5000);
                       $("#dt_remesas").DataTable().ajax.reload();
                       $("#btn_cancelar_remesa").click();
+                      $('#txt_saldo_remesa').val(json['saldo']);
               }
           });
         }else{
@@ -228,7 +259,6 @@ $(window).load(function() {
       create_alert("<li>No posee permisos para eliminar esta remesa</li>","ERROR","errores_remesa",false,0);
     }
   });
-
-
 });
+
 </script>

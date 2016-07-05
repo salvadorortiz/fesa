@@ -377,10 +377,11 @@ def dt_reservas(request):
 						,ca.cancha_id
 						,co.nombre
 						,ca.nombre
-						,rc.fecha::text AS fecha
+						,to_char(rc.fecha,'dd-mm-yyyy'::text) AS fecha
 						,rc.hora_inicio::text AS inicio
 						,rc.hora_fin::text AS fin
 						,'$'::text || rc.precio_sugerido::text AS precio_sugerido
+						,'$'::text || rc.precio_acordado::text AS precio_acordado
 					FROM
 						modulo_1_reserva r
 						JOIN modulo_1_reservacancha rc ON rc.reserva_id = r.reserva_id
@@ -418,7 +419,7 @@ def GuardarReserva(request):
 	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
 	ReservaCancha(cancha_id=request.POST['cancha'],reserva_id=request.POST['evento'],usuario=usuario[0],fecha=request.POST['fecha'],
 				hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],notas=request.POST['notas'],
-				precio_sugerido=request.POST['precio_sugerido']).save()
+				precio_sugerido=request.POST['precio_sugerido'],precio_acordado=request.POST['precio_acordado']).save()
 	mensaje = "<li>Reserva ingresada con éxito</li>"
 	return HttpResponse(json.dumps({'error':False,'mensaje':mensaje}), content_type='application/json')
 
@@ -432,6 +433,7 @@ def InformacionReserva(request):
 			'inicio':reserva.hora_inicio.strftime("%H:%M"),#str(reserva.hora_inicio),
 			'fin':reserva.hora_fin.strftime("%H:%M"),#str(reserva.hora_fin),
 			'precio_sugerido':str(reserva.precio_sugerido),
+			'precio_acordado':str(reserva.precio_acordado),
 			'notas':reserva.notas,
 			}
 
@@ -463,12 +465,14 @@ def GuardarCambiosReserva(request):
 	reservas = 	ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],hora_inicio__gte=request.POST['inicio'],
 		hora_inicio__lt=request.POST['fin']) | ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],
 		hora_fin__gt=request.POST['inicio'],hora_fin__lte=request.POST['fin'])
+	reservas = reservas.exclude(reserva_cancha_id=request.POST['reserva'])
 	mensaje = ""
 	tab = "&nbsp;"*5	
 	if len(reservas) > 0:
 		for reserva in reservas:
+			mensaje += "<li><b>ID:</b> "+str(reserva.reserva_cancha_id)+"</li>"
 			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
-			mensaje += "<b>Igresado por:</b> "+reserva.usuario.nombre+"<br>"
+			mensaje += "<b>Ingresado por:</b> "+reserva.usuario.nombre+"<br>"
 			mensaje += "<b>Conflicto con la reserva:</b><br>"
 			mensaje += tab+"<b>Complejo:</b> "+reserva.cancha.complejo.nombre+"<br>"
 			mensaje += tab+"<b>Cancha:</b> "+reserva.cancha.nombre+"<br>"
@@ -478,7 +482,7 @@ def GuardarCambiosReserva(request):
 
 	ReservaCancha.objects.filter(reserva_cancha_id=request.POST['reserva']).update(cancha_id=request.POST['cancha'],
 				fecha=request.POST['fecha'],hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],
-				notas=request.POST['notas'],precio_sugerido=request.POST['precio_sugerido'])
+				notas=request.POST['notas'],precio_sugerido=request.POST['precio_sugerido'],precio_acordado=request.POST['precio_acordado'])
 	mensaje = "<li>Reserva actualizada con éxito</li>"
 	return HttpResponse(json.dumps({'error':False,'mensaje':mensaje}), content_type='application/json')
 
@@ -489,6 +493,7 @@ def dt_remesas(request):
 						,rem.numero_remesa
 						,rem.monto::text
 						,rem.fecha::text
+						,rem.banco
 					FROM
 						modulo_1_remesaxreserva rem
 						JOIN modulo_1_reserva res ON res.reserva_id = rem.reserva_id
@@ -502,21 +507,21 @@ def dt_remesas(request):
 def GuardarRemesa(request):
 	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
 	RemesaXReserva(numero_remesa=request.POST['numero_remesa'],monto=request.POST['monto'],fecha=request.POST['fecha'],
-					reserva_id=request.POST['evento'],usuario=usuario[0]).save()
-	CalcularSaldo(request.POST['evento'])
-	return HttpResponse(json.dumps({'mensaje':'<li>Remesa ingresada con éxito</li>'}), content_type='application/json')
+					reserva_id=request.POST['evento'],usuario=usuario[0],banco=request.POST['banco']).save()
+	saldo = CalcularSaldo(request.POST['evento'])
+	return HttpResponse(json.dumps({'mensaje':'<li>Remesa ingresada con éxito</li>','saldo':str(saldo)}), content_type='application/json')
 
 def GuardarCambiosRemesa(request):
 	RemesaXReserva.objects.filter(remesa_reserva_id=request.POST['remesa']).update(numero_remesa=request.POST['numero_remesa'],
-									monto=request.POST['monto'],fecha=request.POST['fecha'])
-	CalcularSaldo(request.POST['evento'])
+									monto=request.POST['monto'],fecha=request.POST['fecha'],banco=request.POST['banco'])
+	saldo = CalcularSaldo(request.POST['evento'])
 	mensaje = "<li>Remesa actualizada con éxito</li>"
-	return HttpResponse(json.dumps({'mensaje':mensaje}), content_type='application/json')
+	return HttpResponse(json.dumps({'mensaje':mensaje,'saldo':str(saldo)}), content_type='application/json')
 
 def EliminarRemesa(request):
 	RemesaXReserva.objects.filter(remesa_reserva_id=request.POST['remesa']).delete()
-	CalcularSaldo(request.POST['evento'])
-	return HttpResponse(json.dumps({}), content_type='application/json')
+	saldo = CalcularSaldo(request.POST['evento'])
+	return HttpResponse(json.dumps({'saldo':str(saldo)}), content_type='application/json')
 
 def CalcularSaldo(reserva):
 	total_remesa = 0.0
@@ -525,3 +530,26 @@ def CalcularSaldo(reserva):
 		total_remesa = decimal.Decimal(total_remesa) + decimal.Decimal(remesa.monto)
 	precio = Reserva.objects.get(reserva_id=reserva).precio
 	Reserva.objects.filter(reserva_id=reserva).update(saldo = (decimal.Decimal(precio) - decimal.Decimal(total_remesa)))
+	return (decimal.Decimal(precio) - decimal.Decimal(total_remesa))
+
+def CalcularPrecioEvento(request):
+	total = 0.0
+	reservas = ReservaCancha.objects.filter(reserva_id=request.POST['evento'])
+	for reserva in reservas:
+		total = decimal.Decimal(total) + decimal.Decimal(reserva.precio_acordado)
+	Reserva.objects.filter(reserva_id=request.POST['evento']).update(precio=total)
+	CalcularSaldo(request.POST['evento'])
+	Reserva.objects.get(reserva_id=request.POST['evento']).saldo
+	return HttpResponse(json.dumps({'precio':str(total),'saldo':str(Reserva.objects.get(reserva_id=request.POST['evento']).saldo)}), content_type='application/json')
+
+def EliminarEvento(request):
+	Reserva.objects.filter(reserva_id=request.POST['evento']).delete()
+	return HttpResponse(json.dumps({}), content_type='application/json')
+
+def EliminarReserva(request):
+	ReservaCancha.objects.filter(reserva_cancha_id=request.POST['reserva']).delete()
+	return HttpResponse(json.dumps({}), content_type='application/json')
+
+def DataSaldoEvento(request):
+	
+	return HttpResponse(json.dumps({'saldo':str(Reserva.objects.get(reserva_id=request.POST['evento']).saldo)}), content_type='application/json')

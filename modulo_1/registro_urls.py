@@ -73,4 +73,8 @@ urlpatterns = [
     url(r'^guardar_cambios_remesa/', 'modulo_1.views.GuardarCambiosRemesa',name='guardar_cambios_remesa'),
     url(r'^eliminar_remesa/', 'modulo_1.views.EliminarRemesa',name='eliminar_remesa'),
     url(r'^guardar_password/', 'modulo_1.views.GuardarPassword',name='guardar_password'),
+    url(r'^calcular_precio_evento/', 'modulo_1.views.CalcularPrecioEvento',name='calcular_precio_evento'),
+    url(r'^eliminar_evento/', 'modulo_1.views.EliminarEvento',name='eliminar_evento'),
+    url(r'^eliminar_reserva/', 'modulo_1.views.EliminarReserva',name='eliminar_reserva'),
+    url(r'^data_saldo_evento/', 'modulo_1.views.DataSaldoEvento',name='data_saldo_evento'),
     ]
