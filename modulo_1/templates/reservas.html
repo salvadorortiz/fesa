@@ -151,7 +151,7 @@
                             <th>Fecha</th>
                             <th>Inicio</th>
                             <th>Fin</th>
-                            <th>Precio sugerido</th>
+                            <th>Precio autorizado</th>
                             <th>Acciones</th>
                         </thead>
                         <tbody>
@@ -176,7 +176,7 @@
                             <div class="col-sm-1">
                                 <b>Complejo</b>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <select id="cmb_complejo" class="form-control" onchange="calcular_precio()">
                                     <option value="-1">Seleccione el complejo</option>
                                     {% for complejo in data %}
@@ -184,14 +184,23 @@
                                     {%endfor%}
                                 </select>
                             </div>
-                            <div class="col-sm-2"></div>
+                            <div class="col-sm-1"></div>
                             <div class="col-sm-1">
                                 <strong>Cancha</strong>
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-3">
                                 <select id="cmb_cancha" class="form-control" onchange="calcular_precio()">
                                     <option value="-1">Seleccione la cancha</option>
                                 </select>
+                            </div>
+                            <div class="col-sm-1">
+                                <b>Precio autorizado</b>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon"><i class="fa fa-usd"></i></span>
+                                    <input type="text" id="txt_precio_sugerido" class="form-control" disabled>
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-12">
@@ -214,13 +223,14 @@
                             <div class="col-sm-2">
                                 <input type="text" id="txt_hora_fin" class="time end ui-timepicker-input form-control" placeholder="HH:MM" onchange="calcular_precio()">
                             </div>
+                            
                             <div class="col-sm-1">
-                                <b>Precio sugerido</b>
+                                <b>Precio acordado</b>
                             </div>
                             <div class="col-sm-2">
                                 <div class="form-group input-group">
                                     <span class="input-group-addon"><i class="fa fa-usd"></i></span>
-                                    <input type="text" id="txt_precio_sugerido" class="form-control" disabled>
+                                    <input type="text" id="txt_precio_acordado" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -608,6 +618,7 @@
                             $('#txt_hora_fin').val("");
                             $('#txt_notas_reserva').val("");
                             $('#txt_precio_sugerido').val("");
+                            $('#txt_precio_acordado').val("");
                         }
                     },
                     error:function(json){
@@ -694,6 +705,7 @@
             $('#txt_hora_inicio').val("");
             $('#txt_hora_fin').val("");
             $('#txt_precio_sugerido').val("");
+            $('#txt_precio_acordado').val("");
             $('#txt_notas_reserva').val("");
             $("#btn_guardar_cambios_reserva").hide();
             $("#btn_cancelar_reserva").hide();
@@ -738,6 +750,7 @@
                 data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val(),
                 success: function(json){
                     $('#txt_precio_sugerido').val(json['precio_sugerido']);
+                    $('#txt_precio_acordado').val(json['precio_sugerido']);
                 },
                 error:function(json){
                     create_alert("<li><b>Datos incorrectos: </b>Fecha u horas no válidas</li>","ERROR","div_errores_reservas",false,0);

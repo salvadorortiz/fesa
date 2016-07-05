@@ -106,7 +106,7 @@ function validarCombo(combo){
     		var icono='check';
     		break;
     	case "ERROR":
-    		var msj_aux= '<b>Atención.</b> <small style="color: black">Se han encontado los siguientes inconvenientes:</small>';
+    		var msj_aux= '<b>Atención.</b> <small style="color: black">Se han encontrado los siguientes inconvenientes:</small>';
     		var tipo= 'danger';
     		var icono='exclamation';
     		break;
