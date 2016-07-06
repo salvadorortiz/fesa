@@ -30,6 +30,7 @@
                             <th>Telefono</th>
                             <th>Correo</th>
                             <th>Usuario</th>
+                            <th>Fecha</th>
                             <th>Acciones</th>
                         </thead>
                         <tbody>
@@ -364,15 +365,15 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[1,"asc"],[2,"asc"]],
+            "order":[[6,"desc"],[1,"asc"]],
             "columnDefs":[
-                {"targets":[0],"visible":false,"searchable":false},
+                {"targets":[0,6],"visible":false,"searchable":false},
                 {"targets":1, "width":"20%"},
                 {"targets":2, "width":"20%"},
                 {"targets":3, "width":"12.5%"},
                 {"targets":4, "width":"15%"},
                 {"targets":5, "width":"10%"},
-                {"targets":6 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"registro_remesa\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-credit-card bigger-120\"></i></button> <button type='button' name=\"delete_evento\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button></center>" },
+                {"targets":7 ,"width": "7.5%",  "defaultContent": "<center><button name=\"edit_evento\" class=\"btn btn-xs btn-info\"><i class=\"fa fa-pencil bigger-120\"></i></button> <button type='button' name=\"registro_remesa\" class=\"btn btn-xs btn-success\"><i class=\"fa fa-credit-card bigger-120\"></i></button> <button type='button' name=\"delete_evento\" class=\"btn btn-xs btn-danger\"><i class=\"fa fa-trash-o bigger-120\"></i></button></center>" },
             ],
             "language": {
                 "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -451,6 +452,14 @@
                 processData: false,
                 data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_evento="+data[0][0],
                 success: function(json){
+                    //ACTIVACION Y DESACTIVACION PARA MODIFICAR SOLO ESTADO DE EVENTO
+                    $(document).find("[id^='txt_']").prop('disabled', false);
+                    $(document).find("[id^='cmb_']").prop('disabled', false);
+                    $('#txt_precio_evento').prop('disabled',true);
+                    $('#txt_saldo_evento').prop('disabled',true);
+                    $('#txt_precio_sugerido').prop('disabled',true);
+                    $('#txt_saldo_remesa').prop('disabled',true);
+
                     $('#txt_nombre_evento').val(json['nombre']);
                     $('#txt_cliente').val(json['cliente']);
                     $('#id_cliente').val( json['cliente_id']);
@@ -477,8 +486,6 @@
                     $("#dt_reservas").DataTable().ajax.reload();
 
                     if(data[0][5] != usuario_log && tipo_usuario != "R"){ //SOLO PUEDE VISUALIZAR MÁS NO MODIFICAR
-                        //$(document).find("[id^='txt_']").prop('disabled', true);
-                        //$(document).find("[id^='cmb_']").prop('disabled', true);
                         $("#btn_cancelar").show();
                         $("#btn_cancelar_reserva").show();
                         $("#btn_guardar").hide();
@@ -496,6 +503,15 @@
                             $("#btn_guardar_reserva").hide();
                             $('#txt_precio_evento').prop('disabled',true);
                             desactivar = json['desactivar'];
+                            if(tipo_usuario == "R"){
+                                $('#txt_nombre_evento').prop('disabled',true);
+                                $('#txt_cliente').prop('disabled',true);
+                                $('#cmb_reserva').prop('disabled',true);
+                                $('#cmb_pago').prop('disabled',true);
+                                $('#cmb_facturacion').prop('disabled',true);
+                                $('#txt_notas').prop('disabled',true);
+                                $("#btn_guardar_cambios").show();
+                            }
                         }
                         $("#btn_guardar").hide();
                         $("#btn_guardar_precio").show();
@@ -508,8 +524,6 @@
             $('#dt_eventos').DataTable().$('tr.selected').removeClass('selected');
             $(document).find("[id^='txt_']").val('');
             $(document).find("[id^='cmb_']").val('-1');
-            /*$(document).find("[id^='txt_']").prop('disabled', false);
-            $(document).find("[id^='cmb_']").prop('disabled', false);*/
             $('#id_cliente').val('-1');
             $("#btn_guardar_cambios").hide();
             $("#btn_cancelar").hide();
@@ -520,9 +534,17 @@
             $("#btn_guardar_precio").show();
             evento_seleccionado = -1;
             reserva_seleccionada = -1;
-            /*$("#txt_precio_sugerido").prop('disabled', true);
+            /*$(document).find("[id^='txt_']").prop('disabled', false);
+            $(document).find("[id^='cmb_']").prop('disabled', false);
+            $("#txt_precio_sugerido").prop('disabled', true);
             $('#txt_precio_evento').prop('disabled',false);
             $("#txt_saldo_evento").prop('disabled', true);*/
+            $(document).find("[id^='txt_']").prop('disabled', false);
+            $(document).find("[id^='cmb_']").prop('disabled', false);
+            $('#txt_precio_evento').prop('disabled',true);
+            $('#txt_saldo_evento').prop('disabled',true);
+            $('#txt_precio_sugerido').prop('disabled',true);
+            $('#txt_saldo_remesa').prop('disabled',true);
             dt_reservas.ajax.reload();
         });
 
@@ -565,6 +587,12 @@
                             $("#btn_cancelar").show();
                             $("#btn_guardar").hide();
                             evento_seleccionado = json['id_evento'];
+                            $(document).find("[id^='txt_']").prop('disabled', false);
+                            $(document).find("[id^='cmb_']").prop('disabled', false);
+                            $('#txt_precio_evento').prop('disabled',true);
+                            $('#txt_saldo_evento').prop('disabled',true);
+                            $('#txt_precio_sugerido').prop('disabled',true);
+                            $('#txt_saldo_remesa').prop('disabled',true);
                         }
                     }
                 });
@@ -579,7 +607,7 @@
                     url: "{%url 'guardar_cambios_evento'%}",
                     type: "POST",
                     processData: false,
-                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&nombre="+$('#txt_nombre_evento').val()+"&cliente_id="+$('#id_cliente').val()+"&nombre_cliente="+$('#txt_cliente').val()+"&reserva="+$('#cmb_reserva').val()+"&pago="+$('#cmb_pago').val()+"&facturacion="+$('#cmb_facturacion').val()+"&estado="+$('#cmb_estado').val()+"&notas="+$('#txt_notas').val()+"&id_evento="+evento_seleccionado,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&nombre="+$('#txt_nombre_evento').val()+"&cliente_id="+$('#id_cliente').val()+"&nombre_cliente="+$('#txt_cliente').val()+"&reserva="+$('#cmb_reserva').val()+"&pago="+$('#cmb_pago').val()+"&facturacion="+$('#cmb_facturacion').val()+"&estado="+$('#cmb_estado').val()+"&notas="+$('#txt_notas').val()+"&id_evento="+evento_seleccionado+"&desactivar="+desactivar,
                     success: function(json){
                         if(json['error']==true){
                             create_alert(json['mensaje'],"ERROR","div_errores",false,0);
@@ -591,6 +619,12 @@
                             /*$("#btn_guardar_cambios").show();
                             $("#btn_cancelar").show();
                             $("#btn_guardar").hide();*/
+                            $(document).find("[id^='txt_']").prop('disabled', false);
+                            $(document).find("[id^='cmb_']").prop('disabled', false);
+                            $('#txt_precio_evento').prop('disabled',true);
+                            $('#txt_saldo_evento').prop('disabled',true);
+                            $('#txt_precio_sugerido').prop('disabled',true);
+                            $('#txt_saldo_remesa').prop('disabled',true);
                         }
                     }
                 });

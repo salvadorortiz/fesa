@@ -139,6 +139,7 @@ class Reserva(models.Model):
 	saldo = models.DecimalField('Saldo',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	fecha_ingreso = models.DateField('Fecha de ingreso',auto_now_add=True)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
+	bandera = models.BooleanField('Bandera', default=False)
 
 	def __unicode__(self):
 		return self.nombre_evento
