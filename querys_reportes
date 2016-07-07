@@ -1,4 +1,4 @@
---DROP VIEW dt_repo_reserva;
+-- DROP VIEW dt_repo_reserva;
 
 CREATE OR REPLACE VIEW dt_repo_reserva AS 
  SELECT com.complejo_id,
@@ -6,14 +6,15 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
     recan.reserva_cancha_id,
     res.reserva_id,
     fpag.forma_pago_id,
-    to_char(recan.fecha::timestamp with time zone, 'DD-MM-YYYY'::text) AS fecha_reserva,
-    u.usuario,
         CASE
-            WHEN c.cliente_id IS NOT NULL THEN COALESCE('<span class="fa fa-user"></span>&nbsp;'||c.nombre, ''::character varying)
-            ELSE COALESCE('<span class="fa fa-building"></span>&nbsp;'|| e.nombre || COALESCE(' <br><span class="fa fa-user"></span>&nbsp;<strong>'|| e.contacto ||' </strong><br><span class="fa fa-phone"></span>&nbsp;'|| e.telefono_contacto ||'',''), ''::character varying)
+            WHEN c.cliente_id IS NOT NULL THEN COALESCE('<span class="fa fa-user"></span>&nbsp;'::text || c.nombre::text, ''::character varying::text)
+            ELSE COALESCE(('<span class="fa fa-building"></span>&nbsp;'::text || e.nombre::text) || COALESCE((((' <br><span class="fa fa-user"></span>&nbsp;<strong>'::text || e.contacto::text) || ' </strong><br><span class="fa fa-phone"></span>&nbsp;'::text) || e.telefono_contacto::text) || ''::text, ''::text), ''::character varying::text)
         END AS info_cliente,
     res.nombre_evento,
     can.nombre,
+    to_char(recan.fecha::timestamp with time zone, 'DD-MM-YYYY'::text) AS fecha_reserva_2,
+    u.usuario,
+    com.nombre AS nombre_compeljo,
     (to_char(recan.hora_inicio::interval, 'HH24:MM'::text) || ' - '::text) || to_char(recan.hora_fin::interval, 'HH24:MM'::text),
         CASE
             WHEN res.estado::text = 'C'::text THEN '<span class="label label-primary">Confirmado</span>'::text
@@ -26,7 +27,8 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
         CASE
             WHEN res.forma_pago_id = 1 THEN '$'::text || to_char(res.precio, '9G999.99'::text)
             ELSE ''::text
-        END AS precio_reserva
+        END AS precio_reserva,
+    to_char(recan.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva
    FROM modulo_1_complejo com
      JOIN modulo_1_cancha can ON can.complejo_id = com.complejo_id
      JOIN modulo_1_reservacancha recan ON recan.cancha_id = can.cancha_id
@@ -39,48 +41,45 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
      LEFT JOIN modulo_1_empresa e ON e.empresa_id = res.empresa_id
   ORDER BY recan.fecha DESC;
 
-ALTER TABLE dt_repo_reserva
-  OWNER TO postgres;
 
-
+-- DROP VIEW dt_repo_clientes;
 
 CREATE OR REPLACE VIEW dt_repo_clientes AS 
  SELECT '<i class="fa fa-child"></i>'::text AS tipo,
     c.nombre AS nombre_cliente,
     c.ingresado_por,
-    ( SELECT modulo_1_reserva.nombre_evento || ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
            FROM modulo_1_reserva
           WHERE modulo_1_reserva.cliente_id = c.cliente_id
           ORDER BY modulo_1_reserva.fecha_ingreso
          LIMIT 1) AS primer_evento,
-    ( SELECT modulo_1_reserva.nombre_evento|| ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
            FROM modulo_1_reserva
           WHERE modulo_1_reserva.cliente_id = c.cliente_id
           ORDER BY modulo_1_reserva.fecha_ingreso DESC
          LIMIT 1) AS ultimo_evento,
-    1 as tipo_tabla,
-    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>' as boton,
-    cliente_id as id
+    1 AS tipo_tabla,
+    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>'::text AS boton,
+    c.cliente_id AS id
    FROM modulo_1_cliente c
 UNION
  SELECT '<i class="fa fa-building"></i>'::text AS tipo,
     c.nombre AS nombre_cliente,
     c.ingresado_por,
-    ( SELECT modulo_1_reserva.nombre_evento || ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
            FROM modulo_1_reserva
           WHERE modulo_1_reserva.empresa_id = c.empresa_id
           ORDER BY modulo_1_reserva.fecha_ingreso
          LIMIT 1) AS primer_evento,
-    ( SELECT modulo_1_reserva.nombre_evento || ' ('|| modulo_1_reserva.fecha_ingreso|| ')'
+    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
            FROM modulo_1_reserva
           WHERE modulo_1_reserva.empresa_id = c.empresa_id
           ORDER BY modulo_1_reserva.fecha_ingreso DESC
          LIMIT 1) AS ultimo_evento,
-    2 as tipo_tabla,
-    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>' as boton,
-    empresa_id as id
+    2 AS tipo_tabla,
+    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>'::text AS boton,
+    c.empresa_id AS id
    FROM modulo_1_empresa c;
-
 
 
 
@@ -105,21 +104,20 @@ CREATE OR REPLACE VIEW dt_repo_remesa AS
            FROM modulo_1_remesaxreserva
           WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente_2,
     res.usuario_id AS usuario,
-    CAST(floor( COALESCE(res.precio - COALESCE(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+    floor(COALESCE(res.precio - COALESCE(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
            FROM modulo_1_remesaxreserva
-          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), 0)) AS INTEGER) AS remanente
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), 0::numeric))::integer AS remanente
    FROM modulo_1_remesaxreserva rr
      RIGHT JOIN modulo_1_reserva res ON rr.reserva_id = res.reserva_id
      JOIN modulo_1_usuario u ON res.usuario_id = u.usuario_id
      LEFT JOIN modulo_1_cliente c ON res.cliente_id = c.cliente_id
      LEFT JOIN modulo_1_empresa e ON res.empresa_id = e.empresa_id
   GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.nombre;
-  
-  
+
+ 
 -- DROP VIEW dt_repo_cliente_eventos;
 
 CREATE OR REPLACE VIEW dt_repo_cliente_eventos AS 
-
  SELECT
         CASE
             WHEN res.cliente_id IS NULL THEN 2
@@ -130,23 +128,23 @@ CREATE OR REPLACE VIEW dt_repo_cliente_eventos AS
             ELSE res.cliente_id
         END AS id_registro,
     res.nombre_evento,
-    can.nombre as nombre_cancha,
+    can.nombre AS nombre_cancha,
     '$'::text || COALESCE(to_char(recan.precio_acordado, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS precio,
     to_char(recan.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva
---SELECT *
-FROM modulo_1_reserva res
-INNER JOIN modulo_1_reservacancha recan ON recan.reserva_id=res.reserva_id
-INNER JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id
-ORDER BY res.fecha_ingreso DESC;
+   FROM modulo_1_reserva res
+     JOIN modulo_1_reservacancha recan ON recan.reserva_id = res.reserva_id
+     JOIN modulo_1_cancha can ON can.cancha_id = recan.cancha_id
+  ORDER BY res.fecha_ingreso DESC;
 
 
+-- DROP VIEW dt_repo_horas;
 
 CREATE OR REPLACE VIEW dt_repo_horas AS 
  SELECT c.cancha_id,
     c.complejo_id,
     res.tipo_alquiler_id,
     to_char(rxc.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
-    ((('<div class="row"><div class="col-sm-12"><div class="col-sm-4"></div><div class="col-sm-4 text-capitalize text-center"><h4 style="color:#074515">'::text || c.nombre::text) || '</h4></div><div class="col-sm-4 text-right"><h6><span class="label label-default">'::text) || com.nombre::text) || '</span></h6></div></div></div>'::text AS nombre_cancha,
+    ''::text || c.nombre::text AS nombre_cancha,
     COALESCE(to_char(( SELECT sum(rxcan.hora_fin - rxcan.hora_inicio) AS sum
            FROM modulo_1_cancha can
              JOIN modulo_1_reservacancha rxcan ON can.cancha_id = rxcan.cancha_id
@@ -169,8 +167,6 @@ CREATE OR REPLACE VIEW dt_repo_horas AS
      LEFT JOIN modulo_1_tipoalquiler ta ON res.tipo_alquiler_id = ta.tipo_alquiler_id
   GROUP BY c.cancha_id, c.complejo_id, res.tipo_alquiler_id, res.reserva_id, rxc.fecha, ta.nombre, com.nombre
   ORDER BY c.cancha_id;
-
-
 
 
 CREATE OR REPLACE VIEW dt_repo_horasposibles AS
