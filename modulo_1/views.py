@@ -373,7 +373,7 @@ def GuardarCambiosEvento(request):
 	return HttpResponse(json.dumps(respuesta), content_type='application/json')
 
 def CargarCanchas(request):
-	str_cancha="<option value=\"-1\">Seleccione la cancha</option>"
+	str_cancha="<option value=\"\">Seleccione una cancha</option>"
 	for cancha in Cancha.objects.filter(complejo_id=request.POST['id']):
 		str_cancha += "<option value=\""+str(cancha.cancha_id)+"\">"+cancha.nombre+"</option>"
 	return HttpResponse(json.dumps({'str_cancha':str_cancha}), content_type='application/json')

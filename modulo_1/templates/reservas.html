@@ -180,7 +180,7 @@
                             </div>
                             <div class="col-sm-3">
                                 <select id="cmb_complejo" class="form-control" onchange="calcular_precio_reserva()">
-                                    <option value="-1">Seleccione el complejo</option>
+                                    <option value="-1">Seleccione un complejo</option>
                                     {% for complejo in data %}
                                     <option value="{{complejo.id}}">{{complejo.nombre}}</option>
                                     {%endfor%}
@@ -192,7 +192,7 @@
                             </div>
                             <div class="col-sm-3">
                                 <select id="cmb_cancha" class="form-control" onchange="calcular_precio_reserva()">
-                                    <option value="-1">Seleccione la cancha</option>
+                                    <option value="-1">Seleccione una cancha</option>
                                 </select>
                             </div>
                             <div class="col-sm-1">
