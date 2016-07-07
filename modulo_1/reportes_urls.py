@@ -14,5 +14,6 @@ urlpatterns = [
 	url(r'^calcular_horas_posibles/', 'modulo_1.reportes_views.calcular_horas_posibles',name='calcular_horas_posibles'),
 	url(r'^top_clientes/', 'modulo_1.reportes_views.TopClientesData',name='top_clientes'),
 	url(r'^top_empresa/', 'modulo_1.reportes_views.TopEmpresaData',name='top_empresa'),
+	url(r'^obtener_div_horas/', 'modulo_1.reportes_views.obtener_div_horas',name='obtener_div_horas'),
 	
 ]

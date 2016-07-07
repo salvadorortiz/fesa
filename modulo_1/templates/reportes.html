@@ -97,20 +97,22 @@
                     </div>
                     <hr>
                      <div id="reserv_toggle" class="collapse in col-sm-12">
-                            <table id="dt_repo_reserva" class="stripe">
+                            <table style="width: 100%" id="dt_repo_reserva" class="table table-bordered table-hover table-striped">
+
                                 <thead>
                                     <th>Id complejo</th>
                                     <th>Id cancha</th>
                                     <th>Id reserva de cancha </th>
                                     <th>Id reserva</th>
                                     <th>Id de forma de pago</th>
-                                    <th>Fecha de reserva</th>
-                                    <th>Usuario</th>
                                     <th>Cliente</th>
-                                    <th>Nombre del evento</th>
-                                    <th>Nombre de cancha </th>
+                                    <th>Evento</th>
+                                    <th>cancha</th>
+                                    <th>Fecha reserva</th>
+                                    <th>Responsable</th>
+                                    <th>Complejo</th>
                                     <th>Horario</th>
-                                    <th>Estado de la reserva</th>
+                                    <th>Estado</th>
                                     <th>Forma de pago</th>
                                     <th>Precio</th>
                                 </thead>
@@ -159,7 +161,23 @@
                                                     {{cmb_usuario|safe}}
                                                 </select>
                                             </div>
+                                            <div class="col-sm-1">
+                                            Deudores:
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <input type="checkbox" name="deudores">
+                                            </div>
                                         </div>
+                                    <div class="row">
+                                         <div class="col-sm-2">
+                                            <strong>Seleccione un complejo</strong>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" id="rem_cmb_complejo">
+                                                {{cmb_complejo|safe}}
+                                            </select>
+                                        </div>
+                                    </div>
                                         <br>
                                         <div class="row">
                                             <div class="col-sm-12">
@@ -193,12 +211,13 @@
                                     <th>Evento</th>
                                     <th>Cliente</th>
                                     <th>Usuario</th>
-                                    <th>Precio</th>
+                                    <th>Ingreso</th>
                                     <th>Costo</th>
                                     <th>Utilidad</th>
                                     <th>Remesado</th>
                                     <th>Remanente</th>
                                     <th>Usuario</th>
+                                    <th>Remanente</th>
                                 </thead>
                                 <tbody>
                                     
@@ -226,10 +245,11 @@
                                     <div class="panel-footer">
                                          <table style="width:100%" id="dt_repo_total" class="stripe">
                                             <thead>
-                                                <th>Precio total</th>
+                                                <th>Ingreso total</th>
                                                 <th>Costo total</th>
                                                 <th>Utilidad total</th>
                                                 <th>Remanente total</th>
+                                                <th>Remesado total</th> <!-- IT-RT -->
                                             </thead>
                                             <tbody>
                                                 
@@ -295,7 +315,8 @@
                                                 <th>Tipo registro</th>
                                                 <th>Id registro</th>
                                                 <th>Nombre del evento</th>
-                                                <th>Precio</th>
+                                                <th>Cancha</th>
+                                                <th>Ingreso</th>
                                                 <th>Fecha de reserva</th>
                                             </thead>
                                             <tbody>
@@ -347,6 +368,14 @@
                                                 {{cmb_complejo|safe}}
                                             </select>
                                         </div>
+                                        <div class="col-sm-2">
+                                            <strong>Seleccione una cancha</strong>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" id="hor_cmb_cancha">
+                                                {{cmb_cancha|safe}}
+                                            </select>
+                                        </div>
                                     </div>
                                     <br>
                                     <div class="row">
@@ -363,7 +392,7 @@
                 </div>
                 <hr>
 
-                  <div class="row">
+                  <!--<div class="row">
                             <div style="clear:both;margin-top:1%;padding: 5px;background-color:#337AB7">
                                 <label data-toggle="collapse" href="#horas_toggle" style="width:94%; color:white;">&nbsp;<i class="fa fa-clock"></i> &nbsp;Ocupación de Canchas</label>
                                 <a href="#" onclick="$('#dt_repo_horas').DataTable().ajax.reload(); refrescar_global();"style="float:right; color:white;">
@@ -390,6 +419,10 @@
                                     </tbody>
                                 </table>
                         </div>
+                    </div>-->
+                    <hr>
+                    <div clas="row" id="horas_canchas_div">
+                        {{html_horas|safe}}
                     </div>
                      <hr>
                      <div class="row">
@@ -415,7 +448,7 @@
                                                 <tbody>
                                                     <tr class="success">
                                                         <td>
-                                                            <strong>Horas Posibles</strong>
+                                                            <strong>Capacidad Instalada</strong>
                                                         </td>
                                                         <td id="total_horas_posibles">
                                                             
@@ -445,7 +478,7 @@
                             </div>
                         <div class="col-sm-4"></div>
                     </div>
-
+                   
 
             </div>
 <!--xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-->          
@@ -496,7 +529,7 @@
                                     <th>Cliente</th>
                                     <th>Teléfono</th>
                                     <th>Correo</th>
-                                    <th>Horas</th>
+                                    <th>Ingreso</th>
                                     <th>Cliente_id</th>
                                 </thead>
                                 <tbody>
@@ -522,7 +555,7 @@
                                     <th>Empresa</th>
                                     <th>Contacto</th>
                                     <th>Teléfono</th>
-                                    <th>Horas</th>
+                                    <th>Ingreso</th>
                                     <th>Empresa_id</th>
                                 </thead>
                                 <tbody>
@@ -545,10 +578,11 @@
 	   //$('#rootwizard').bootstrapWizard({'tabClass': 'nav nav-pills'});
        $( "#fecha_desde" ).datepicker({
            // 'minDate': 0
-          // altFormat: "dd-mm-yyyy"
+           //dateFormat: "dd-mm-yy"
         });
        $( "#fecha_hasta" ).datepicker({
-            //altFormat: "dd-mm-yyyy"
+            //altFormat: "dd-mm-yy"
+            //dateFormat: "dd-mm-yy"
         });
 
         $("#panel_remesa").find( "#rem_fecha_desde" ).datepicker({
@@ -563,7 +597,8 @@
        $( "#hor_fecha_hasta" ).datepicker({
         });
 
-       $("#hor_fecha_desde").datepicker().datepicker("setDate", new Date());
+     // $("#hor_fecha_desde").datepicker().datepicker("setDate", new Date());
+       $("#hor_fecha_desde").datepicker().datepicker("setDate", '2016-06-01');
        $("#hor_fecha_hasta").datepicker().datepicker("setDate", new Date());
        //----Reporte de reserva
            var dt_repo_reserva = $('#dt_repo_reserva').DataTable( {
@@ -583,14 +618,14 @@
                 "searching": true,
                 "paging": true,
                 "columnDefs":[
-                    {"targets":[0,1,2,3,4,11],"visible":false,"searchable":false},
-                    {"targets":5, "width":"10%"},
-                    {"targets":6, "width":"10%"},
-                    {"targets":7, "width":"15%"},
-                    {"targets":8, "width":"20%"},
-                    {"targets":9, "width":"20%"},
-                    {"targets":10, "width":"15%"},
-                    {"targets":[11,12,13], "width":"10%"},
+                    {"targets":[0,1,2,3,4,12],"visible":false,"searchable":false},
+                    {"targets":5, "width":"20%"},
+                    {"targets":6, "width":"15%"},
+                    {"targets":7, "width":"10%"},
+                    {"targets":8, "width":"10%"},
+                    {"targets":9, "width":"10%"},
+                    {"targets":14, "width":"5%"},
+                    {"targets":[11,13,10], "width":"10%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -610,16 +645,17 @@
                                     2<th>Id reserva de cancha </th>
                                     3<th>Id reserva</th>
                                     4<th>Id de forma de pago</th>
-                                    5<th>Fecha de reserva</th>
-                                    6<th>Usuario</th>
-                                    7<th>Cliente</th>
-                                    8<th>Nombre del evento</th> 
-                                    9<th>Nombre de cancha </th>
-                                    10<th>Horario</th>
-                                    11<th>Estado de la reserva</th>
-                                    12<th>Forma de pago</th>
-                                    13<th>Precio</th>
-                                    */
+                                   * 5<th>Cliente</th>
+                                   * 6<th>Evento</th>
+                                   * 7<th>cancha</th>
+                                   * 8<th>Fecha reserva</th>
+                                   * 9<th>Responsable</th>
+                                   * 10<th>Complejo</th>
+                                    11<th>Horario</th>
+                                    12<th>Estado</th>
+                                    13<th>Forma de pago</th>
+                                    14<th>Precio</th>
+             */
            $("#filtrar_repo_reserva").on('click',function(){
                 $("#dt_repo_reserva").DataTable().ajax.reload();
            });
@@ -701,8 +737,9 @@
                 "paging": true,
                 "columnDefs":[
                     {"targets":[0,1],"visible":false,"searchable":false},
-                    {"targets":2, "width":"40%"},
-                    {"targets":[3,4], "width":"30%"},
+                    {"targets":2, "width":"30%"},
+                    {"targets":3, "width":"20%"},
+                    {"targets":[4,5], "width":"25%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -727,7 +764,9 @@
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
                         d.fecha_desde= $("#panel_remesa").find("#rem_fecha_desde").val(),
                         d.fecha_hasta=$("#panel_remesa").find("#rem_fecha_hasta").val(),
-                        d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val()
+                        d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val(),
+                        d.deudores=$("[name=deudores]").is(':checked'),
+                        d.complejo_id=$("#rem_cmb_complejo").val()
                     },
                 },
                 "pageLength": 15,
@@ -736,7 +775,7 @@
                 "searching": true,
                 "paging": true,
                 "columnDefs":[
-                    {"targets":[0,10,4],"visible":false,"searchable":false},
+                    {"targets":[0,10,4,11],"visible":false,"searchable":false},
                     {"targets":1, "width":"10%"},
                     {"targets":[2,3], "width":"20%"},
                     {"targets":[5,6,7,8,9], "width":"10%"},
@@ -767,7 +806,9 @@
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
                         d.fecha_desde= $("#panel_remesa").find("#rem_fecha_desde").val(),
                         d.fecha_hasta=$("#panel_remesa").find("#rem_fecha_hasta").val(),
-                        d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val()
+                        d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val(),
+                        d.deudores=$("[name=deudores]").is(':checked'),
+                        d.complejo_id=$("#rem_cmb_complejo").val()
                     },
                 },
                 "pageLength": 1,
@@ -779,7 +820,7 @@
                    // {"targets":[],"visible":false,"searchable":false},
                    // {"targets":1, "width":"10%"},
                     //{"targets":[2,3], "width":"15%"},
-                    {"targets":[0,1,2,3], "width":"25%"},
+                    {"targets":[0,1,2,3,4], "width":"20%"},
                 ],
                 "language": {
                     "lengthMenu": "Mostrando _MENU_ filas por página",
@@ -795,7 +836,7 @@
             });
 
             //---- Reporte de horas cancha
-            var dt_repo_horas = $('#dt_repo_horas').DataTable( {
+            /*var dt_repo_horas = $('#dt_repo_horas').DataTable( {
                 "ajax": {
                     "url": "{%url 'repo_horas_cancha' %}",
                     "type": "POST",
@@ -889,8 +930,14 @@
             
             $("#dt_repo_horas").on('init.dt',function(){
                 refrescar_global();
-            });
+            });*/
 
+            $("#hor_cmb_complejo").on('change',function(){
+                $("#hor_cmb_cancha").val('');
+            });
+            $("#hor_cmb_cancha").on('change',function(){
+                $("#hor_cmb_complejo").val('');
+            });
             function limpiar_resultados(){
                 $("#total_horas_posibles").html('procesando...');
                 $("#total_horas_usadas").html('procesando...');
@@ -899,21 +946,96 @@
 
             $("#filtrar_repo_hora").on('click',function(){
                 if($("#hor_fecha_hasta").val()!='' && $("#hor_fecha_desde").val()!=''){
-                    console.log("1");
+                    //console.log("1");
                     limpiar_resultados();
-                   $("#dt_repo_horas").DataTable().ajax.reload();
-                    setTimeout(function(){ refrescar_global();  }, 1500);
+                  // $("#dt_repo_horas").DataTable().ajax.reload();
+                    actualizar_div_hora();
+                   // setTimeout(function(){ refrescar_global();  }, 1500);
 
-                }else if($("#hor_fecha_hasta").val()=='' && $("#hor_fecha_desde").val()=='' && $("#hor_cmb_complejo").val()!=''){
-                    console.log("2");
+                }else if($("#hor_fecha_hasta").val()=='' && $("#hor_fecha_desde").val()=='' && ($("#hor_cmb_complejo").val()!='' || $("#hor_cmb_cancha").val()!='' )){
+                    //console.log("2");
                     limpiar_resultados();
-                    $("#dt_repo_horas").DataTable().ajax.reload();
-                     setTimeout(function(){ refrescar_global();  }, 1500);
+                   // $("#dt_repo_horas").DataTable().ajax.reload();
+                    actualizar_div_hora();
+                    // setTimeout(function(){ refrescar_global();  }, 1500);
                 }else{
                     create_alert("<li>Debe ingresar un rango de fechas válido</li>","ERROR","notificaciones",true,5000);
                 }
                 
             });
+
+            function actualizar_div_hora(){
+                //filtrar_repo_hora
+                console.log("actualizar_div_hora");
+                jQuery.ajax({
+                    url: "{%url 'obtener_div_horas'%}",
+                    type: "POST",
+                    processData: false,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&fecha_desde="+$("#hor_fecha_desde").val()+"&fecha_hasta="+$("#hor_fecha_hasta").val()+"&complejo_id="+$("#hor_cmb_complejo").val()+"&cancha_id="+$("#hor_cmb_cancha").val(),
+                    success: function(json){
+                        if(json['html']!=''){
+                            //alert("entro");
+                            $("#horas_canchas_div").html(json['html']);
+                            //console.log('entro');
+                             try {
+                                //console.log($(".capacidad_instalada"));
+                                var total_capacidad_instalada=parseFloat("0");
+                                $(".capacidad_instalada").each(function(){
+                                    total_capacidad_instalada+=parseFloat($(this).html());
+                                });
+
+                                var total_horas_usadas=parseFloat("0");
+                                $(".horas_usadas").each(function(){
+                                    console.log($(this).html());
+                                    total_horas_usadas+=parseFloat($(this).html());
+                                }); 
+
+                                total_capacidad_instalada=total_capacidad_instalada.toFixedDown(3);
+                                total_horas_usadas=total_horas_usadas.toFixedDown(3);
+                                
+                                if(total_capacidad_instalada==-0.001){
+                                    total_capacidad_instalada=0;
+                                }
+                                if(total_horas_usadas==-0.001){
+                                    total_horas_usadas=0;
+                                }
+                                var total_uso= total_horas_usadas/total_capacidad_instalada;
+                                if(total_uso==-0.001){
+                                    //alert("entro 1");
+                                    total_uso=0;
+                                }else if(total_capacidad_instalada==0 && total_horas_usadas==0) {
+                                    //alert("entro 2");
+                                    total_uso=0;
+                                }else if(total_capacidad_instalada==-0.001 || total_capacidad_instalada==0){
+                                   // alert
+                                   //alert("entro 3");
+                                    total_uso=0;
+                                }else{
+                                    total_uso=(total_uso*100).toFixedDown(3);
+                                }
+                                
+                                $("#total_horas_posibles").html(total_capacidad_instalada);
+                                $("#total_horas_usadas").html(total_horas_usadas);
+                                $("#porcentaje_global").html(total_uso.toString()+" %");
+                            }catch(err) {
+                                $("#total_horas_posibles").html('-');
+                                $("#total_horas_usadas").html('-');
+                                $("#porcentaje_global").html("0%");
+                            }
+                        }else{
+                            $("#horas_canchas_div").html(json['html']);
+                            $("#total_horas_posibles").html('-');
+                            $("#total_horas_usadas").html('-');
+                            $("#porcentaje_global").html("0%");
+                        }
+                    }
+                });
+            }
+            Number.prototype.toFixedDown = function(digits) {
+                  var n = this - Math.pow(10, -digits)/2;
+                  n += n / Math.pow(2, 53); // added 1360765523: 17.56.toFixedDown(2) === "17.56"
+                  return n.toFixed(digits);
+                }
 
             $( "#txt_desde_ranking" ).datepicker({
                // 'minDate': 0

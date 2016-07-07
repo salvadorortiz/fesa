@@ -5,16 +5,16 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
     can.cancha_id,
     recan.reserva_cancha_id,
     res.reserva_id,
-    fpag.forma_pago_id, 
-    to_char(recan.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva,
+    fpag.forma_pago_id,
+    to_char(recan.fecha::timestamp with time zone, 'DD-MM-YYYY'::text) AS fecha_reserva,
     u.usuario,
         CASE
-            WHEN c.cliente_id IS NOT NULL THEN COALESCE(c.nombre, ''::character varying)
-            ELSE COALESCE(e.nombre, ''::character varying)
+            WHEN c.cliente_id IS NOT NULL THEN COALESCE('<span class="fa fa-user"></span>&nbsp;'||c.nombre, ''::character varying)
+            ELSE COALESCE('<span class="fa fa-building"></span>&nbsp;'|| e.nombre || COALESCE(' <br><span class="fa fa-user"></span>&nbsp;<strong>'|| e.contacto ||' </strong><br><span class="fa fa-phone"></span>&nbsp;'|| e.telefono_contacto ||'',''), ''::character varying)
         END AS info_cliente,
     res.nombre_evento,
-     can.nombre,
-    to_char(recan.hora_inicio,'HH24:MM') || ' - ' || to_char(recan.hora_fin,'HH24:MM'), 
+    can.nombre,
+    (to_char(recan.hora_inicio::interval, 'HH24:MM'::text) || ' - '::text) || to_char(recan.hora_fin::interval, 'HH24:MM'::text),
         CASE
             WHEN res.estado::text = 'C'::text THEN '<span class="label label-primary">Confirmado</span>'::text
             WHEN res.estado::text = 'T'::text THEN '<span class="label label-default">Tentativo</span>'::text
@@ -27,7 +27,6 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
             WHEN res.forma_pago_id = 1 THEN '$'::text || to_char(res.precio, '9G999.99'::text)
             ELSE ''::text
         END AS precio_reserva
---SELECT *
    FROM modulo_1_complejo com
      JOIN modulo_1_cancha can ON can.complejo_id = com.complejo_id
      JOIN modulo_1_reservacancha recan ON recan.cancha_id = can.cancha_id
@@ -35,10 +34,14 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
      JOIN modulo_1_formapago fpag ON fpag.forma_pago_id = res.forma_pago_id
      JOIN modulo_1_formafacturacion ff ON ff.forma_facturacion_id = res.forma_facturacion_id
      JOIN modulo_1_tipoalquiler ta ON ta.tipo_alquiler_id = res.tipo_alquiler_id
-     JOIN modulo_1_usuario u ON u.usuario_id= res.usuario_id
+     JOIN modulo_1_usuario u ON u.usuario_id = res.usuario_id
      LEFT JOIN modulo_1_cliente c ON c.cliente_id = res.cliente_id
      LEFT JOIN modulo_1_empresa e ON e.empresa_id = res.empresa_id
   ORDER BY recan.fecha DESC;
+
+ALTER TABLE dt_repo_reserva
+  OWNER TO postgres;
+
 
 
 CREATE OR REPLACE VIEW dt_repo_clientes AS 
@@ -81,6 +84,8 @@ UNION
 
 
 
+-- DROP VIEW dt_repo_remesa;
+
 CREATE OR REPLACE VIEW dt_repo_remesa AS 
  SELECT res.reserva_id,
     to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
@@ -96,11 +101,13 @@ CREATE OR REPLACE VIEW dt_repo_remesa AS
     '$'::text || COALESCE(to_char(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
            FROM modulo_1_remesaxreserva
           WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remesado,
-    '$'::text || COALESCE(to_char(res.precio - COALESCE((( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+    '$'::text || COALESCE(to_char(res.precio - COALESCE(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
            FROM modulo_1_remesaxreserva
-          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id)),0), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente,
-    res.usuario_id AS usuario
- --SELECT * 
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente_2,
+    res.usuario_id AS usuario,
+    CAST(floor( COALESCE(res.precio - COALESCE(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+           FROM modulo_1_remesaxreserva
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), 0)) AS INTEGER) AS remanente
    FROM modulo_1_remesaxreserva rr
      RIGHT JOIN modulo_1_reserva res ON rr.reserva_id = res.reserva_id
      JOIN modulo_1_usuario u ON res.usuario_id = u.usuario_id
@@ -109,20 +116,29 @@ CREATE OR REPLACE VIEW dt_repo_remesa AS
   GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.nombre;
   
   
-Create or replace view dt_repo_cliente_eventos as
-SELECT 
-case 
-	when cliente_id is null then 2
-	else 1
-end as tipo_registro,
-case
-	when cliente_id is null then empresa_id
-	else cliente_id
-end as id_registro, nombre_evento,
-'$' || COALESCE(to_char(precio, '9G999.99'), to_char(0, '9G999.99')) as precio,
-to_char(fecha_ingreso, 'YYYY-MM-DD') AS fecha_reserva
-FROM modulo_1_reserva
-order by fecha_ingreso desc;
+-- DROP VIEW dt_repo_cliente_eventos;
+
+CREATE OR REPLACE VIEW dt_repo_cliente_eventos AS 
+
+ SELECT
+        CASE
+            WHEN res.cliente_id IS NULL THEN 2
+            ELSE 1
+        END AS tipo_registro,
+        CASE
+            WHEN res.cliente_id IS NULL THEN res.empresa_id
+            ELSE res.cliente_id
+        END AS id_registro,
+    res.nombre_evento,
+    can.nombre as nombre_cancha,
+    '$'::text || COALESCE(to_char(recan.precio_acordado, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS precio,
+    to_char(recan.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_reserva
+--SELECT *
+FROM modulo_1_reserva res
+INNER JOIN modulo_1_reservacancha recan ON recan.reserva_id=res.reserva_id
+INNER JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id
+ORDER BY res.fecha_ingreso DESC;
+
 
 
 CREATE OR REPLACE VIEW dt_repo_horas AS 
