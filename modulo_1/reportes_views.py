@@ -99,13 +99,13 @@ def ReporteRemesasData(request):
 
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
 		str_query="SELECT repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
-		repo.nombre_cliente,repo.precio,repo.costo,repo.utilidad,repo.remesado,\
+		repo.nombre_cliente,repo.nombre_usuario,repo.precio,repo.costo,repo.utilidad,repo.remesado,\
 		repo.remanente_2,repo.usuario,repo.remanente\
 		 FROM dt_repo_remesa repo\
 		LEFT JOIN modulo_1_reservacancha recan ON recan.reserva_id=repo.reserva_id\
 		LEFT JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id\
 		WHERE can.complejo_id= "+str(request.POST['complejo_id'])+" GROUP BY repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
-		repo.nombre_cliente,repo.precio,repo.costo,repo.utilidad,repo.remesado,\
+		repo.nombre_cliente,repo.precio,repo.costo,repo.utilidad,repo.remesado,repo.nombre_usuario,\
 		repo.remanente_2,repo.usuario,repo.remanente,can.complejo_id"
 
 	else:
@@ -119,60 +119,51 @@ def ReporteRemesasData(request):
 
 def ReporteRemesasTotalData(request):
 	filtro=" WHERE 1=1"
-	deudores= False
+
 	if str(request.POST['fecha_desde'])!= '':
-		filtro+=" AND to_char(res.fecha_ingreso, 'YYYY-MM-DD') >= '" + str(request.POST['fecha_desde']) + "'" 
+		filtro+=" AND fecha_ingreso >= '" + str(request.POST['fecha_desde']) + "'" 
 
 	if str(request.POST['fecha_hasta'])!='':
-		filtro+=" AND to_char(res.fecha_ingreso, 'YYYY-MM-DD') <= '" + str(request.POST['fecha_hasta']) + "'"
+		filtro+=" AND fecha_ingreso <= '" + str(request.POST['fecha_hasta']) + "'"
 
 	if str(request.POST['usuario_id'])!='':
-		filtro+=" AND res.usuario_id = " + str(request.POST['usuario_id'])
+		filtro+=" AND usuario = " + str(request.POST['usuario_id'])
 
 	if str(request.POST['deudores'])=='true':
-			deudores=True
+		filtro+=" AND remanente > 0 "
 
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
-		filtro+=" AND can.complejo_id= "+ str(request.POST['complejo_id'])
+		str_query="SELECT repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
+		repo.nombre_cliente,repo.nombre_usuario,repo.precio,repo.costo,repo.utilidad,repo.remesado,\
+		repo.remanente_2,repo.usuario,repo.remanente\
+		 FROM dt_repo_remesa repo\
+		LEFT JOIN modulo_1_reservacancha recan ON recan.reserva_id=repo.reserva_id\
+		LEFT JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id\
+		WHERE can.complejo_id= "+str(request.POST['complejo_id'])+" GROUP BY repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
+		repo.nombre_cliente,repo.precio,repo.costo,repo.utilidad,repo.remesado,repo.nombre_usuario,\
+		repo.remanente_2,repo.usuario,repo.remanente,can.complejo_id"
 
-	str_query = "SELECT\
-				 COALESCE(res.precio,0) as precio_total,\
-				COALESCE(res.costo,0) as costo_total,\
-				COALESCE(res.precio - res.costo,0) as utilidad_total,\
-				COALESCE(res.precio,0)-COALESCE(SUM(rr.monto),0) as remanente_total,\
-				COALESCE(SUM(rr.monto),0) as remesado_total\
-				FROM modulo_1_remesaxreserva rr \
-				LEFT JOIN modulo_1_reservacancha recan ON recan.reserva_id=rr.reserva_id \
-				LEFT JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id \
-				right join modulo_1_reserva res on rr.reserva_id=res.reserva_id \
-				" +filtro +" group by res.reserva_id,rr.remesa_reserva_id"
+	else:
+		str_query = "SELECT * FROM dt_repo_remesa" + filtro
+
 	print   "remesa total--->  ",str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
 	##print   convert_fetchall_total(qs)
-	return HttpResponse(json.dumps(convert_fetchall_total(qs,deudores)), content_type='application/json')
+	return HttpResponse(json.dumps(convert_fetchall_total(qs)), content_type='application/json')
 
-def convert_fetchall_total(cursor,deudores=False):
+def convert_fetchall_total(cursor):
 	print cursor
 	dict_cursor={}
 	list_aux=[]
 	list_totales=[0,0,0,0,0]
 	for item in cursor:
-		if deudores is True:
-			if float(item[3]) > 0:
-				print   "\n item -->",item
-				list_totales[0]+=float(item[0])
-				list_totales[1]+=float(item[1])
-				list_totales[2]+=float(item[2])
-				list_totales[3]+=float(item[3])
-				list_totales[4]+=float(item[4])
-		else:
-			list_totales[0]+=float(item[0])
-			list_totales[1]+=float(item[1])
-			list_totales[2]+=float(item[2])
-			list_totales[3]+=float(item[3])
-			list_totales[4]+=float(item[4])
+		list_totales[0]+=float(money_to_float(item[5]))
+		list_totales[1]+=float(money_to_float(item[6]))
+		list_totales[2]+=float(money_to_float(item[7]))
+		list_totales[3]+=float(money_to_float(item[8]))
+		list_totales[4]+=float(money_to_float(item[9]))
 	###print   "totall--->",list_totales
 
 	list_aux.append(['$'+str(list_totales[0]),'$'+str(list_totales[1]),'$'+str(list_totales[2]),'$'+str(list_totales[3]),'$'+str(list_totales[4])])
@@ -181,6 +172,10 @@ def convert_fetchall_total(cursor,deudores=False):
 	dict_cursor['draw']= len(list_aux)//10
 	dict_cursor['data']=list_aux
 	return dict_cursor
+
+def money_to_float(money):
+	arr_money=money.split('$')
+	return float(arr_money[1])
 
 def ReporteHorasCancha(request):
 	total_horas_posibles=0
