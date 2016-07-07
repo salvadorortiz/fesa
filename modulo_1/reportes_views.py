@@ -185,8 +185,8 @@ def ReporteHorasCancha(request):
 
 	if 'cancha_id' in request.POST.keys() and str(request.POST['cancha_id'])!='':
 		filtro+=" AND cancha_id = " + str(request.POST['cancha_id'])
-		filtro+=" UNION SELECT * FROM dt_repo_horas Where cancha_id="+ str(request.POST['cancha_id'])
-		filtro+=" AND fecha_ingreso is null"
+		# filtro+=" UNION SELECT * FROM dt_repo_horas Where cancha_id="+ str(request.POST['cancha_id'])
+		# filtro+=" AND fecha_ingreso is null"
 
 	if 'fecha_desde' in request.POST.keys() and str(request.POST['fecha_desde'])!= '':
 		filtro+=" AND fecha_ingreso >= '" + str(request.POST['fecha_desde']) + "'" 
@@ -197,8 +197,8 @@ def ReporteHorasCancha(request):
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
 		filtro+=" AND complejo_id = " + str(request.POST['complejo_id'])
 		#if str(request.POST['fecha_desde'])== '' and str(request.POST['fecha_hasta'])=='':
-		filtro+=" UNION SELECT * FROM dt_repo_horas Where complejo_id="+ str(request.POST['complejo_id'])
-		filtro+=" AND fecha_ingreso is null"
+		# filtro+=" UNION SELECT * FROM dt_repo_horas Where complejo_id="+ str(request.POST['complejo_id'])
+		# filtro+=" AND fecha_ingreso is null"
 
 	str_query = "SELECT * FROM dt_repo_horas" + filtro
 	#print  str_query

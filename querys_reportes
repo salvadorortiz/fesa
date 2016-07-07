@@ -7,8 +7,8 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
     res.reserva_id,
     fpag.forma_pago_id,
         CASE
-            WHEN c.cliente_id IS NOT NULL THEN COALESCE('<span class="fa fa-user"></span>&nbsp;'::text || c.nombre::text, ''::character varying::text)
-            ELSE COALESCE(('<span class="fa fa-building"></span>&nbsp;'::text || e.nombre::text) || COALESCE((((' <br><span class="fa fa-user"></span>&nbsp;<strong>'::text || e.contacto::text) || ' </strong><br><span class="fa fa-phone"></span>&nbsp;'::text) || e.telefono_contacto::text) || ''::text, ''::text), ''::character varying::text)
+            WHEN c.cliente_id IS NOT NULL THEN COALESCE('<span class="fa fa-user"></span>&nbsp;'::text || c.nombre::text|| ' <br><span class="fa fa-phone"></span>&nbsp;'::text || c.telefono, ''::character varying::text)
+            ELSE COALESCE(COALESCE(((('<span class="fa fa-user"></span>&nbsp;'::text || e.contacto::text) || '<br><span class="fa fa-phone"></span>&nbsp;'::text) || e.telefono_contacto::text) || ''::text, ''::text), ''::character varying::text)
         END AS info_cliente,
     res.nombre_evento,
     can.nombre,
@@ -82,7 +82,6 @@ UNION
    FROM modulo_1_empresa c;
 
 
-
 -- DROP VIEW dt_repo_remesa;
 
 CREATE OR REPLACE VIEW dt_repo_remesa AS 
@@ -93,7 +92,7 @@ CREATE OR REPLACE VIEW dt_repo_remesa AS
             WHEN c.cliente_id IS NULL THEN e.nombre
             ELSE c.nombre
         END AS nombre_cliente,
-    u.nombre AS nombre_usuario,
+    u.usuario AS nombre_usuario,
     '$'::text || COALESCE(to_char(res.precio, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS precio,
     '$'::text || COALESCE(to_char(res.costo, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS costo,
     '$'::text || COALESCE(to_char(res.precio - res.costo, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS utilidad,
@@ -112,7 +111,10 @@ CREATE OR REPLACE VIEW dt_repo_remesa AS
      JOIN modulo_1_usuario u ON res.usuario_id = u.usuario_id
      LEFT JOIN modulo_1_cliente c ON res.cliente_id = c.cliente_id
      LEFT JOIN modulo_1_empresa e ON res.empresa_id = e.empresa_id
-  GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.nombre;
+  GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.usuario;
+
+ALTER TABLE dt_repo_remesa
+  OWNER TO postgres;
 
  
 -- DROP VIEW dt_repo_cliente_eventos;
