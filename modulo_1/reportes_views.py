@@ -315,7 +315,11 @@ def get_html_reporteHoras(rows,request):
 						total_horas_posibles= contar_horas(rows[contador_auxiliar:contador_auxiliar+len(qs_alquiler)])
 						cadena+="<div class='col-sm-3'>"
 						cadena+="<table class='table table-bordered table-hover table-striped'>"
-						cadena+="<tr><td class='success' colspan='2'>"+row[3]+"</td></tr>"
+						try:
+							nbr_complejo= Complejo.objects.get(complejo_id=int(row[1]))
+							cadena+="<tr><td class='success' colspan='2'><p class='text-success'><strong>"+row[3]+"</strong></p><p class='small text-right'><small><i class='fa fa-flag'></i>&nbsp;"+nbr_complejo.nombre+"</small></p>"+"</td></tr>"
+						except:
+							cadena+="<tr><td class='success' colspan='2'><p class='text-success'><strong>"+row[3]+"</strong></p></td></tr>"
 						cadena+="<tr><td class='warning'>Horas</td><td class='warning'>%</td>"
 					if total_horas_posibles!=0:
 							porcen= truncate((float(row[5])/float(total_horas_posibles))*100,3)
