@@ -445,20 +445,24 @@
          });
 
          $("#dt_cancha").on('click','[name=eliminar_cancha]',function(){
-            console.log("eliminar_cancha");
-            $(this).parent().parent().parent().addClass('selected');
-            var data = $('#dt_cancha').DataTable().rows('.selected').data();
-            jQuery.ajax({
-                url: "{%url 'eliminar_cancha'%}",
-                type: "POST",
-                processData: false,
-                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+data[0][0].toString(),
-                success: function(json){
+            bootbox.confirm("Se eliminará la cancha seleccionada, ¿Está seguro?", function(result) {
+                if(result){
+                    $(this).parent().parent().parent().addClass('selected');
+                    var data = $('#dt_cancha').DataTable().rows('.selected').data();
+                    jQuery.ajax({
+                        url: "{%url 'eliminar_cancha'%}",
+                        type: "POST",
+                        processData: false,
+                        data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_cancha="+data[0][0].toString(),
+                        success: function(json){
+                            $("#cancelar_cancha").click();
+                            create_alert("<li>Cancha eliminada con éxito </li>","EXITO","errores_cancha",true,5000);
+                        }
+                    });
+                }else{
                     $("#cancelar_cancha").click();
-                    create_alert("<li>Cancha eliminada con éxito </li>","EXITO","errores_cancha",true,5000);
                 }
             });
-            //console.log("salir");
         });
 
          $("#dt_cancha").on('click','[name=agregar_horario]',function(){

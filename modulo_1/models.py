@@ -12,7 +12,7 @@ class Usuario(models.Model):
 			)
 	usuario_id = models.AutoField(primary_key=True)
 	nombre = models.CharField('Nombre',max_length=100,blank=False,null=False,default='')
-	area = models.CharField('Área',max_length=50,blank=False,null=False)
+	area = models.CharField('Área',max_length=100,blank=False,null=False)
 	jefe_directo = models.CharField('Jefe Directo',max_length=100,blank=False,null=False,default='')
 	estado = models.BooleanField('Estado', default=True)
 	tipo_usuario =  models.CharField('Tipo Usuario',max_length=1,choices=TIPO,null=False,blank=False,default='')

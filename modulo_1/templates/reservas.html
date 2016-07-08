@@ -58,7 +58,7 @@
                             <div class="col-sm-5">
                                 <div class="form-group input-group">
                                     <span class="input-group-addon"><i class="fa fa-pencil"></i></span>
-                                    <input type="text" class="form-control" id="txt_nombre_evento" placeholder="Nombre del evento" />
+                                    <input type="text" class="form-control" id="txt_nombre_evento" placeholder="Nombre del evento" maxlength="100" />
                                 </div>
                             </div>
                             <div class="col-sm-1">
@@ -66,7 +66,7 @@
                             </div>
                             <div class="col-sm-5">
                                 <input type="hidden" id="id_cliente" value="-1">
-                                <input type="text" class="form-control" id="txt_cliente" placeholder="Nombre del cliente" />
+                                <input type="text" class="form-control" id="txt_cliente" placeholder="Nombre del cliente" maxlength="100" />
                             </div>
                         </div>
                     </div>
@@ -101,7 +101,7 @@
                         <div class="col-sm-12">
                             <div class="col-sm-8">
                                 <br>
-                                <textarea id="txt_notas" rows="2" class="form-control" placeholder="Notas"></textarea>
+                                <textarea id="txt_notas" rows="2" class="form-control" placeholder="Notas" maxlength="500"></textarea>
                             </div>
                             <div class="col-sm-1">
                                 <br>
@@ -556,6 +556,7 @@
                     processData: false,
                     data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&precio_evento="+$('#txt_precio_evento').val()+"&costo_evento="+$('#txt_costo_evento').val()+"&id_evento="+evento_seleccionado,
                     success: function(json){
+                        $("#div_errores_precio").html('');
                         create_alert("<li>Precio y costo ingresado exitosamente</li>","EXITO","notificaciones",true,5000);
                     },
                     error:function(json){
@@ -659,7 +660,7 @@
                         }
                     },
                     error:function(json){
-                        create_alert("<li><b>Datos incorrectos: </b>Fecha u horas no válidas</li>","ERROR","div_errores_reservas",false,0);
+                        create_alert("<li><b>Datos incorrectos: </b>Fecha, horas o precio no válidos</li>","ERROR","div_errores_reservas",false,0);
                     }
                 });
             }else{

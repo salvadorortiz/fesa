@@ -203,23 +203,30 @@
         });
 
         $("#tabla_horario_complejo").on('click','[name=eliminar_horario]',function(){
-           $('#tabla_horario_complejo').DataTable().$('tr.selected').removeClass('selected');
-            $(this).parent().parent().parent().addClass('selected');
-            var data = $('#tabla_horario_complejo').DataTable().rows('.selected').data();
-            console.log(data[0]);
-            console.log(data[0][0]);
-            jQuery.ajax({
-                url: "{%url 'eliminar_horario'%}",
-                type: "POST",
-                processData: false,
-                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_preciocancha="+data[0][0].toString(),
-                success: function(json){
-                  $("#errores_horario").html('');
-                    create_alert("<li>Horario eliminado con éxito</li>","EXITO","errores_horario",true,5000);
-                  $("#tabla_horario_complejo").DataTable().ajax.reload();
-                  $("#cancelar_horario").click();
-                }
-            });
+             $('#tabla_horario_complejo').DataTable().$('tr.selected').removeClass('selected');
+              $(this).parent().parent().parent().addClass('selected');
+              var data = $('#tabla_horario_complejo').DataTable().rows('.selected').data();
+         bootbox.confirm("Se eliminará el horario seleccionado, ¿Está seguro?", function(result) {
+            if(result){
+              console.log(data[0]);
+              console.log(data[0][0]);
+              jQuery.ajax({
+                  url: "{%url 'eliminar_horario'%}",
+                  type: "POST",
+                  processData: false,
+                  data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&id_preciocancha="+data[0][0].toString(),
+                  success: function(json){
+                    $("#errores_horario").html('');
+                      create_alert("<li>Horario eliminado con éxito</li>","EXITO","errores_horario",true,5000);
+                    $("#tabla_horario_complejo").DataTable().ajax.reload();
+                    $("#cancelar_horario").click();
+                  }
+              });
+            }else{
+              $("#tabla_horario_complejo").DataTable().ajax.reload();
+              $("#cancelar_horario").click();
+            }
+          });  
         });
 
         $("#guardar_horario").on('click',function(){
