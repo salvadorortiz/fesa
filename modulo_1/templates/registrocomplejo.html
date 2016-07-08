@@ -15,6 +15,7 @@
 
 
 {% block content %}
+{%if request.session.type_user == 'R'%}
 	{% csrf_token %}
     {% load widget_tweaks %}
     <div class="row">
@@ -153,10 +154,12 @@
     </div>
 
 {%include 'horariocancha.html'%}
+{%endif%}
 {% endblock %}
 
 {% block addExtraScript %} 
 <script type="text/javascript">
+{%if request.session.type_user == 'R'%}
    $(window).load(function() {
        
          var dt_complejo = $('#dt_complejo').DataTable( {
@@ -471,8 +474,10 @@
 
 
     });
-
-  
-
+{%else%}
+    $(window).load(function() {
+        $("#div_403").show();
+    });
+{%endif%}
 </script>
 {% endblock %}

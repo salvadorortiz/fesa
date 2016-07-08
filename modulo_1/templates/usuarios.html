@@ -11,6 +11,7 @@
 {% block pagetitle %} Creación de usuarios {% endblock %} 
 
 {% block content %}
+{%if request.session.type_user == 'R'%}
 	{% csrf_token %}
     {% load widget_tweaks %}
     <div class="row">
@@ -139,10 +140,12 @@
         </div>
         </form>
     </div>
+{%endif%}
 {% endblock %}
 
 {% block addExtraScript %} 
 <script type="text/javascript">
+{%if request.session.type_user == 'R'%}
    $(window).load(function() {
         var dt_usuarios = $('#dt_usuarios').DataTable( {
             "ajax": {
@@ -266,5 +269,10 @@
 
 
     });
+{%else%}
+    $(window).load(function() {
+        $("#div_403").show();
+    });
+{%endif%}
 </script>
 {% endblock %}

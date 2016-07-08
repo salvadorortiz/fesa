@@ -237,23 +237,23 @@
                         </li>
                         {% block breadcrumbs %} {% endblock %}
                     </ol>
-                    <div class="space-1"></div>
-                    <div class="row" id="div_403" style="display:none">
-                        <br>
-                        <div class="col-lg-12">
-                            <div class="jumbotron">
-                                <h5>&nbsp;Error 403</h5>
-                                <h1 class="text-danger"><i class="fa fa-eye-slash"></i>&nbsp;Atención!, <small>Permiso Denegado</small></h1>
-                                <hr>
-                                <p><small>Lo sentimos. Usted no cuenta con los permisos necesarios para poder acceder a esta pantalla/aplicación.</small></p>
-                                <p><small>Por favor, inténtelo mas tarde.</small></p>
-                            </div>
-
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                         {% block content %}{%endblock%}
+                        <div class="space-1"></div>
+                        <div class="row" id="div_403" style="display:none">
+                            <br>
+                            <div class="col-lg-12">
+                                <div class="jumbotron">
+                                    <h5>&nbsp;Error: Permiso denegado</h5>
+                                    <h1 class="text-danger"><i class="fa fa-eye-slash"></i>&nbsp;Atención!, <small>Permiso Denegado</small></h1>
+                                    <hr>
+                                    <p><small>Lo sentimos. Usted no cuenta con los permisos necesarios para poder acceder a esta pantalla/aplicación.</small></p>
+                                    <p><small>Por favor, póngase en contacto con el administrador.</small></p>
+                                </div>
+
+                            </div>
+                        </div>
                         </div>
                     </div>
                 </div>
