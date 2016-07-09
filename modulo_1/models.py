@@ -132,7 +132,7 @@ class Reserva(models.Model):
 	usuario = models.ForeignKey('Usuario',verbose_name='Usuario')
 	tipo_alquiler = models.ForeignKey('TipoAlquiler',verbose_name='Tipo de alquiler',null=False,blank=False)
 	forma_pago = models.ForeignKey('FormaPago',verbose_name='Forma de pago',null=False,blank=False)
-	forma_facturacion = models.ForeignKey('FormaFacturacion',verbose_name='Forma de facturación',null=False,blank=False)
+	forma_facturacion = models.ForeignKey('FormaFacturacion',verbose_name='Forma de facturación',null=True,blank=True)
 	estado = models.CharField('Dias',max_length=1,choices=ESTADO,null=False,blank=False,default='')
 	precio = models.DecimalField('Precio',max_digits=10, decimal_places=2, blank=True, null=True)
 	costo = models.DecimalField('Costo',max_digits=10, decimal_places=2, blank=True, null=True)

@@ -313,8 +313,9 @@ def ClientesAutocomplete(request):
 
 def GuardarEvento(request):
 	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
-	cliente = Cliente.objects.filter(cliente_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
-	empresa = Empresa.objects.filter(empresa_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
+	nombre_cliente = str(request.POST['nombre_cliente']).split(' -')[0]
+	cliente = Cliente.objects.filter(cliente_id=request.POST['cliente_id'],nombre=nombre_cliente)
+	empresa = Empresa.objects.filter(empresa_id=request.POST['cliente_id'],nombre=nombre_cliente)
 	if request.session['type_user'] == 'B' and (request.POST['reserva'] != "3" and request.POST['reserva'] != "4"):
 		respuesta = {
 					'error': True,
@@ -323,14 +324,26 @@ def GuardarEvento(request):
 		return HttpResponse(json.dumps(respuesta), content_type='application/json')
 
 	if len(cliente)>0:
-		reserva = Reserva(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
-					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
-					notas=request.POST['notas'],usuario=usuario[0]).save()
+		if request.POST['facturacion'] != "-1":
+			reserva = Reserva(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+			notas=request.POST['notas'],usuario=usuario[0]).save()
+		else:
+			reserva = Reserva(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],estado=request.POST['estado'],
+			notas=request.POST['notas'],usuario=usuario[0]).save()
+
 		respuesta ={'error':False,'mensaje':"<li>Evento ingresado con éxito </li>",'id_evento':Reserva.objects.latest('reserva_id').reserva_id}
 	elif len(empresa)>0:
-		reserva = Reserva(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
-					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
-					notas=request.POST['notas'],usuario=usuario[0]).save()
+		if request.POST['facturacion'] != "-1":
+			reserva = Reserva(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+			notas=request.POST['notas'],usuario=usuario[0]).save()
+		else:
+			reserva = Reserva(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],estado=request.POST['estado'],
+			notas=request.POST['notas'],usuario=usuario[0]).save()
+
 		respuesta ={'error':False,'mensaje':"<li>Evento ingresado con éxito </li>",'id_evento':Reserva.objects.latest('reserva_id').reserva_id}
 	else:
 		respuesta = {
@@ -341,8 +354,9 @@ def GuardarEvento(request):
 	return HttpResponse(json.dumps(respuesta), content_type='application/json')
 
 def GuardarCambiosEvento(request):
-	cliente = Cliente.objects.filter(cliente_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
-	empresa = Empresa.objects.filter(empresa_id=request.POST['cliente_id'],nombre=request.POST['nombre_cliente'])
+	nombre_cliente = str(request.POST['nombre_cliente']).split(' -')[0]
+	cliente = Cliente.objects.filter(cliente_id=request.POST['cliente_id'],nombre=nombre_cliente)
+	empresa = Empresa.objects.filter(empresa_id=request.POST['cliente_id'],nombre=nombre_cliente)
 	respuesta = {'error':False,'mensaje':"<li>Evento actualizado con éxito </li>"}
 	
 	if request.session['type_user'] == 'B' and (request.POST['reserva'] != "3" and request.POST['reserva'] != "4"):
@@ -353,15 +367,27 @@ def GuardarCambiosEvento(request):
 		return HttpResponse(json.dumps(respuesta), content_type='application/json')
 
 	if len(cliente)>0:
-		reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
-					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
-					notas=request.POST['notas'])
+		if request.POST['facturacion'] != "-1":
+			reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+			notas=request.POST['notas'])
+		else:
+			reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],cliente_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],forma_facturacion_id=None,estado=request.POST['estado'],
+			notas=request.POST['notas'])
+
 		if request.POST['desactivar'] == 'true':
 			Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(bandera=True)
 	elif len(empresa)>0:
-		reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
-					forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
-					notas=request.POST['notas'])
+		if request.POST['facturacion'] != "-1":
+			reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],forma_facturacion_id=request.POST['facturacion'],estado=request.POST['estado'],
+			notas=request.POST['notas'])
+		else:
+			reserva = Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(nombre_evento=request.POST['nombre'],empresa_id=request.POST['cliente_id'],tipo_alquiler_id=request.POST['reserva'],
+			forma_pago_id=request.POST['pago'],forma_facturacion_id=None,estado=request.POST['estado'],
+			notas=request.POST['notas'])
+
 		if request.POST['desactivar'] == 'true':
 			Reserva.objects.filter(reserva_id=request.POST['id_evento']).update(bandera=True)
 	else:

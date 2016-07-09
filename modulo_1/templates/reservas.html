@@ -365,7 +365,7 @@
             "lengthChange": true,
             "searching": true,
             "paging": true,
-            "order":[[6,"desc"],[1,"asc"]],
+            "order":[[6,"desc"],[0,"desc"],[1,"asc"]],
             "columnDefs":[
                 {"targets":[0,6],"visible":false,"searchable":false},
                 {"targets":1, "width":"20%"},
@@ -465,7 +465,11 @@
                     $('#id_cliente').val( json['cliente_id']);
                     $('#cmb_reserva').val(json['alquiler']);
                     $('#cmb_pago').val(json['pago']);
-                    $('#cmb_facturacion').val(json['facturacion']);
+                    if(json['facturacion']==null){
+                        $('#cmb_facturacion').val("-1");
+                    }else{
+                        $('#cmb_facturacion').val(json['facturacion']);
+                    }
                     $('#cmb_estado').val(json['estado']);
                     $('#txt_notas').val(json['notas']);
                     if(json['precio']!="None"){
@@ -569,7 +573,7 @@
         });
 
         $("#btn_guardar").on('click',function(){
-            if($('#cmb_estado').val()=="-1" || $('#cmb_reserva').val()=="-1" || $('#cmb_pago').val()=="-1" || $('#cmb_estado').val()=="-1" || $('#txt_nombre_evento').val()==""){
+            if($('#cmb_estado').val()=="-1" || $('#cmb_reserva').val()=="-1" || $('#cmb_pago').val()=="-1" || ($('#cmb_facturacion').val()=="-1" && $('#cmb_pago').val()!="5") || $('#txt_nombre_evento').val()==""){
                 create_alert("<li><b>Campos requeridos:</b> nombre evento, tipo reserva, forma pago, forma facturación y estado son campos requeridos.</li>","ERROR","div_errores",false,0);
             }else{
                 jQuery.ajax({
@@ -601,7 +605,7 @@
         });
 
         $("#btn_guardar_cambios").on('click',function(){
-            if($('#cmb_estado').val()=="-1" || $('#cmb_reserva').val()=="-1" || $('#cmb_pago').val()=="-1" || $('#cmb_estado').val()=="-1" || $('#txt_nombre_evento').val()==""){
+            if($('#cmb_estado').val()=="-1" || $('#cmb_reserva').val()=="-1" || $('#cmb_pago').val()=="-1" || ($('#cmb_facturacion').val()=="-1" && $('#cmb_pago').val()!="5") || $('#txt_nombre_evento').val()==""){
                 create_alert("<li><b>Campos requeridos:</b> nombre evento, tipo reserva, forma pago, forma facturación y estado son campos requeridos.</li>","ERROR","div_errores",false,0);
             }else{
                 jQuery.ajax({
