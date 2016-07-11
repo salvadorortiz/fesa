@@ -34,8 +34,9 @@
             <li class="active"><a href="#tab1" data-toggle="tab">Reservas</a></li>
             <li><a href="#tab2" data-toggle="tab">Utilidad</a></li>
             <li><a href="#tab3" data-toggle="tab">Clientes</a></li>
-            <li><a href="#tab4" data-toggle="tab">Utilización de canchas</a></li>
             <li><a href="#tab5" data-toggle="tab">Ranking</a></li>
+            <li><a href="#tab4" data-toggle="tab">Utilización de canchas</a></li>
+            
         </ul>
         <hr>
         <div class="tab-content">
@@ -153,7 +154,7 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-sm-1"></div>
-                                            <div class="col-sm-2">
+                                            <div class="col-sm-3">
                                                 <strong>Seleccione un usuario</strong>
                                             </div>
                                             <div class="col-sm-3">
@@ -168,8 +169,10 @@
                                                 <input type="checkbox" name="deudores">
                                             </div>
                                         </div>
+                                        <br>
                                     <div class="row">
-                                         <div class="col-sm-2">
+                                        <div class="col-sm-1"></div>
+                                         <div class="col-sm-3">
                                             <strong>Seleccione un complejo</strong>
                                         </div>
                                         <div class="col-sm-3">
@@ -501,6 +504,18 @@
                                         <input type="text" id="txt_hasta_ranking">
                                     </div>
                                 </div>
+                                <br>
+                                <div class="row">
+                                        <div class="col-sm-1"></div>
+                                         <div class="col-sm-3">
+                                            <strong>Seleccione un complejo</strong>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" id="top_cmb_complejo">
+                                                {{cmb_complejo|safe}}
+                                            </select>
+                                        </div>
+                                    </div>
                                 <br>
                                 <div class="row">
                                     <div class="col-sm-12">
@@ -1062,7 +1077,8 @@
                     "data":  function( d ) {
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
                         d.fecha_desde= $("#txt_desde_ranking").val(),
-                        d.fecha_hasta= $("#txt_hasta_ranking").val()
+                        d.fecha_hasta= $("#txt_hasta_ranking").val(),
+                        d.complejo_id= $("#top_cmb_complejo").val()
                     },
                 },
                 "pageLength": 5,
@@ -1097,7 +1113,8 @@
                     "data":  function( d ) {
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
                         d.fecha_desde= $("#txt_desde_ranking").val(),
-                        d.fecha_hasta= $("#txt_hasta_ranking").val()
+                        d.fecha_hasta= $("#txt_hasta_ranking").val(),
+                        d.complejo_id= $("#top_cmb_complejo").val()
                     },
                 },
                 "pageLength": 5,
@@ -1127,6 +1144,7 @@
 
             $("#btn_filtrar_top").on('click',function(){
                 $("#dt_ranking_clientes").DataTable().ajax.reload();
+                $("#dt_ranking_empresas").DataTable().ajax.reload();
             });
     });
 

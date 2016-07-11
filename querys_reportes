@@ -45,41 +45,83 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
 -- DROP VIEW dt_repo_clientes;
 
 CREATE OR REPLACE VIEW dt_repo_clientes AS 
- SELECT '<i class="fa fa-child"></i>'::text AS tipo,
-    c.nombre AS nombre_cliente,
-    c.ingresado_por,
-    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
-           FROM modulo_1_reserva
-          WHERE modulo_1_reserva.cliente_id = c.cliente_id
-          ORDER BY modulo_1_reserva.fecha_ingreso
-         LIMIT 1) AS primer_evento,
-    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
-           FROM modulo_1_reserva
-          WHERE modulo_1_reserva.cliente_id = c.cliente_id
-          ORDER BY modulo_1_reserva.fecha_ingreso DESC
-         LIMIT 1) AS ultimo_evento,
-    1 AS tipo_tabla,
-    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>'::text AS boton,
-    c.cliente_id AS id
-   FROM modulo_1_cliente c
+      SELECT '<i class="fa fa-child"></i>' AS tipo,
+          c.nombre AS nombre_cliente,
+          c.ingresado_por,
+          (
+                SELECT q_res.nombre_evento || 
+                        ' (' || 
+				COALESCE(
+				to_char((
+					SELECT cancha.fecha
+                			FROM modulo_1_reserva reserva inner join modulo_1_reservacancha cancha 
+                			on reserva.reserva_id=cancha.reserva_id
+                			WHERE reserva.reserva_id=q_res.reserva_id ORDER BY cancha.fecha ASC LIMIT 1
+				),'DD-MM-YYYY'),'-') 
+                         || ')'
+                FROM modulo_1_reserva q_res
+                WHERE q_res.cliente_id = c.cliente_id
+                ORDER BY q_res.fecha_ingreso
+                LIMIT 1 
+          ) AS primer_evento,
+          ( 
+                SELECT q_res.nombre_evento || ' (' || 
+			COALESCE(
+			to_char((
+                		SELECT cancha.fecha
+				FROM modulo_1_reserva reserva inner join modulo_1_reservacancha cancha 
+				on reserva.reserva_id=cancha.reserva_id
+				WHERE reserva.reserva_id=q_res.reserva_id ORDER BY cancha.fecha DESC LIMIT 1
+			),'DD-MM-YYYY'),'-')  
+		 || ')'
+                FROM modulo_1_reserva q_res
+                WHERE q_res.cliente_id = c.cliente_id
+                ORDER BY q_res.fecha_ingreso DESC
+                LIMIT 1
+          ) AS ultimo_evento,
+          1 AS tipo_tabla,
+          '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>' AS boton,
+          c.cliente_id AS id
+         FROM modulo_1_cliente c
 UNION
- SELECT '<i class="fa fa-building"></i>'::text AS tipo,
-    c.nombre AS nombre_cliente,
-    c.ingresado_por,
-    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
-           FROM modulo_1_reserva
-          WHERE modulo_1_reserva.empresa_id = c.empresa_id
-          ORDER BY modulo_1_reserva.fecha_ingreso
-         LIMIT 1) AS primer_evento,
-    ( SELECT ((modulo_1_reserva.nombre_evento::text || ' ('::text) || modulo_1_reserva.fecha_ingreso) || ')'::text
-           FROM modulo_1_reserva
-          WHERE modulo_1_reserva.empresa_id = c.empresa_id
-          ORDER BY modulo_1_reserva.fecha_ingreso DESC
-         LIMIT 1) AS ultimo_evento,
-    2 AS tipo_tabla,
-    '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>'::text AS boton,
-    c.empresa_id AS id
-   FROM modulo_1_empresa c;
+       SELECT '<i class="fa fa-building"></i>' AS tipo,
+          c.nombre AS nombre_cliente,
+          c.ingresado_por,
+          ( 
+                SELECT q_res.nombre_evento || ' (' || 
+			COALESCE(
+			to_char((
+                		SELECT cancha.fecha
+				FROM modulo_1_reserva reserva inner join modulo_1_reservacancha cancha 
+				on reserva.reserva_id=cancha.reserva_id
+				WHERE reserva.reserva_id=q_res.reserva_id ORDER BY cancha.fecha ASC LIMIT 1
+			),'DD-MM-YYYY'),'-')  
+                || ')'
+                FROM modulo_1_reserva q_res
+                WHERE q_res.empresa_id = c.empresa_id
+                ORDER BY q_res.fecha_ingreso
+                LIMIT 1
+          ) AS primer_evento,
+          ( 
+              SELECT q_res.nombre_evento || ' (' || 
+		COALESCE(
+			to_char((
+                		SELECT cancha.fecha
+				FROM modulo_1_reserva reserva inner join modulo_1_reservacancha cancha 
+				on reserva.reserva_id=cancha.reserva_id
+				WHERE reserva.reserva_id = q_res.reserva_id 
+				ORDER BY cancha.fecha DESC LIMIT 1
+			),'DD-MM-YYYY'),'-') 
+              || ')'
+              FROM modulo_1_reserva q_res
+              WHERE q_res.empresa_id = c.empresa_id
+              ORDER BY q_res.fecha_ingreso DESC
+              LIMIT 1
+          ) AS ultimo_evento,
+          2 AS tipo_tabla,
+          '<button name="ver_eventos" class="btn btn-xs btn-warning"><i class="fa fa-eye bigger-120"></i></button>' AS boton,
+          c.empresa_id AS id
+          FROM modulo_1_empresa c;
 
 
 -- DROP VIEW dt_repo_remesa;

@@ -17,13 +17,13 @@ sys.setdefaultencoding('utf-8')
 def ReportesView(request):
 	#ReporteHorasCancha()
 	complejos= Complejo.objects.all()
-	##print   complejos
+	###print   complejos
 	cmb_complejo="<option value=''>Seleccione un complejo</option>"
 	for complejo in complejos:
 		cmb_complejo+="<option value='"+str(complejo.complejo_id)+"'>"+complejo.nombre+"</option>"
 
 	canchas= Cancha.objects.all()
-	##print   complejos
+	###print   complejos
 	cmb_cancha="<option value=''>Seleccione una cancha</option>"
 	for cancha in canchas:
 		cmb_cancha+="<option value='"+str(cancha.cancha_id)+"'>"+cancha.nombre+"</option>"
@@ -34,7 +34,7 @@ def ReportesView(request):
 	for user in usuarios:
 		cmb_usuario+="<option value='"+str(user.usuario_id)+"'>"+user.nombre+"</option>"
 
-	##print  "\n\n\nRESULTADO HTML --->", html
+	###print  "\n\n\nRESULTADO HTML --->", html
 
 	data={'cmb_complejo':cmb_complejo,
 		  'cmb_usuario':cmb_usuario,
@@ -56,30 +56,30 @@ def ReporteReservaData(request):
 		filtro+=" AND complejo_id = " + str(request.POST['complejo_id'])
 
 	str_query = "SELECT * FROM dt_repo_reserva" + filtro
-	#print   str_query
+	##print   str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
-	###print   convert_fetchall(qs)
+	####print   convert_fetchall(qs)
 	return HttpResponse(json.dumps(convert_fetchall(qs)), content_type='application/json')
 
 def ReporteClientesData(request):
 	str_query = "SELECT * FROM dt_repo_clientes"
-	###print   str_query
+	####print   str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
-	###print   convert_fetchall(qs)
+	####print   convert_fetchall(qs)
 	return HttpResponse(json.dumps(convert_fetchall(qs)), content_type='application/json')
 
 def EventosClientesData(request):
 	str_query = "SELECT * from dt_repo_cliente_eventos where tipo_registro="+str(request.POST['tipo_registro'])
 	str_query+= " AND id_registro="+str(request.POST['id_registro']) 
-	###print   str_query
+	####print   str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
-	###print   convert_fetchall(qs)
+	####print   convert_fetchall(qs)
 	return HttpResponse(json.dumps(convert_fetchall(qs)), content_type='application/json')
 
 def ReporteRemesasData(request):
@@ -111,7 +111,7 @@ def ReporteRemesasData(request):
 	else:
 		str_query = "SELECT * FROM dt_repo_remesa" + filtro
 
-	print 'remesa---> ',str_query
+	#print 'remesa---> ',str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
@@ -146,15 +146,15 @@ def ReporteRemesasTotalData(request):
 	else:
 		str_query = "SELECT * FROM dt_repo_remesa" + filtro
 
-	print   "remesa total--->  ",str_query
+	#print   "remesa total--->  ",str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
-	##print   convert_fetchall_total(qs)
+	###print   convert_fetchall_total(qs)
 	return HttpResponse(json.dumps(convert_fetchall_total(qs)), content_type='application/json')
 
 def convert_fetchall_total(cursor):
-	print cursor
+	#print cursor
 	dict_cursor={}
 	list_aux=[]
 	list_totales=[0,0,0,0,0]
@@ -164,7 +164,7 @@ def convert_fetchall_total(cursor):
 		list_totales[2]+=float(money_to_float(item[7]))
 		list_totales[3]+=float(money_to_float(item[8]))
 		list_totales[4]+=float(money_to_float(item[9]))
-	###print   "totall--->",list_totales
+	####print   "totall--->",list_totales
 
 	list_aux.append(['$'+str(list_totales[0]),'$'+str(list_totales[1]),'$'+str(list_totales[2]),'$'+str(list_totales[3]),'$'+str(list_totales[4])])
 	dict_cursor['recordsTotal']=len(list_aux)
@@ -180,7 +180,7 @@ def money_to_float(money):
 def ReporteHorasCancha(request):
 	total_horas_posibles=0
 	total_horas_usadas=0
-	###print   "\n \n -----------------------------------"
+	####print   "\n \n -----------------------------------"
 	filtro=" WHERE 1=1"
 
 	if 'cancha_id' in request.POST.keys() and str(request.POST['cancha_id'])!='':
@@ -201,16 +201,16 @@ def ReporteHorasCancha(request):
 		# filtro+=" AND fecha_ingreso is null"
 
 	str_query = "SELECT * FROM dt_repo_horas" + filtro
-	#print  str_query
+	##print  str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
-	###print   qs
+	####print   qs
 	qs_alquiler= TipoAlquiler.objects.all().order_by('nombre')
-	###print   qs_alquiler
+	####print   qs_alquiler
 	tuples_resultado=[]
 	for item in qs:
-		##print   "\n -->",item
+		###print   "\n -->",item
 		#verifica que no exista alguna tupla con sus datos 
 		if verificar_existencia(item,tuples_resultado):
 			for tipo_a in qs_alquiler:
@@ -227,7 +227,7 @@ def ReporteHorasCancha(request):
 		for tupla in tuples_resultado:
 			if item[2] is not None:
 				if int(item[0])==int(tupla[0]) and int(item[1])==int(tupla[1]) and int(item[2])==int(tupla[2]):
-					###print   "\n -->",time_to_int(item[5])
+					####print   "\n -->",time_to_int(item[5])
 					tupla[5]+=time_to_int(item[5])
 					total_horas_usadas+=time_to_int(item[5])
 
@@ -242,22 +242,22 @@ def ReporteHorasCancha(request):
 	cursor.execute(str_query)
 	repo_horas = cursor.fetchall()
 	for hora in repo_horas:
-		#print  "\n",hora
+		##print  "\n",hora
 		total_horas_posibles+=time_to_int(hora[2])/7
 #--------------------------------------------------------------------------------------------
 	for item in tuples_resultado:
-		#print  item
-		#print  '\n'
+		##print  item
+		##print  '\n'
 		item.append(total_horas_posibles)
 		item.append(total_horas_usadas)
-		###print   "\n",item
+		####print   "\n",item
 		lista_resultado.append(tuple(item))
 
-	#print  "RES", lista_resultado
+	##print  "RES", lista_resultado
 	return lista_resultado
 
-	###print   "\n TOTAL HORAS POSIBLES --> ", total_horas_posibles
-	###print   "\n TOTAL HORAS USADAS -->",total_horas_usadas
+	####print   "\n TOTAL HORAS POSIBLES --> ", total_horas_posibles
+	####print   "\n TOTAL HORAS USADAS -->",total_horas_usadas
 
 def obtener_div_horas(request):
 	html=get_html_reporteHoras(ReporteHorasCancha(request),request)
@@ -265,41 +265,42 @@ def obtener_div_horas(request):
 
 def get_html_reporteHoras(rows,request):
 	qs_alquiler= TipoAlquiler.objects.all().order_by('nombre')
-	##print  "-------------------- GET HTML ---------------------"
-	##print  "\n"
+	###print  "-------------------- GET HTML ---------------------"
+	###print  "\n"
 	#for r in rows:
-		#print  "\n",r
-	##print  "cantidad de alquiler", len(qs_alquiler)
-	##print  "cantidad de rows", len(rows)
+		##print  "\n",r
+	###print  "cantidad de alquiler", len(qs_alquiler)
+	###print  "cantidad de rows", len(rows)
 	if 'fecha_desde' in request.POST.keys() and 'fecha_hasta' in request.POST.keys():
-		#print  "TRAE DIAS"
+		##print  "TRAE DIAS"
 		dic_dias= calcular_horas_posibles(request)
-		#print  dic_dias
+		##print  dic_dias
 	if 'errors' in dic_dias.keys():
 		cant_dias=0
 	else:
 		cant_dias= abs(dic_dias['resultado'])
-	##print  "cantidad de dias", cant_dias
+	###print  "cantidad de dias", cant_dias
 	total_canchas= len(rows)//len(qs_alquiler)
 	#lista_nombre_alquiler=[]
-	#print  "-------------------- HTML --------------------------"
+	##print  "-------------------- HTML --------------------------"
 	contador_auxiliar=0
 	cadena=''
 
 	if len(rows)==0:
 		return cadena
 
-	#print  total_canchas
-	#print  "total_canchas//3--->", float(total_canchas)/3
-	#print  "total_canchas//3 ceil --->", math.ceil(float(total_canchas)/3)
+	##print  total_canchas
+	##print  "total_canchas//3--->", float(total_canchas)/3
+	##print  "total_canchas//3 ceil --->", math.ceil(float(total_canchas)/3)
 	for i in range(int(math.ceil(float(total_canchas)/3))):#porque va a ir de 3 en 3
-		#print  "----------------- "+str(i)+" -----------------------"
+		##print  "----------------- "+str(i)+" -----------------------"
 		cadena+="<div class='row'>"
 		cadena+="<div class='col-sm-3'>"
 		
 		cadena+="<table class='table table-bordered table-hover table-striped'>"
 		#se llena la lista con nombres de alquiler
 		cadena+="<tr class='success'><td>Cancha</td></tr>"
+		cadena+="<tr class='success'><td>&nbsp;</td></tr>"
 		cadena+="<tr class='warning'><td>&nbsp;</td></tr>"
 		for alqui in qs_alquiler:
 			cadena+="<tr class='info'><td>"+str(alqui.nombre)+"</td></tr>"
@@ -308,8 +309,8 @@ def get_html_reporteHoras(rows,request):
 		try:
 			for k in range(3): 
 				for j in range(len(qs_alquiler)):
-					#print  "\n\t-------------- "+str(j)+"------------------"
-					#print  "\t\t--->",rows[contador_auxiliar]
+					##print  "\n\t-------------- "+str(j)+"------------------"
+					##print  "\t\t--->",rows[contador_auxiliar]
 					row=rows[contador_auxiliar] 
 					if j==0:
 						total_horas_posibles= contar_horas(rows[contador_auxiliar:contador_auxiliar+len(qs_alquiler)])
@@ -350,7 +351,7 @@ def truncate(number, digits):
     return math.trunc(stepper * number) / stepper
 
 def contar_horas(lista):
-	#print  "L I S T A ->",lista
+	##print  "L I S T A ->",lista
 	suma= float(0)
 	for item in lista:
 		suma+=float(item[5])
@@ -358,7 +359,7 @@ def contar_horas(lista):
 
 def ReporteHorasCanchaData(request):
 	fetch=convert_fetchall(ReporteHorasCancha(request))
-	##print  get_html_reporteHoras(ReporteHorasCancha(request))
+	###print  get_html_reporteHoras(ReporteHorasCancha(request))
 	return HttpResponse(json.dumps(fetch), content_type='application/json')
 
 def time_to_int(tiempo):
@@ -380,20 +381,20 @@ def verificar_existencia(item,tuplas):
 def calcular_horas_posibles(request):
 	try:
 		arr_hasta= request.POST['fecha_hasta'].split('-')
-		##print   arr_hasta
+		###print   arr_hasta
 		arr_desde= request.POST['fecha_desde'].split('-')
 		#d0 = date(int(arr_desde[0]), int(arr_desde[1]), int(arr_desde[2]))
-		###print   d0
+		####print   d0
 		#d1 = date(int(arr_hasta[0]), int(arr_hasta[1]), int(arr_desde[2]))
 		d0=datetime.strptime(str(request.POST['fecha_desde']), "%Y-%m-%d").date()
 		d1=datetime.strptime(str(request.POST['fecha_hasta']), "%Y-%m-%d").date()
 		delta = d0 - d1
 		cantidad_dias= delta.days-1
-		#print   "Cantidad de dias-->",cantidad_dias
+		##print   "Cantidad de dias-->",cantidad_dias
 		if cantidad_dias < 0: #esta bien :3
 			#resultado= float(request.POST['horas_posibles'])*(-1*cantidad_dias)
 			resultado=cantidad_dias
-			###print   resultado
+			####print   resultado
 			fetch={'resultado':resultado}
 		elif cantidad_dias==0:	#tambien esta bien
 			#resultado= float(request.POST['horas_posibles'])
@@ -413,15 +414,24 @@ def TopClientesData(request):
 	if str(request.POST['fecha_hasta'])!='':
 		filtro+=" AND r.fecha_ingreso <= '" + str(request.POST['fecha_hasta']) + "'"
 #COALESCE(to_char(recan.precio_acordado, '9G999.99'::text), to_char(0, '9G999.99'::text))
+	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id']) !='':
+		filtro+=" AND can.complejo_id="+str(request.POST['complejo_id'])
+
 	str_query = "SELECT c.nombre,c.telefono,c.correo,\
-				'$ '|| COALESCE(to_char(sum(r.precio), '9G999.99'), to_char(0, '9G999.99')) as precio_total,\
-				r.cliente_id\
-				FROM modulo_1_reserva r \
+				'$ '|| COALESCE(to_char(\
+				(SELECT sum(res.precio) from modulo_1_reserva res\
+				where res.cliente_id=c.cliente_id)\
+				, '9G999.99'), to_char(0, '9G999.99')) as precio_total,\
+				c.cliente_id\
+				FROM modulo_1_reserva r\
 				INNER JOIN modulo_1_cliente c ON c.cliente_id=r.cliente_id\
+				LEFT JOIN modulo_1_reservacancha rc ON rc.reserva_id=r.reserva_id\
+				LEFT JOIN modulo_1_cancha can ON can.cancha_id=rc.cancha_id	\
 				WHERE r.empresa_id is null" + filtro
-	str_query+=" GROUP BY r.cliente_id,c.nombre,c.telefono,c.correo \
+	str_query+=" GROUP BY c.cliente_id,c.nombre,c.telefono,c.correo \
 				ORDER BY precio_total DESC\
 				LIMIT 5"
+	#print "\n\n",str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
@@ -436,19 +446,27 @@ def TopEmpresaData(request):
 	if str(request.POST['fecha_hasta'])!='':
 		filtro+=" AND r.fecha_ingreso <= '" + str(request.POST['fecha_hasta']) + "'"
 
+	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id']) !='':
+		filtro+=" AND can.complejo_id="+str(request.POST['complejo_id'])
+
 	str_query = "SELECT c.nombre,c.contacto,c.telefono_contacto,\
-				'$ '|| COALESCE(to_char(sum(r.precio), '9G999.99'), to_char(0, '9G999.99')) as precio_total,\
-				r.empresa_id\
+				'$ '|| COALESCE(to_char(\
+				(SELECT sum(res.precio) from modulo_1_reserva res\
+				where res.empresa_id=c.empresa_id)\
+				, '9G999.99'), to_char(0, '9G999.99')) as precio_total,\
+				c.empresa_id\
 				FROM modulo_1_reserva r \
 				INNER JOIN modulo_1_empresa c ON c.empresa_id=r.empresa_id\
+				LEFT JOIN modulo_1_reservacancha rc ON rc.reserva_id=r.reserva_id\
+				LEFT JOIN modulo_1_cancha can ON can.cancha_id=rc.cancha_id	\
 				WHERE r.cliente_id is null  " + filtro
-	str_query+=" GROUP BY c.nombre,c.contacto,c.telefono_contacto,r.empresa_id \
+	str_query+=" GROUP BY c.nombre,c.contacto,c.telefono_contacto,c.empresa_id \
 				ORDER BY precio_total DESC\
 				LIMIT 5"
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
-	###print   convert_fetchall(qs)
+	####print   convert_fetchall(qs)
 	return HttpResponse(json.dumps(convert_fetchall(qs)), content_type='application/json')
 
 def convert_fetchall_top(cursor):
