@@ -10,6 +10,8 @@ import json
 import hashlib
 
 def RegistroComplejo(request):
+	if not request.session.has_key('user_log'):
+		return render(request,'login.html')
 	data={
 		'form_complejo': ComplejoForm(),
 		'form_horario': HorarioCanchaForm(),

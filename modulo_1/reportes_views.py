@@ -15,6 +15,8 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def ReportesView(request):
+	if not request.session.has_key('user_log'):
+		return render(request,'login.html')
 	#ReporteHorasCancha()
 	complejos= Complejo.objects.all()
 	###print   complejos

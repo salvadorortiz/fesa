@@ -41,6 +41,8 @@ def GuardarPassword(request):
 	return HttpResponse(respuesta,content_type='application/json')
 
 def PreciosView(request):
+	if not request.session.has_key('user_log'):
+		return render(request,'login.html')
 	return render(request,'precios.html')
 
 def dt_precios(request):
@@ -72,6 +74,8 @@ def GuardarPrecio(request):
 	return HttpResponse(json.dumps({}), content_type='application/json')
 
 def RegistroUsuarioView(request):
+	if not request.session.has_key('user_log'):
+		return render(request,'login.html')
 	data={'usuario_form': UsuarioForm()}
 	return render(request,'usuarios.html',data)
 
@@ -127,6 +131,8 @@ def GuardarCambiosUsuario(request):
 		return HttpResponse(json.dumps({'errors': form_usuario.errors}), content_type='application/json')
 
 def CatalogosView(request):
+	if not request.session.has_key('user_log'):
+		return render(request,'login.html')
 	return render(request,'catalogos.html')
 
 def dt_forma_pago(request):
@@ -184,6 +190,8 @@ def GuardarCambiosCatalogo(request):
 	return HttpResponse(json.dumps({}), content_type='application/json')
 
 def ReservasView(request):
+	if not request.session.has_key('user_log'):
+		return render(request,'login.html')
 	data = []
 	for complejo in Complejo.objects.all():
 		data.append({'id':complejo.complejo_id,'nombre':complejo.nombre})
@@ -585,5 +593,4 @@ def EliminarReserva(request):
 	return HttpResponse(json.dumps({}), content_type='application/json')
 
 def DataSaldoEvento(request):
-	
 	return HttpResponse(json.dumps({'saldo':str(Reserva.objects.get(reserva_id=request.POST['evento']).saldo)}), content_type='application/json')
