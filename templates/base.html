@@ -181,10 +181,10 @@
                             </div>
                              /input-group -->
                         </li>
-                        {%if request.session.type_user == 'R'%}
                         <li >
                             <a href="{%url 'precios_guia'%}"><i class="fa fa-fw fa-usd"></i> Precios</a>
                         </li>
+                        {%if request.session.type_user == 'R'%}
                         <li>
                             <a href="{%url 'usuario_registrousuario'%}"><i class="fa fa-fw fa-group"></i> Usuarios</a>
                         </li>

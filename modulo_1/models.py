@@ -155,6 +155,7 @@ class ReservaCancha(models.Model):
 	precio_sugerido = models.DecimalField('Precio Sugerido',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	precio_acordado = models.DecimalField('Precio Acordado',max_digits=10, decimal_places=2, blank=False, default=0.0)
 	notas = models.TextField('Área',max_length=500,blank=True,null=True)
+	media_cancha = models.BooleanField('Media cancha', default=False)
 
 class RemesaXReserva(models.Model):
 	remesa_reserva_id = models.AutoField(primary_key=True)

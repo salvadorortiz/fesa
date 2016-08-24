@@ -186,7 +186,6 @@
                                     {%endfor%}
                                 </select>
                             </div>
-                            <div class="col-sm-1"></div>
                             <div class="col-sm-1">
                                 <strong>Cancha</strong>
                             </div>
@@ -194,6 +193,10 @@
                                 <select id="cmb_cancha" class="form-control" onchange="calcular_precio_reserva()">
                                     <option value="-1">Seleccione una cancha</option>
                                 </select>
+                            </div>
+                            <div class="col-sm-1" style="padding:0px;display:none" id="div_media_cancha">
+                                <label for="media_cancha">&frac12; cancha</label> 
+                                <input type="checkbox" id="media_cancha" onchange="calcular_precio_reserva()">   
                             </div>
                             <div class="col-sm-1">
                                 <b>Precio autorizado</b>
@@ -350,6 +353,15 @@
                     $('#cmb_cancha').html(json['str_cancha']);
                 }
             });
+        });
+
+        $('#cmb_cancha').on('change', function() {
+            if($("#cmb_cancha option:selected").text()=="Fútbol 11"){
+                $("#div_media_cancha").show();
+            }else{
+                $("#media_cancha").prop("checked",false);
+                $("#div_media_cancha").hide(); 
+            }
         });
 
         var dt_eventos = $('#dt_eventos').DataTable( {
@@ -536,6 +548,8 @@
             $("#btn_guardar_cambios_reserva").hide();
             $("#btn_cancelar_reserva").hide();
             $("#btn_guardar_precio").show();
+            $("#div_media_cancha").hide();
+            $("#media_cancha").prop("checked",false);
             evento_seleccionado = -1;
             reserva_seleccionada = -1;
             /*$(document).find("[id^='txt_']").prop('disabled', false);
@@ -644,7 +658,7 @@
                     url: "{%url 'guardar_reserva'%}",
                     type: "POST",
                     processData: false,
-                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&precio_acordado="+$('#txt_precio_acordado').val()+"&evento="+evento_seleccionado,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&precio_acordado="+$('#txt_precio_acordado').val()+"&evento="+evento_seleccionado+"&media_cancha="+$('#media_cancha').prop('checked'),
                     success: function(json){
                         if(json['error']==true){
                             create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
@@ -661,6 +675,8 @@
                             $('#txt_notas_reserva').val("");
                             $('#txt_precio_sugerido').val("");
                             $('#txt_precio_acordado').val("");
+                            $("#media_cancha").prop("checked",false);
+                            $("#div_media_cancha").hide();
                         }
                     },
                     error:function(json){
@@ -694,6 +710,13 @@
                     $('#txt_notas_reserva').val(json['notas']);
                     $("#btn_cancelar_reserva").show();
                     $("#btn_guardar_reserva").hide();
+                    if(json['media_cancha']==true){
+                        $("#media_cancha").prop("checked",true);
+                        $("#div_media_cancha").show();
+                    }else{
+                        $("#media_cancha").prop("checked",false);
+                        $("#div_media_cancha").hide();
+                    }
                     if(data_evento[0][5] == usuario_log || tipo_usuario == "R"){
                         $("#btn_guardar_cambios_reserva").show();
                     }
@@ -721,7 +744,7 @@
                     url: "{%url 'guardar_cambios_reserva'%}",
                     type: "POST",
                     processData: false,
-                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&precio_acordado="+$('#txt_precio_acordado').val()+"&reserva="+reserva_seleccionada,
+                    data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&notas="+$('#txt_notas_reserva').val()+"&precio_sugerido="+$('#txt_precio_sugerido').val()+"&precio_acordado="+$('#txt_precio_acordado').val()+"&reserva="+reserva_seleccionada+"&media_cancha="+$('#media_cancha').prop('checked'),
                     success: function(json){
                         if(json['error']==true){
                             create_alert(json['mensaje'],"ERROR","div_errores_reservas",false,0);
@@ -753,6 +776,8 @@
             $('#txt_notas_reserva').val("");
             $("#btn_guardar_cambios_reserva").hide();
             $("#btn_cancelar_reserva").hide();
+            $("#div_media_cancha").hide();
+            $("#media_cancha").prop("checked",false);
             var data = $('#dt_eventos').DataTable().rows('.selected').data();
             if(data[0][5] == usuario_log || tipo_usuario == "R"){
                 if(!desactivar){
@@ -826,8 +851,8 @@
             $('#dt_reservas').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
             var data = $('#dt_reservas').DataTable().rows('.selected').data();
-            console.log(data);
-            if(data[0][5] == usuario_log || tipo_usuario == "R"){
+            var data2 = $('#dt_eventos').DataTable().rows('.selected').data();
+            if(data2[0][5] == usuario_log || tipo_usuario == "R"){
                 bootbox.confirm("Se eliminará la reserva seleccionada, ¿Está seguro?", function(result) {
                     if(result){
                         jQuery.ajax({
@@ -855,11 +880,14 @@
 
     function calcular_precio_reserva(){
         if(!($('#cmb_complejo').val()=="-1" || $('#cmb_cancha').val()=="-1" || $("#txt_fecha").val()=="" || $('#txt_hora_inicio').val()=="" || $('#txt_hora_fin').val()=="")){
+            if($("#cmb_cancha option:selected").text()!="Fútbol 11"){
+                $("#media_cancha").prop("checked",false);
+            }
             jQuery.ajax({
                 url: "{%url 'calcular_precio'%}",
                 type: "POST",
                 processData: false,
-                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val(),
+                data: "csrfmiddlewaretoken="+$("[name=csrfmiddlewaretoken]").val()+"&cancha="+$('#cmb_cancha').val()+"&fecha="+$('#txt_fecha').val()+"&inicio="+$('#txt_hora_inicio').val()+"&fin="+$('#txt_hora_fin').val()+"&media_cancha="+$("#media_cancha").prop("checked"),
                 success: function(json){
                     $('#txt_precio_sugerido').val(json['precio_sugerido']);
                     $('#txt_precio_acordado').val(json['precio_sugerido']);

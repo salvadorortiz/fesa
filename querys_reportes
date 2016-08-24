@@ -34,7 +34,7 @@ CREATE OR REPLACE VIEW dt_repo_reserva AS
      JOIN modulo_1_reservacancha recan ON recan.cancha_id = can.cancha_id
      JOIN modulo_1_reserva res ON res.reserva_id = recan.reserva_id
      JOIN modulo_1_formapago fpag ON fpag.forma_pago_id = res.forma_pago_id
-     JOIN modulo_1_formafacturacion ff ON ff.forma_facturacion_id = res.forma_facturacion_id
+     LEFT JOIN modulo_1_formafacturacion ff ON ff.forma_facturacion_id = res.forma_facturacion_id
      JOIN modulo_1_tipoalquiler ta ON ta.tipo_alquiler_id = res.tipo_alquiler_id
      JOIN modulo_1_usuario u ON u.usuario_id = res.usuario_id
      LEFT JOIN modulo_1_cliente c ON c.cliente_id = res.cliente_id

@@ -14,7 +14,6 @@
 {% endblock %}
 
 {% block content %}
-{%if request.session.type_user == 'R'%}
 	{% csrf_token %}
     <div class="row"> 
         <div class="col-lg-12">
@@ -163,12 +162,10 @@
             {%endif%}
         </div>
     </div>
-{%endif%}
 {% endblock %}
 
 {% block addExtraScript %} 
 <script type="text/javascript">
-{%if request.session.type_user == 'R'%}
    $(window).load(function() {
         var precio_cancha_id=-1;
         var dt_santa_tecla = $('#dt_santa_tecla').DataTable( {
@@ -393,10 +390,5 @@
             }
         });
     });
-{%else%}
-    $(window).load(function() {
-        $("#div_403").show();
-    });
-{%endif%}
 </script>
 {% endblock %}
