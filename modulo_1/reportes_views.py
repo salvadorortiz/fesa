@@ -135,7 +135,7 @@ def ReporteRemesasData(request):
 	else:
 		str_query = "SELECT * FROM dt_repo_remesa" + filtro
 
-	print 'remesa---> ',str_query
+	#print 'remesa---> ',str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
@@ -158,7 +158,7 @@ def ReporteRemesasTotalData(request):
 
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
 		filtro+= " AND can.complejo_id= "+str(request.POST['complejo_id'])
-		
+
 		str_query='''SELECT repo.reserva_id,
 							repo.fecha_ingreso,
 							repo.nombre_evento,
