@@ -100,20 +100,42 @@ def ReporteRemesasData(request):
 		filtro+=" AND remanente > 0 "
 
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
-		str_query="SELECT repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
-		repo.nombre_cliente,repo.nombre_usuario,repo.precio,repo.costo,repo.utilidad,repo.remesado,\
-		repo.remanente_2,repo.usuario,repo.remanente\
-		 FROM dt_repo_remesa repo\
-		LEFT JOIN modulo_1_reservacancha recan ON recan.reserva_id=repo.reserva_id\
-		LEFT JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id\
-		WHERE can.complejo_id= "+str(request.POST['complejo_id'])+" GROUP BY repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
-		repo.nombre_cliente,repo.precio,repo.costo,repo.utilidad,repo.remesado,repo.nombre_usuario,\
-		repo.remanente_2,repo.usuario,repo.remanente,can.complejo_id"
-
+		filtro+= " AND can.complejo_id= " +str(request.POST['complejo_id'])
+		str_query='''SELECT repo.reserva_id,
+							repo.fecha_ingreso,
+							repo.nombre_evento,
+							repo.nombre_cliente,
+							repo.nombre_usuario,
+							repo.precio,
+							repo.costo,
+							repo.utilidad,
+							repo.remesado,
+							repo.remanente_2,
+							repo.usuario,
+							repo.remanente
+					FROM dt_repo_remesa repo
+					LEFT JOIN modulo_1_reservacancha recan 
+						ON recan.reserva_id=repo.reserva_id
+					LEFT JOIN modulo_1_cancha can 
+						ON can.cancha_id=recan.cancha_id
+					'''+ filtro+''' 
+					GROUP BY 	repo.reserva_id,
+								repo.fecha_ingreso,
+								repo.nombre_evento,
+								repo.nombre_cliente,
+								repo.precio,
+								repo.costo,
+								repo.utilidad,
+								repo.remesado,
+								repo.nombre_usuario,
+								repo.remanente_2,
+								repo.usuario,
+								repo.remanente,
+								can.complejo_id'''
 	else:
 		str_query = "SELECT * FROM dt_repo_remesa" + filtro
 
-	#print 'remesa---> ',str_query
+	print 'remesa---> ',str_query
 	cursor = connection.cursor()
 	cursor.execute(str_query)
 	qs = cursor.fetchall()
@@ -135,15 +157,39 @@ def ReporteRemesasTotalData(request):
 		filtro+=" AND remanente > 0 "
 
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
-		str_query="SELECT repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
-		repo.nombre_cliente,repo.nombre_usuario,repo.precio,repo.costo,repo.utilidad,repo.remesado,\
-		repo.remanente_2,repo.usuario,repo.remanente\
-		 FROM dt_repo_remesa repo\
-		LEFT JOIN modulo_1_reservacancha recan ON recan.reserva_id=repo.reserva_id\
-		LEFT JOIN modulo_1_cancha can ON can.cancha_id=recan.cancha_id\
-		WHERE can.complejo_id= "+str(request.POST['complejo_id'])+" GROUP BY repo.reserva_id,repo.fecha_ingreso,repo.nombre_evento,\
-		repo.nombre_cliente,repo.precio,repo.costo,repo.utilidad,repo.remesado,repo.nombre_usuario,\
-		repo.remanente_2,repo.usuario,repo.remanente,can.complejo_id"
+		filtro+= " AND can.complejo_id= "+str(request.POST['complejo_id'])
+		
+		str_query='''SELECT repo.reserva_id,
+							repo.fecha_ingreso,
+							repo.nombre_evento,
+							repo.nombre_cliente,
+							repo.nombre_usuario,
+							repo.precio,
+							repo.costo,
+							repo.utilidad,
+							repo.remesado,
+							repo.remanente_2,
+							repo.usuario,
+							repo.remanente
+							FROM dt_repo_remesa repo
+						LEFT JOIN modulo_1_reservacancha recan 
+							ON recan.reserva_id=repo.reserva_id
+						LEFT JOIN modulo_1_cancha can 
+							ON can.cancha_id=recan.cancha_id
+						'''+filtro+'''
+						GROUP BY 	repo.reserva_id,
+									repo.fecha_ingreso,
+									repo.nombre_evento,
+									repo.nombre_cliente,
+									repo.precio,
+									repo.costo,
+									repo.utilidad,
+									repo.remesado,
+									repo.nombre_usuario,
+									repo.remanente_2,
+									repo.usuario,
+									repo.remanente,
+									can.complejo_id'''
 
 	else:
 		str_query = "SELECT * FROM dt_repo_remesa" + filtro
