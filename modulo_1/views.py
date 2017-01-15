@@ -19,7 +19,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 def Autenticacion(request):
-	if True:#time.strftime("%x") < "08/31/16": #CAMBIO_SRV
+	if True:#time.strftime("%x") < "31/01/17": #CAMBIO_SRV
 		usuario= Usuario.objects.filter(usuario=request.POST['user'], password=hashlib.sha1(request.POST['pass']).hexdigest(), estado=True)
 		#if time.now() < datetime.strptime("", "%H:%M")
 		if(len(usuario)==1):

@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'fesa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'fesa_dev',
+        'NAME': 'fesa_prod',
         'USER': 'postgres',
         'PASSWORD': 'root',
         'HOST': 'localhost',

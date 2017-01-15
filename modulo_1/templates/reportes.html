@@ -136,8 +136,26 @@
                                     <div class="col-sm-12">
                                         <div class="row">
                                             <div class="col-sm-1"></div>
-                                            <div class="col-sm-2">
-                                                <strong>Fecha de reserva</strong>
+                                            <div class="col-sm-4">
+                                                <strong>Fecha de uso de la reserva</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-1">Desde: </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" id="rem_fecha_desde_uso">
+                                            </div>
+                                            <div class="col-sm-1">Hasta: </div>
+                                            <div class="col-sm-3">
+                                                <input type="text" id="rem_fecha_hasta_uso">
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-4">
+                                                <strong>Fecha de realización de la reserva</strong>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -210,7 +228,8 @@
                             <table style="width:100%" id="dt_repo_remesa" class="stripe">
                                 <thead>
                                     <th>Remesa id</th>
-                                    <th>Fecha</th>
+                                    <th>Fecha uso reserva</th>
+                                    <th>Fecha reserva</th>
                                     <th>Evento</th>
                                     <th>Cliente</th>
                                     <th>Usuario</th>
@@ -607,6 +626,13 @@
         $("#panel_remesa").find( "#rem_fecha_hasta" ).datepicker({
             //altFormat: "dd-mm-yyyy"
         });
+        $("#panel_remesa").find( "#rem_fecha_desde_uso" ).datepicker({
+           // 'minDate': 0
+          // altFormat: "dd-mm-yyyy"
+        });
+        $("#panel_remesa").find( "#rem_fecha_hasta_uso" ).datepicker({
+            //altFormat: "dd-mm-yyyy"
+        });
         $( "#hor_fecha_desde" ).datepicker({
         });
        $( "#hor_fecha_hasta" ).datepicker({
@@ -780,6 +806,8 @@
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
                         d.fecha_desde= $("#panel_remesa").find("#rem_fecha_desde").val(),
                         d.fecha_hasta=$("#panel_remesa").find("#rem_fecha_hasta").val(),
+                        d.fecha_desde_uso= $("#panel_remesa").find("#rem_fecha_desde_uso").val(),
+                        d.fecha_hasta_uso=$("#panel_remesa").find("#rem_fecha_hasta_uso").val(),
                         d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val(),
                         d.deudores=$("[name=deudores]").is(':checked'),
                         d.complejo_id=$("#rem_cmb_complejo").val()
@@ -822,6 +850,8 @@
                         d.csrfmiddlewaretoken = $("[name=csrfmiddlewaretoken]").val(),
                         d.fecha_desde= $("#panel_remesa").find("#rem_fecha_desde").val(),
                         d.fecha_hasta=$("#panel_remesa").find("#rem_fecha_hasta").val(),
+                        d.fecha_desde_uso= $("#panel_remesa").find("#rem_fecha_desde_uso").val(),
+                        d.fecha_hasta_uso=$("#panel_remesa").find("#rem_fecha_hasta_uso").val(),
                         d.usuario_id=$("#panel_remesa").find("#cmb_usuario").val(),
                         d.deudores=$("[name=deudores]").is(':checked'),
                         d.complejo_id=$("#rem_cmb_complejo").val()

@@ -228,3 +228,36 @@ LEFT JOIN modulo_1_precioxcancha pxc
 ON c.cancha_id=pxc.cancha_id
 WHERE (pxc.dia::text <> 'X' or pxc.dia is null)
 GROUP BY c.cancha_id
+
+
+
+CREATE OR REPLACE VIEW dt_repo_remesa_modif AS 
+ SELECT res.reserva_id,
+    to_char(recan.fecha::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_uso,
+    to_char(res.fecha_ingreso::timestamp with time zone, 'YYYY-MM-DD'::text) AS fecha_ingreso,
+    res.nombre_evento,
+        CASE
+            WHEN c.cliente_id IS NULL THEN e.nombre
+            ELSE c.nombre
+        END AS nombre_cliente,
+    u.usuario AS nombre_usuario,
+    '$'::text || COALESCE(to_char(res.precio, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS precio,
+    '$'::text || COALESCE(to_char(res.costo, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS costo,
+    '$'::text || COALESCE(to_char(res.precio - res.costo, '9G999.99'::text), to_char(res.precio, '9G999.99'::text), to_char(0, '9G999.99'::text)) AS utilidad,
+    '$'::text || COALESCE(to_char(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+           FROM modulo_1_remesaxreserva
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remesado,
+    '$'::text || COALESCE(to_char(res.precio - COALESCE(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+           FROM modulo_1_remesaxreserva
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), '9G999.99'::text), to_char(0, '9G999.99'::text)) AS remanente_2,
+    res.usuario_id AS usuario,
+    floor(COALESCE(res.precio - COALESCE(( SELECT sum(modulo_1_remesaxreserva.monto) AS sum
+           FROM modulo_1_remesaxreserva
+          WHERE modulo_1_remesaxreserva.reserva_id = res.reserva_id), 0::numeric), 0::numeric))::integer AS remanente
+   FROM modulo_1_remesaxreserva rr
+     RIGHT JOIN modulo_1_reserva res ON rr.reserva_id = res.reserva_id
+     JOIN modulo_1_usuario u ON res.usuario_id = u.usuario_id
+     LEFT JOIN modulo_1_cliente c ON res.cliente_id = c.cliente_id
+     LEFT JOIN modulo_1_empresa e ON res.empresa_id = e.empresa_id
+     LEFT JOIN modulo_1_reservacancha recan ON res.reserva_id = recan.reserva_id
+  GROUP BY res.reserva_id, c.cliente_id, e.nombre, res.nombre_evento, res.usuario_id, u.usuario,recan.fecha;

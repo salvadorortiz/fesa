@@ -93,6 +93,12 @@ def ReporteRemesasData(request):
 	if str(request.POST['fecha_hasta'])!='':
 		filtro+=" AND fecha_ingreso <= '" + str(request.POST['fecha_hasta']) + "'"
 
+	if str(request.POST['fecha_desde_uso'])!= '':
+		filtro+=" AND fecha_uso >= '" + str(request.POST['fecha_desde_uso']) + "'" 
+
+	if str(request.POST['fecha_hasta_uso'])!='':
+		filtro+=" AND fecha_uso <= '" + str(request.POST['fecha_hasta_uso']) + "'"
+
 	if str(request.POST['usuario_id'])!='':
 		filtro+=" AND usuario = " + str(request.POST['usuario_id'])
 
@@ -102,6 +108,7 @@ def ReporteRemesasData(request):
 	if 'complejo_id' in request.POST.keys() and str(request.POST['complejo_id'])!='':
 		filtro+= " AND can.complejo_id= " +str(request.POST['complejo_id'])
 		str_query='''SELECT repo.reserva_id,
+							repo.fecha_uso,
 							repo.fecha_ingreso,
 							repo.nombre_evento,
 							repo.nombre_cliente,
@@ -113,7 +120,7 @@ def ReporteRemesasData(request):
 							repo.remanente_2,
 							repo.usuario,
 							repo.remanente
-					FROM dt_repo_remesa repo
+					FROM dt_repo_remesa_modif repo
 					LEFT JOIN modulo_1_reservacancha recan 
 						ON recan.reserva_id=repo.reserva_id
 					LEFT JOIN modulo_1_cancha can 
@@ -131,9 +138,10 @@ def ReporteRemesasData(request):
 								repo.remanente_2,
 								repo.usuario,
 								repo.remanente,
-								can.complejo_id'''
+								can.complejo_id,
+								repo.fecha_uso'''
 	else:
-		str_query = "SELECT * FROM dt_repo_remesa" + filtro
+		str_query = "SELECT * FROM dt_repo_remesa_modif" + filtro
 
 	#print 'remesa---> ',str_query
 	cursor = connection.cursor()
@@ -150,6 +158,12 @@ def ReporteRemesasTotalData(request):
 	if str(request.POST['fecha_hasta'])!='':
 		filtro+=" AND fecha_ingreso <= '" + str(request.POST['fecha_hasta']) + "'"
 
+	if str(request.POST['fecha_desde_uso'])!= '':
+		filtro+=" AND fecha_uso >= '" + str(request.POST['fecha_desde_uso']) + "'" 
+
+	if str(request.POST['fecha_hasta_uso'])!='':
+		filtro+=" AND fecha_uso <= '" + str(request.POST['fecha_hasta_uso']) + "'"
+
 	if str(request.POST['usuario_id'])!='':
 		filtro+=" AND usuario = " + str(request.POST['usuario_id'])
 
@@ -160,6 +174,7 @@ def ReporteRemesasTotalData(request):
 		filtro+= " AND can.complejo_id= "+str(request.POST['complejo_id'])
 
 		str_query='''SELECT repo.reserva_id,
+							repo.fecha_uso,
 							repo.fecha_ingreso,
 							repo.nombre_evento,
 							repo.nombre_cliente,
@@ -171,13 +186,14 @@ def ReporteRemesasTotalData(request):
 							repo.remanente_2,
 							repo.usuario,
 							repo.remanente
-							FROM dt_repo_remesa repo
+							FROM dt_repo_remesa_modif repo
 						LEFT JOIN modulo_1_reservacancha recan 
 							ON recan.reserva_id=repo.reserva_id
 						LEFT JOIN modulo_1_cancha can 
 							ON can.cancha_id=recan.cancha_id
 						'''+filtro+'''
 						GROUP BY 	repo.reserva_id,
+									repo.fecha_uso,
 									repo.fecha_ingreso,
 									repo.nombre_evento,
 									repo.nombre_cliente,
@@ -192,7 +208,7 @@ def ReporteRemesasTotalData(request):
 									can.complejo_id'''
 
 	else:
-		str_query = "SELECT * FROM dt_repo_remesa" + filtro
+		str_query = "SELECT * FROM dt_repo_remesa_modif" + filtro
 
 	#print   "remesa total--->  ",str_query
 	cursor = connection.cursor()
@@ -207,13 +223,12 @@ def convert_fetchall_total(cursor):
 	list_aux=[]
 	list_totales=[0,0,0,0,0]
 	for item in cursor:
-		list_totales[0]+=float(money_to_float(item[5]))
-		list_totales[1]+=float(money_to_float(item[6]))
-		list_totales[2]+=float(money_to_float(item[7]))
-		list_totales[3]+=float(money_to_float(item[8]))
-		list_totales[4]+=float(money_to_float(item[9]))
+		list_totales[0]+=float(money_to_float(item[6]))
+		list_totales[1]+=float(money_to_float(item[7]))
+		list_totales[2]+=float(money_to_float(item[8]))
+		list_totales[3]+=float(money_to_float(item[9]))
+		list_totales[4]+=float(money_to_float(item[10]))
 	####print   "totall--->",list_totales
-
 	list_aux.append(['$'+str(list_totales[0]),'$'+str(list_totales[1]),'$'+str(list_totales[2]),'$'+str(list_totales[3]),'$'+str(list_totales[4])])
 	dict_cursor['recordsTotal']=len(list_aux)
 	dict_cursor['recordsFiltered']=len(list_aux)
