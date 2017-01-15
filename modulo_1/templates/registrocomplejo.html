@@ -445,10 +445,10 @@
          });
 
          $("#dt_cancha").on('click','[name=eliminar_cancha]',function(){
+            $(this).parent().parent().parent().addClass('selected');
+            var data = $('#dt_cancha').DataTable().rows('.selected').data();
             bootbox.confirm("Se eliminará la cancha seleccionada, ¿Está seguro?", function(result) {
                 if(result){
-                    $(this).parent().parent().parent().addClass('selected');
-                    var data = $('#dt_cancha').DataTable().rows('.selected').data();
                     jQuery.ajax({
                         url: "{%url 'eliminar_cancha'%}",
                         type: "POST",
@@ -466,7 +466,7 @@
         });
 
          $("#dt_cancha").on('click','[name=agregar_horario]',function(){
-             $('#dt_cancha').DataTable().$('tr.selected').removeClass('selected');
+            $('#dt_cancha').DataTable().$('tr.selected').removeClass('selected');
             $(this).parent().parent().parent().addClass('selected');
             var data = $('#dt_cancha').DataTable().rows('.selected').data();
             console.log(data[0]);
